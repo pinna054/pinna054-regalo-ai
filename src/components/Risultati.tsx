@@ -44,8 +44,10 @@ export function Risultati() {
   const prefisso = useId();
 
   if (grezza === SUL_SERVER) return <Scheletro />;
-  const sessione = modificata ?? interpreta<Sessione>(grezza);
-  if (!sessione || sessione.lotti.length === 0) return <Vuoto />;
+  const salvata = interpreta<Sessione>(grezza);
+  // (i campi mancanti in una sessione salvata da una versione precedente prendono un valore vuoto)
+  const sessione = modificata ?? (salvata && { ...salvata, risposte: salvata.risposte ?? [], voti: salvata.voti ?? {} });
+  if (!sessione || !Array.isArray(sessione.lotti) || sessione.lotti.length === 0) return <Vuoto />;
 
   const [ultimo, ...precedenti] = sessione.lotti;
   const risultato = ultimo.risultato;

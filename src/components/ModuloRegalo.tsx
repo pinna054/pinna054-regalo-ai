@@ -107,7 +107,8 @@ export function ModuloRegalo() {
     () => deduciPaese(lingua),
   );
   const [modificato, setModificato] = useState<StatoModulo | null>(null);
-  const stato = modificato ?? interpreta<StatoModulo>(bozza) ?? statoVuoto(paeseDedotto);
+  // (i campi mancanti in una bozza vecchia prendono il valore predefinito)
+  const stato = modificato ?? { ...statoVuoto(paeseDedotto), ...interpreta<Partial<StatoModulo>>(bozza) };
 
   const [errori, setErrori] = useState<ErroriModulo>({});
   const [erroreInvio, setErroreInvio] = useState<CodiceErroreApi | null>(null);
