@@ -5,14 +5,19 @@ export function formattaPrezzo(valore: number, valuta: string, lingua: string): 
   return formattatore(valore, valuta, lingua).format(valore);
 }
 
-/** Fascia di prezzo, es. "25–40 €". Se i due valori coincidono mostra un solo prezzo. */
+/**
+ * Fascia di prezzo arrotondata all'unità (sono stime), es. "25–40 €".
+ * Se i due valori coincidono mostra un solo prezzo.
+ */
 export function formattaFascia(minimo: number, massimo: number, valuta: string, lingua: string): string {
-  if (Math.round(minimo) === Math.round(massimo)) return formattaPrezzo(massimo, valuta, lingua);
-  const formato = formattatore(Math.max(minimo, massimo), valuta, lingua);
+  const da = Math.round(minimo);
+  const a = Math.round(massimo);
+  const formato = formattatore(a, valuta, lingua);
+  if (da === a) return formato.format(a);
   try {
-    return formato.formatRange(minimo, massimo);
+    return formato.formatRange(da, a);
   } catch {
-    return `${formato.format(minimo)} – ${formato.format(massimo)}`;
+    return `${formato.format(da)} – ${formato.format(a)}`;
   }
 }
 

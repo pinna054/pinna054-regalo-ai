@@ -46,18 +46,18 @@ Utente ──► modulo (home /it o /en)
 
 ## 3. Fasi
 
-### Fase 1 — Motore e sito pubblico
+### Fase 1 — Motore e sito pubblico (completata)
 
-- [ ] Home mobile-first: breve spiegazione + modulo + avviso privacy sotto il modulo
-- [ ] Multilingua con URL per lingua (`/it`, `/en`), lingua dedotta dal browser e modificabile
-- [ ] Paese di consegna obbligatorio (dedotto dalla lingua/browser, modificabile) → valuta e negozi
-- [ ] Motore: prompt `prompts/motore-v1.md`, JSON validato con zod, nuovi tentativi, controlli lato server
-- [ ] Pagina risultati con schede, link Amazon/Google, 👍/👎, Rigenera, risposte alle domande
-- [ ] Registrazione anonima di ogni generazione, voti e click
-- [ ] Limite di richieste per IP (e tetto giornaliero globale)
-- [ ] Pagina privacy in bozza (GDPR, con note per i paesi extra-UE)
-- [ ] File SQL pronto, `.env.example`, README in italiano
-- [ ] Verifica completa del flusso in locale
+- [x] Home mobile-first: breve spiegazione + modulo + avviso privacy sotto il modulo
+- [x] Multilingua con URL per lingua (`/it`, `/en`), lingua dedotta dal browser e modificabile
+- [x] Paese di consegna obbligatorio (dedotto dalla lingua/browser, modificabile) → valuta e negozi
+- [x] Motore: prompt `prompts/motore-v1.md`, JSON validato con zod, nuovi tentativi, controlli lato server
+- [x] Pagina risultati con schede, link Amazon/Google, 👍/👎, Rigenera, risposte alle domande
+- [x] Registrazione anonima di ogni generazione, voti e click
+- [x] Limite di richieste per IP (e tetto giornaliero globale)
+- [x] Pagina privacy in bozza (GDPR, con note per i paesi extra-UE)
+- [x] File SQL pronto, `.env.example`, README in italiano
+- [x] Verifica completa del flusso in locale (motore finto e finta API Anthropic, Postgres locale)
 
 ### Fase 2 — Area valutazione del team (`/valutazione`)
 
@@ -165,8 +165,11 @@ Regole generali:
 
 Le righe più vecchie di 48 ore vengono cancellate automaticamente.
 
-Funzioni SQL: `registra_richiesta(chiave, secondi)` (incremento atomico del contatore) e
-`registra_click(idea, negozio)`.
+Gli aggiornamenti dei contatori (limiti, click) sono istruzioni SQL atomiche eseguite dal server
+(`insert … on conflict do update`, `update … set click_amazon = click_amazon + 1`).
+
+Vista **`riepilogo_giorni`**: per ogni giorno e origine, numero di generazioni, esiti, costo,
+durata media, 👍/👎 e click.
 
 ### 5.2 Fase 2 (progettata ora, creata con il file SQL della fase 2)
 
@@ -288,6 +291,21 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
 22. **Test automatici** (vitest) sulle parti di logica: controlli budget/filtri, link, budget, CSV.
 23. **Design**: palette calda (crema, terracotta, salvia), titoli con Fraunces e testo con Figtree,
     componenti disegnati a mano senza librerie di UI.
+24. **Prompt v1**: oltre alle tre modifiche richieste per il sito internazionale (primo paragrafo,
+    regole 11 e 12), nel testo originale sono state cambiate solo due espressioni che contraddicevano
+    la regola 12: "prezzi come numeri in euro" → "prezzi come numeri nella valuta del paese di
+    consegna" e "su Amazon.it o Google Shopping" → "su Amazon o Google Shopping". Il resto è identico.
+25. **Messaggio al modello**: i dati del modulo arrivano in un messaggio strutturato in italiano
+    (come il prompt), con i testi liberi racchiusi tra marcatori (es. `<descrizione>`), così il
+    modello li tratta come dati e non come istruzioni. "natale" viene spiegato come "festività di
+    fine anno"; con un solo valore di budget il messaggio esplicita l'intervallo (metà–massimo).
+26. **Più di 4 idee** nella risposta: se almeno 4 sono valide si prendono le prime 4 senza ritentare;
+    meno di 4 idee contano come errore da correggere. Le domande utili oltre la seconda vengono scartate.
+27. **Pagine mantenute in memoria**: con Next.js 16 le pagine visitate restano nascoste nel browser
+    (per un "indietro" istantaneo); per questo i campi dei moduli usano identificativi unici (`useId`).
+28. **Memoria del browser**: modulo compilato e idee ricevute restano nel `sessionStorage` della scheda
+    (si cancellano chiudendola): permettono "Modifica i dati", il ritorno alle idee e il cambio di lingua
+    senza perdere nulla, senza cookie né account.
 
 ## 8. Cose che può dare solo il proprietario
 

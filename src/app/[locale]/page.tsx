@@ -31,15 +31,15 @@ export default async function Home() {
       </section>
 
       {/* Come funziona */}
-      <ol className="grid gap-3 pb-10 sm:grid-cols-3 sm:gap-4">
+      <ol className="mb-10 divide-y divide-bordo/70 rounded-2xl border border-bordo/80 bg-carta/70 sm:grid sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {passi.map((passo, indice) => (
-          <li key={passo} className="flex gap-4 rounded-2xl border border-bordo/80 bg-carta/70 p-4 sm:flex-col sm:gap-3 sm:p-5">
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-inchiostro font-titoli text-lg font-semibold text-crema">
+          <li key={passo} className="flex gap-3.5 px-4 py-3.5 sm:flex-col sm:gap-3 sm:p-5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-inchiostro font-titoli text-base font-semibold text-crema sm:size-9 sm:text-lg">
               {indice + 1}
             </span>
             <span>
               <span className="block font-titoli text-lg font-semibold">{t(`passi.${passo}.titolo`)}</span>
-              <span className="mt-1 block leading-snug text-tenue">{t(`passi.${passo}.testo`)}</span>
+              <span className="mt-0.5 block text-[0.95rem] leading-snug text-tenue sm:mt-1 sm:text-base">{t(`passi.${passo}.testo`)}</span>
             </span>
           </li>
         ))}

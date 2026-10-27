@@ -5,7 +5,7 @@
  * Non chiede MAI nome o cognome. I dati restano nella scheda del browser finché non si invia.
  */
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useSyncExternalStore, useTransition, type FormEvent, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, useTransition, type FormEvent, type ReactNode } from "react";
 import {
   CHIAVE_RELAZIONE,
   CHIAVE_TIPOLOGIA,
@@ -113,6 +113,9 @@ export function ModuloRegalo() {
   const [erroreInvio, setErroreInvio] = useState<CodiceErroreApi | null>(null);
   const [inviando, setInviando] = useState(false);
   const [cambioPagina, avviaCambioPagina] = useTransition();
+  // Identificativi unici dei campi (la pagina può restare in memoria anche in un'altra lingua)
+  const prefisso = useId();
+  const id = (nome: string) => `${prefisso}-${nome}`;
 
   function aggiorna<K extends keyof StatoModulo>(campo: K, valore: StatoModulo[K]) {
     const nuovo = { ...stato, [campo]: valore };
@@ -129,7 +132,7 @@ export function ModuloRegalo() {
       setErrori(esito.errori);
       // porta l'utente al primo campo da correggere
       const primo = Object.keys(esito.errori)[0];
-      document.getElementById(`campo-${primo}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById(id(`campo-${primo}`))?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -174,8 +177,8 @@ export function ModuloRegalo() {
     <>
       {(inviando || cambioPagina) && <Caricamento />}
 
-      <form onSubmit={invia} noValidate className="scheda p-5 sm:p-8" aria-labelledby="titolo-modulo">
-        <h2 id="titolo-modulo" className="text-[1.75rem] leading-tight font-semibold sm:text-3xl">
+      <form onSubmit={invia} noValidate className="scheda p-5 sm:p-8" aria-labelledby={id("titolo")}>
+        <h2 id={id("titolo")} className="text-[1.75rem] leading-tight font-semibold sm:text-3xl">
           {t("titolo")}
         </h2>
         <p className="mt-1 text-sm text-tenue">{t("obbligatori")}</p>
@@ -183,13 +186,15 @@ export function ModuloRegalo() {
         <div className="mt-7 space-y-8">
           {/* Relazione */}
           <GruppoScelte
-            id="campo-relazione"
+            id={id("campo-relazione")}
+            idErrore={id("errore-relazione")}
             legenda={`${t("relazione.etichetta")} *`}
             errore={errori.relazione && t(`errori.${errori.relazione}`)}
           >
             {RELAZIONI.map((valore) => (
               <Pillola
                 key={valore}
+                prefisso={prefisso}
                 tipo="radio"
                 nome="relazione"
                 valore={valore}
@@ -203,13 +208,15 @@ export function ModuloRegalo() {
 
           {/* Occasione */}
           <GruppoScelte
-            id="campo-occasione"
+            id={id("campo-occasione")}
+            idErrore={id("errore-occasione")}
             legenda={`${t("occasione.etichetta")} *`}
             errore={errori.occasione && t(`errori.${errori.occasione}`)}
           >
             {OCCASIONI.map((valore) => (
               <Pillola
                 key={valore}
+                prefisso={prefisso}
                 tipo="radio"
                 nome="occasione"
                 valore={valore}
@@ -222,35 +229,35 @@ export function ModuloRegalo() {
           </GruppoScelte>
           {stato.occasione === "altra" && (
             <div className="-mt-4 animate-comparsa">
-              <label htmlFor="campo-occasione_altra" className="etichetta">
+              <label htmlFor={id("campo-occasione_altra")} className="etichetta">
                 {t("occasione.altraEtichetta")} *
               </label>
               <input
-                id="campo-occasione_altra"
+                id={id("campo-occasione_altra")}
                 className="campo"
                 value={stato.occasione_altra}
                 maxLength={MASSIMO_CARATTERI.occasione_altra}
                 placeholder={t("occasione.altraSegnaposto")}
                 aria-invalid={Boolean(errori.occasione_altra)}
-                aria-describedby={errori.occasione_altra ? "errore-occasione_altra" : undefined}
+                aria-describedby={errori.occasione_altra ? id("errore-occasione_altra") : undefined}
                 onChange={(e) => aggiorna("occasione_altra", e.target.value)}
               />
-              <MessaggioErrore id="errore-occasione_altra" testo={errori.occasione_altra && t(`errori.${errori.occasione_altra}`)} />
+              <MessaggioErrore id={id("errore-occasione_altra")} testo={errori.occasione_altra && t(`errori.${errori.occasione_altra}`)} />
             </div>
           )}
 
           {/* Paese di consegna e budget */}
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <label htmlFor="campo-paese" className="etichetta">
+              <label htmlFor={id("campo-paese")} className="etichetta">
                 {t("paese.etichetta")} *
               </label>
               <select
-                id="campo-paese"
+                id={id("campo-paese")}
                 className="campo cursor-pointer"
                 value={stato.paese}
                 aria-invalid={Boolean(errori.paese)}
-                aria-describedby="aiuto-paese"
+                aria-describedby={id("aiuto-paese")}
                 onChange={(e) => aggiorna("paese", e.target.value)}
               >
                 {paesiOrdinati.map((p) => (
@@ -259,16 +266,17 @@ export function ModuloRegalo() {
                   </option>
                 ))}
               </select>
-              <p id="aiuto-paese" className="mt-1.5 text-sm text-tenue">
+              <p id={id("aiuto-paese")} className="mt-1.5 text-sm text-tenue">
                 {paese && t("paese.aiuto", { valuta: `${paese.valuta} (${simbolo})` })}
               </p>
-              <MessaggioErrore id="errore-paese" testo={errori.paese && t(`errori.${errori.paese}`)} />
+              <MessaggioErrore id={id("errore-paese")} testo={errori.paese && t(`errori.${errori.paese}`)} />
             </div>
 
-            <fieldset id="campo-budget" aria-describedby="aiuto-budget">
+            <fieldset id={id("campo-budget")} aria-describedby={id("aiuto-budget")}>
               <legend className="etichetta">{t("budget.etichetta")} *</legend>
               <div className="grid grid-cols-2 gap-3">
                 <CampoImporto
+                  idErrore={id("errore-budget")}
                   etichetta={t("budget.da")}
                   simbolo={simbolo}
                   valore={stato.budget_min}
@@ -276,6 +284,7 @@ export function ModuloRegalo() {
                   onChange={(v) => aggiorna("budget_min", v)}
                 />
                 <CampoImporto
+                  idErrore={id("errore-budget")}
                   etichetta={t("budget.a")}
                   simbolo={simbolo}
                   valore={stato.budget_max}
@@ -283,36 +292,36 @@ export function ModuloRegalo() {
                   onChange={(v) => aggiorna("budget_max", v)}
                 />
               </div>
-              <p id="aiuto-budget" className="mt-1.5 text-sm text-tenue">
+              <p id={id("aiuto-budget")} className="mt-1.5 text-sm text-tenue">
                 {t("budget.aiuto")}
               </p>
-              <MessaggioErrore id="errore-budget" testo={errori.budget && t(`errori.${errori.budget}`)} />
+              <MessaggioErrore id={id("errore-budget")} testo={errori.budget && t(`errori.${errori.budget}`)} />
             </fieldset>
           </div>
 
           {/* Età */}
-          <div className="max-w-[12rem]">
-            <label htmlFor="campo-eta" className="etichetta">
+          <div>
+            <label htmlFor={id("campo-eta")} className="etichetta">
               {t("eta.etichetta")} <Facoltativo testo={t("facoltativo")} />
             </label>
             <input
-              id="campo-eta"
-              className="campo"
+              id={id("campo-eta")}
+              className="campo max-w-[9rem]"
               inputMode="numeric"
               autoComplete="off"
               maxLength={3}
               placeholder={t("eta.segnaposto")}
               value={stato.eta}
               aria-invalid={Boolean(errori.eta)}
-              aria-describedby={errori.eta ? "errore-eta" : undefined}
+              aria-describedby={errori.eta ? id("errore-eta") : undefined}
               onChange={(e) => aggiorna("eta", e.target.value.replace(/[^\d]/g, ""))}
             />
-            <MessaggioErrore id="errore-eta" testo={errori.eta && t(`errori.${errori.eta}`)} />
+            <MessaggioErrore id={id("errore-eta")} testo={errori.eta && t(`errori.${errori.eta}`)} />
           </div>
 
           {/* Testi liberi */}
           <AreaTesto
-            id="campo-descrizione"
+            id={id("campo-descrizione")}
             etichetta={t("descrizione.etichetta")}
             facoltativo={t("facoltativo")}
             segnaposto={t("descrizione.segnaposto")}
@@ -322,7 +331,7 @@ export function ModuloRegalo() {
             onChange={(v) => aggiorna("descrizione", v)}
           />
           <AreaTesto
-            id="campo-ha_gia"
+            id={id("campo-ha_gia")}
             etichetta={t("haGia.etichetta")}
             facoltativo={t("facoltativo")}
             segnaposto={t("haGia.segnaposto")}
@@ -332,7 +341,7 @@ export function ModuloRegalo() {
             onChange={(v) => aggiorna("ha_gia", v)}
           />
           <AreaTesto
-            id="campo-non_sopporta"
+            id={id("campo-non_sopporta")}
             etichetta={t("nonSopporta.etichetta")}
             facoltativo={t("facoltativo")}
             segnaposto={t("nonSopporta.segnaposto")}
@@ -364,6 +373,7 @@ export function ModuloRegalo() {
                 {TIPOLOGIE.map((valore) => (
                   <Pillola
                     key={valore}
+                    prefisso={prefisso}
                     tipo="checkbox"
                     nome="tipologie"
                     valore={valore}
@@ -385,6 +395,7 @@ export function ModuloRegalo() {
                 {INGOMBRI_MASSIMI.map((valore) => (
                   <Pillola
                     key={valore}
+                    prefisso={prefisso}
                     tipo="radio"
                     nome="ingombro_max"
                     valore={valore}
@@ -434,16 +445,17 @@ export function ModuloRegalo() {
 
 function GruppoScelte({
   id,
+  idErrore,
   legenda,
   errore,
   children,
 }: {
   id?: string;
+  idErrore?: string;
   legenda: string;
   errore?: string | false;
   children: ReactNode;
 }) {
-  const idErrore = id ? `errore-${id.replace("campo-", "")}` : undefined;
   return (
     <fieldset id={id} aria-describedby={errore ? idErrore : undefined}>
       <legend className="etichetta">{legenda}</legend>
@@ -454,6 +466,7 @@ function GruppoScelte({
 }
 
 function Pillola({
+  prefisso,
   tipo,
   nome,
   valore,
@@ -461,6 +474,7 @@ function Pillola({
   onChange,
   children,
 }: {
+  prefisso: string;
   tipo: "radio" | "checkbox";
   nome: string;
   valore: string;
@@ -468,7 +482,7 @@ function Pillola({
   onChange: () => void;
   children: ReactNode;
 }) {
-  const id = `${nome}-${valore}`.replace(/[^\w-]/g, "_");
+  const id = `${prefisso}-${nome}-${valore}`;
   return (
     <span>
       <input
@@ -488,12 +502,14 @@ function Pillola({
 }
 
 function CampoImporto({
+  idErrore,
   etichetta,
   simbolo,
   valore,
   errore,
   onChange,
 }: {
+  idErrore: string;
   etichetta: string;
   simbolo: string;
   valore: string;
@@ -514,7 +530,7 @@ function CampoImporto({
           maxLength={9}
           value={valore}
           aria-invalid={errore}
-          aria-describedby={errore ? "errore-budget" : undefined}
+          aria-describedby={errore ? idErrore : undefined}
           onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ""))}
         />
       </span>

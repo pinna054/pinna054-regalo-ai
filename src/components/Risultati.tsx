@@ -5,7 +5,7 @@
  * "Rigenera" e "Rispondi e rigenera". I dati arrivano dalla memoria della scheda (sessionStorage).
  */
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useSyncExternalStore } from "react";
+import { useId, useState, useSyncExternalStore } from "react";
 import { CHIAVE_RELAZIONE } from "@/config/opzioni";
 import { SITO } from "@/config/sito";
 import { Link } from "@/i18n/navigation";
@@ -41,6 +41,7 @@ export function Risultati() {
   const [inAttesa, setInAttesa] = useState(false);
   const [errore, setErrore] = useState<CodiceErroreApi | null>(null);
   const [risposte, setRisposte] = useState<Record<string, string>>({});
+  const prefisso = useId();
 
   if (grezza === SUL_SERVER) return <Scheletro />;
   const sessione = modificata ?? interpreta<Sessione>(grezza);
@@ -159,8 +160,8 @@ export function Risultati() {
 
       {/* Lettura del profilo, avvisi, domande */}
       <div className="mt-8 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <section className="scheda p-5 sm:p-6" aria-labelledby="titolo-lettura">
-          <h2 id="titolo-lettura" className="text-sm font-semibold tracking-wide text-terracotta uppercase [font-family:var(--font-testo)]">
+        <section className="scheda p-5 sm:p-6" aria-labelledby={`${prefisso}-lettura`}>
+          <h2 id={`${prefisso}-lettura`} className="text-sm font-semibold tracking-wide text-terracotta uppercase [font-family:var(--font-testo)]">
             {t("letturaTitolo")}
           </h2>
           <p className="mt-2 font-titoli text-xl leading-snug [font-variation-settings:'SOFT'_100]">
@@ -179,8 +180,8 @@ export function Risultati() {
         </section>
 
         {risultato.domande_utili.length > 0 && (
-          <section className="scheda bg-salvia-chiaro/40 p-5 sm:p-6" aria-labelledby="titolo-domande">
-            <h2 id="titolo-domande" className="text-xl font-semibold">
+          <section className="scheda bg-salvia-chiaro/40 p-5 sm:p-6" aria-labelledby={`${prefisso}-domande`}>
+            <h2 id={`${prefisso}-domande`} className="text-xl font-semibold">
               {t("domandeTitolo")}
             </h2>
             <p className="mt-1 text-sm text-tenue">{t("domandeAiuto")}</p>
@@ -193,11 +194,11 @@ export function Risultati() {
             >
               {risultato.domande_utili.map((domanda, i) => (
                 <div key={domanda}>
-                  <label htmlFor={`risposta-${i}`} className="mb-1.5 block font-medium">
+                  <label htmlFor={`${prefisso}-risposta-${i}`} className="mb-1.5 block font-medium">
                     {domanda}
                   </label>
                   <input
-                    id={`risposta-${i}`}
+                    id={`${prefisso}-risposta-${i}`}
                     className="campo"
                     maxLength={500}
                     placeholder={t("rispostaSegnaposto")}
@@ -220,7 +221,7 @@ export function Risultati() {
           {risultato.idee.length === 0 ? t("nessuna") : t("parziale", { numero: risultato.idee.length })}
         </p>
       )}
-      <div key={risultato.generazione_id} className="mt-6 grid gap-5 md:grid-cols-2">
+      <div key={risultato.generazione_id} data-lotto="attuale" className="mt-6 grid gap-5 md:grid-cols-2">
         {risultato.idee.map((idea, i) => (
           <SchedaIdea
             key={idea.id}
