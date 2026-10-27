@@ -1,0 +1,274 @@
+{
+  "meta": {
+    "titolo": "{sito} · Il regalo giusto, pensato per te",
+    "descrizione": "Racconta a chi devi fare un regalo: ti propongo 4 idee concrete, dentro il tuo budget, con i link per trovarle online.",
+    "titoloIdee": "Le tue idee regalo · {sito}",
+    "titoloPrivacy": "Privacy · {sito}"
+  },
+  "intestazione": {
+    "home": "{sito}, torna alla pagina iniziale",
+    "lingua": "Lingua"
+  },
+  "home": {
+    "occhiello": "Idee regalo su misura",
+    "titolo": "Raccontami chi è. Al regalo ci penso io.",
+    "sottotitolo": "Descrivi la persona in poche righe: ti propongo 4 idee concrete, dentro il tuo budget, con i link per trovarle online.",
+    "inizia": "Inizia",
+    "passi": {
+      "uno": {
+        "titolo": "Racconta",
+        "testo": "Chi è per te, l’occasione, il budget e qualche dettaglio su gusti e carattere."
+      },
+      "due": {
+        "titolo": "Ricevi 4 idee",
+        "testo": "Almeno una sicura e una più originale, ognuna con il motivo per cui può piacere."
+      },
+      "tre": {
+        "titolo": "Trovala online",
+        "testo": "Con un tocco cerchi l’idea su Amazon o Google Shopping, nel paese giusto."
+      }
+    }
+  },
+  "modulo": {
+    "titolo": "Per chi è il regalo?",
+    "obbligatori": "I campi con * sono obbligatori.",
+    "facoltativo": "facoltativo",
+    "relazione": {
+      "etichetta": "Chi è per te?"
+    },
+    "occasione": {
+      "etichetta": "Per quale occasione?",
+      "altraEtichetta": "Quale occasione?",
+      "altraSegnaposto": "Es. Diwali, Hanukkah, festa della mamma…"
+    },
+    "paese": {
+      "etichetta": "Dove va consegnato?",
+      "aiuto": "Prezzi in {valuta} e negozi di questo paese."
+    },
+    "budget": {
+      "etichetta": "Quanto vuoi spendere?",
+      "da": "Da",
+      "a": "A",
+      "aiuto": "Se scrivi un solo numero, lo considero il massimo."
+    },
+    "eta": {
+      "etichetta": "Quanti anni ha?",
+      "segnaposto": "Es. 34"
+    },
+    "descrizione": {
+      "etichetta": "Com’è? Cosa gli/le piace, cosa no, che carattere ha",
+      "segnaposto": "Es. Adora cucinare e i gialli nordici, odia il disordine, è riservata ma molto ironica…"
+    },
+    "haGia": {
+      "etichetta": "Cosa ha già o ha ricevuto di recente?",
+      "segnaposto": "Es. Ha appena comprato una macchina del caffè."
+    },
+    "nonSopporta": {
+      "etichetta": "Cosa non sopporta?",
+      "segnaposto": "Es. I soprammobili, i profumi forti."
+    },
+    "filtri": {
+      "titolo": "Filtri",
+      "aiuto": "Facoltativi: se non scegli niente, va bene tutto.",
+      "tipologie": "Che tipo di regalo?",
+      "ingombro": "Quanto può essere ingombrante?"
+    },
+    "avvisoPrivacy": "Non scrivere nomi, cognomi o dettagli che rendano riconoscibile la persona: per trovare il regalo non servono.",
+    "invia": "Trova le idee",
+    "errori": {
+      "relazione": "Scegli chi è per te.",
+      "occasione": "Scegli l’occasione.",
+      "occasioneAltra": "Scrivi quale occasione.",
+      "budget": "Scrivi quanto vuoi spendere.",
+      "budgetValore": "Scrivi un importo valido.",
+      "budgetOrdine": "Il minimo non può superare il massimo.",
+      "eta": "Scrivi un’età tra 0 e 120 anni.",
+      "paese": "Scegli il paese di consegna.",
+      "generico": "Controlla i campi evidenziati."
+    }
+  },
+  "opzioni": {
+    "relazione": {
+      "amico": "Amico o amica",
+      "partner": "Partner",
+      "genitore": "Genitore",
+      "parente": "Altro parente",
+      "collega": "Collega o capo",
+      "altro": "Altro"
+    },
+    "occasione": {
+      "compleanno": "Compleanno",
+      "natale": "Festività di fine anno",
+      "anniversario": "Anniversario",
+      "laurea": "Laurea",
+      "nascita": "Nascita",
+      "scuse": "Per scusarmi",
+      "consolazione": "Per consolare",
+      "pensione": "Pensione",
+      "trasloco": "Casa nuova",
+      "ringraziamento": "Per ringraziare",
+      "nessuna": "Nessuna in particolare",
+      "altra": "Altra occasione"
+    },
+    "tipologia": {
+      "esperienze": "Esperienze",
+      "libri": "Libri e cultura",
+      "cibo": "Cibo e bevande",
+      "tecnologia": "Tecnologia",
+      "casa": "Casa",
+      "benessere": "Benessere",
+      "hobby": "Hobby e tempo libero",
+      "accessori": "Accessori"
+    },
+    "ingombroMassimo": {
+      "piccolo": "Piccolo",
+      "medio": "Medio",
+      "qualsiasi": "Qualsiasi"
+    },
+    "tipo": {
+      "sicura": "Sicura",
+      "originale": "Originale"
+    }
+  },
+  "caricamento": {
+    "titolo": "Sto pensando alle tue idee…",
+    "frasi": {
+      "1": "Leggo il profilo con attenzione…",
+      "2": "Scarto le idee banali…",
+      "3": "Controllo che tutto stia nel budget…",
+      "4": "Cerco anche qualcosa di originale…",
+      "5": "Ultimi ritocchi…"
+    },
+    "nota": "Di solito ci vogliono 15–30 secondi."
+  },
+  "idee": {
+    "titolo": "Ecco le tue idee",
+    "modifica": "Modifica i dati",
+    "nuovaRicerca": "Nuova ricerca",
+    "letturaTitolo": "Cosa ho capito",
+    "avvisiTitolo": "Da tenere presente",
+    "domandeTitolo": "Per idee ancora più centrate",
+    "domandeAiuto": "Rispondi anche solo a una domanda e ti propongo nuove idee.",
+    "rispostaSegnaposto": "La tua risposta",
+    "rispondiRigenera": "Rispondi e proponimi nuove idee",
+    "perche": "Perché può piacere",
+    "attenzione": "Prima di comprare",
+    "prezzo": "Prezzo indicativo",
+    "prezzoCirca": "circa {prezzo}",
+    "cercaAmazon": "Cerca su Amazon",
+    "cercaGoogle": "Cerca su Google Shopping",
+    "tiPiace": "Ti piace questa idea?",
+    "votoSu": "Mi piace",
+    "votoGiu": "Non mi piace",
+    "grazie": "Grazie, ne terrò conto!",
+    "rigeneraTitolo": "Nessuna ti convince?",
+    "rigeneraTesto": "Ti propongo altre 4 idee, diverse da quelle che hai già visto.",
+    "rigenera": "Proponimi altre idee",
+    "parziale": "Ho trovato solo {numero, plural, one {# idea che rispetta} other {# idee che rispettano}} budget e filtri. Prova a chiedere altre idee o ad allargare i filtri.",
+    "nessuna": "Non ho trovato idee che rispettino budget e filtri. Prova ad allargare i filtri o il budget.",
+    "precedenti": "Proposte precedenti",
+    "proposta": "Proposta {numero}",
+    "notaPrezzi": "I prezzi sono stime: controlla sempre prezzo, disponibilità e tempi di consegna sul negozio.",
+    "affiliazione": "In qualità di Affiliato Amazon, {sito} riceve un guadagno dagli acquisti idonei.",
+    "demo": "Modalità demo: queste idee sono finte e servono solo a provare il sito.",
+    "vuoto": {
+      "titolo": "Qui compariranno le tue idee",
+      "testo": "Compila il modulo: in pochi secondi ti propongo 4 idee regalo.",
+      "azione": "Vai al modulo"
+    }
+  },
+  "errori": {
+    "titolo": "Qualcosa non ha funzionato",
+    "limite": "Hai chiesto molte idee in poco tempo. Riprova tra un po’.",
+    "limiteGlobale": "Oggi il servizio ha ricevuto moltissime richieste. Riprova più tardi.",
+    "motore": "Non sono riuscito a preparare le idee questa volta. Riprova tra qualche istante.",
+    "rifiuto": "Non posso proporre idee per questa richiesta. Prova a descriverla in un altro modo.",
+    "dati": "Alcuni dati del modulo non sono validi. Controllali e riprova.",
+    "configurazione": "Il servizio non è ancora configurato. Riprova più tardi.",
+    "rete": "Non riesco a collegarmi. Controlla la connessione e riprova.",
+    "riprova": "Riprova"
+  },
+  "piede": {
+    "avvertenza": "Le idee sono generate da un’intelligenza artificiale e possono contenere errori: controlla sempre prezzo e disponibilità prima di comprare.",
+    "privacy": "Privacy",
+    "cookie": "Nessun cookie di profilazione."
+  },
+  "nonTrovato": {
+    "titolo": "Pagina non trovata",
+    "testo": "Questa pagina non esiste o è stata spostata.",
+    "azione": "Torna alla pagina iniziale"
+  },
+  "privacy": {
+    "titolo": "Informativa sulla privacy",
+    "bozza": "Bozza da far verificare a un consulente legale prima della pubblicazione.",
+    "intro": "Questa pagina spiega quali dati tratta {sito}, perché e per quanto tempo. In breve: non ti chiediamo chi sei, non chiediamo chi è la persona a cui fai il regalo e non usiamo cookie di profilazione.",
+    "sezioni": {
+      "titolare": {
+        "titolo": "Chi tratta i dati",
+        "testo": "Titolare del trattamento è {titolare}. Per qualsiasi richiesta sulla privacy puoi scrivere a {email}."
+      },
+      "dati": {
+        "titolo": "Quali dati trattiamo",
+        "punti": {
+          "1": "Le informazioni che scrivi nel modulo: relazione, occasione, budget, paese di consegna, età e le descrizioni facoltative (gusti, cosa ha già, cosa non sopporta). Non chiediamo mai nome o cognome della persona a cui fai il regalo, né i tuoi dati: ti chiediamo anzi di non inserirli.",
+          "2": "Prima di salvarli e di inviarli al servizio di intelligenza artificiale, togliamo automaticamente dai testi eventuali indirizzi email e numeri di telefono.",
+          "3": "Le idee proposte, i tuoi 👍/👎 e i click sui link di ricerca, senza collegarli alla tua identità.",
+          "4": "L’indirizzo IP, solo per limitare gli abusi: lo trasformiamo subito in un codice non reversibile (hash), non lo colleghiamo alle tue richieste e lo cancelliamo entro 48 ore.",
+          "5": "Non creiamo account e non usiamo strumenti di analisi delle visite."
+        }
+      },
+      "finalita": {
+        "titolo": "Perché li usiamo",
+        "punti": {
+          "1": "Per proporti le idee che chiedi: è il servizio che richiedi (art. 6.1.b GDPR).",
+          "2": "Per migliorare la qualità delle idee, analizzando in forma anonima richieste, risposte e gradimento (legittimo interesse, art. 6.1.f GDPR).",
+          "3": "Per proteggere il servizio da abusi e costi eccessivi (legittimo interesse, art. 6.1.f GDPR)."
+        }
+      },
+      "fornitori": {
+        "titolo": "A chi li affidiamo",
+        "testo": "Ci appoggiamo a fornitori che trattano i dati per nostro conto, come responsabili del trattamento: Anthropic (genera le idee con il modello Claude: i testi del modulo vengono inviati ai suoi server), Supabase (database) e Vercel (ospita il sito). Alcuni fornitori possono trattare dati fuori dall’Unione europea, in particolare negli Stati Uniti: in questi casi il trasferimento avviene con le garanzie previste dal GDPR, come l’EU-US Data Privacy Framework o le clausole contrattuali standard."
+      },
+      "conservazione": {
+        "titolo": "Per quanto tempo",
+        "testo": "Richieste e idee, in forma anonima: {mesi} mesi. Codici usati per limitare le richieste: 48 ore."
+      },
+      "cookie": {
+        "titolo": "Cookie",
+        "testo": "Usiamo solo un cookie tecnico, NEXT_LOCALE, che ricorda la lingua scelta e si cancella quando chiudi il browser. Nessun cookie di profilazione o di terze parti. Se apri un link verso Amazon o Google Shopping, da quel momento valgono le loro informative e i loro cookie."
+      },
+      "affiliazione": {
+        "titolo": "Link di affiliazione",
+        "testo": "Alcuni link verso Amazon possono essere link di affiliazione: se compri, {sito} può ricevere una piccola commissione, senza costi in più per te. Le commissioni non influenzano le idee proposte."
+      },
+      "diritti": {
+        "titolo": "I tuoi diritti",
+        "testo": "Puoi chiedere accesso, rettifica, cancellazione, limitazione, opposizione e portabilità dei dati scrivendo a {email}. Dato che non raccogliamo informazioni che ti identificano, potremmo non riuscire a ritrovare le tue richieste: se ci indichi giorno, ora e contenuto, faremo il possibile. Puoi anche presentare reclamo all’autorità di controllo del tuo paese (in Italia, il Garante per la protezione dei dati personali)."
+      },
+      "minori": {
+        "titolo": "Minori",
+        "testo": "Il servizio non è pensato per chi ha meno di 14 anni."
+      },
+      "extraUe": {
+        "titolo": "Se vivi fuori dall’Unione europea",
+        "testo": "Nel Regno Unito si applicano lo UK GDPR e il Data Protection Act 2018, con diritti analoghi a quelli descritti qui; l’autorità di controllo è l’ICO. Negli Stati Uniti alcune leggi statali (ad esempio in California) riconoscono diritti di accesso e cancellazione: puoi esercitarli allo stesso indirizzo. Non vendiamo dati personali e non li condividiamo per pubblicità mirata."
+      },
+      "modifiche": {
+        "titolo": "Modifiche",
+        "testo": "Se cambiamo questa informativa, lo indicheremo in questa pagina."
+      }
+    },
+    "verificare": {
+      "titolo": "Da verificare prima della pubblicazione",
+      "punti": {
+        "1": "Dati del titolare e contatto privacy (in src/config/sito.ts); se il titolare non è nell’UE, valutare un rappresentante UE/UK (art. 27 GDPR).",
+        "2": "Accordi sul trattamento dei dati (DPA) con Anthropic, Supabase e Vercel; regione del database (consigliata UE).",
+        "3": "Base giuridica e bilanciamento del legittimo interesse per l’analisi delle richieste; tempi di conservazione.",
+        "4": "Testi liberi: l’utente potrebbe scrivere dati sensibili (salute, religione) su una terza persona; valutare l’art. 9 GDPR e la minimizzazione.",
+        "5": "Età minima e uso da parte di minori nei diversi paesi.",
+        "6": "Regno Unito: UK GDPR, eventuale registrazione presso l’ICO. Stati Uniti: leggi statali (CCPA/CPRA in California e altre), eventuali avvisi obbligatori. Altri paesi extra-UE: normative locali.",
+        "7": "Requisiti del Programma Affiliazione Amazon per ogni marketplace (testo esatto dell’avviso)."
+      }
+    }
+  }
+}

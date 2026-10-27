@@ -1,0 +1,274 @@
+{
+  "meta": {
+    "titolo": "{sito} · The right gift, picked for you",
+    "descrizione": "Tell me who you're buying for: I'll suggest 4 concrete gift ideas within your budget, with links to find them online.",
+    "titoloIdee": "Your gift ideas · {sito}",
+    "titoloPrivacy": "Privacy · {sito}"
+  },
+  "intestazione": {
+    "home": "{sito}, back to the home page",
+    "lingua": "Language"
+  },
+  "home": {
+    "occhiello": "Gift ideas, made to measure",
+    "titolo": "Tell me who they are. I’ll handle the gift.",
+    "sottotitolo": "Describe the person in a few lines: I’ll suggest 4 concrete ideas within your budget, with links to find them online.",
+    "inizia": "Get started",
+    "passi": {
+      "uno": {
+        "titolo": "Describe them",
+        "testo": "Who they are to you, the occasion, your budget and a few details about their tastes and personality."
+      },
+      "due": {
+        "titolo": "Get 4 ideas",
+        "testo": "At least one safe bet and one more original pick, each with the reason it could work."
+      },
+      "tre": {
+        "titolo": "Find it online",
+        "testo": "One tap searches for the idea on Amazon or Google Shopping, in the right country."
+      }
+    }
+  },
+  "modulo": {
+    "titolo": "Who’s the gift for?",
+    "obbligatori": "Fields marked * are required.",
+    "facoltativo": "optional",
+    "relazione": {
+      "etichetta": "Who are they to you?"
+    },
+    "occasione": {
+      "etichetta": "What’s the occasion?",
+      "altraEtichetta": "Which occasion?",
+      "altraSegnaposto": "E.g. Diwali, Hanukkah, Mother’s Day…"
+    },
+    "paese": {
+      "etichetta": "Where will it be delivered?",
+      "aiuto": "Prices in {valuta} and shops from this country."
+    },
+    "budget": {
+      "etichetta": "How much do you want to spend?",
+      "da": "From",
+      "a": "To",
+      "aiuto": "If you only enter one number, I’ll treat it as the maximum."
+    },
+    "eta": {
+      "etichetta": "How old are they?",
+      "segnaposto": "E.g. 34"
+    },
+    "descrizione": {
+      "etichetta": "What are they like? What do they love, what don’t they, what’s their personality",
+      "segnaposto": "E.g. Loves cooking and Nordic crime novels, hates clutter, quite reserved but very witty…"
+    },
+    "haGia": {
+      "etichetta": "What do they already have, or have recently received?",
+      "segnaposto": "E.g. Just bought a coffee machine."
+    },
+    "nonSopporta": {
+      "etichetta": "What can’t they stand?",
+      "segnaposto": "E.g. Knick-knacks, strong perfumes."
+    },
+    "filtri": {
+      "titolo": "Filters",
+      "aiuto": "Optional: if you don’t pick anything, everything is fine.",
+      "tipologie": "What kind of gift?",
+      "ingombro": "How bulky can it be?"
+    },
+    "avvisoPrivacy": "Don’t write names, surnames or details that could identify the person: I don’t need them to find the gift.",
+    "invia": "Find ideas",
+    "errori": {
+      "relazione": "Choose who they are to you.",
+      "occasione": "Choose the occasion.",
+      "occasioneAltra": "Write which occasion.",
+      "budget": "Enter how much you want to spend.",
+      "budgetValore": "Enter a valid amount.",
+      "budgetOrdine": "The minimum can’t be higher than the maximum.",
+      "eta": "Enter an age between 0 and 120.",
+      "paese": "Choose the delivery country.",
+      "generico": "Please check the highlighted fields."
+    }
+  },
+  "opzioni": {
+    "relazione": {
+      "amico": "Friend",
+      "partner": "Partner",
+      "genitore": "Parent",
+      "parente": "Other relative",
+      "collega": "Colleague or boss",
+      "altro": "Other"
+    },
+    "occasione": {
+      "compleanno": "Birthday",
+      "natale": "End-of-year holidays",
+      "anniversario": "Anniversary",
+      "laurea": "Graduation",
+      "nascita": "New baby",
+      "scuse": "To say sorry",
+      "consolazione": "To comfort",
+      "pensione": "Retirement",
+      "trasloco": "New home",
+      "ringraziamento": "To say thank you",
+      "nessuna": "No particular occasion",
+      "altra": "Other occasion"
+    },
+    "tipologia": {
+      "esperienze": "Experiences",
+      "libri": "Books and culture",
+      "cibo": "Food and drink",
+      "tecnologia": "Tech",
+      "casa": "Home",
+      "benessere": "Wellbeing",
+      "hobby": "Hobbies and leisure",
+      "accessori": "Accessories"
+    },
+    "ingombroMassimo": {
+      "piccolo": "Small",
+      "medio": "Medium",
+      "qualsiasi": "Any size"
+    },
+    "tipo": {
+      "sicura": "Safe bet",
+      "originale": "Original"
+    }
+  },
+  "caricamento": {
+    "titolo": "Thinking about your ideas…",
+    "frasi": {
+      "1": "Reading the profile carefully…",
+      "2": "Ruling out the obvious…",
+      "3": "Checking everything fits the budget…",
+      "4": "Looking for something original too…",
+      "5": "Final touches…"
+    },
+    "nota": "This usually takes 15–30 seconds."
+  },
+  "idee": {
+    "titolo": "Here are your ideas",
+    "modifica": "Edit details",
+    "nuovaRicerca": "New search",
+    "letturaTitolo": "What I understood",
+    "avvisiTitolo": "Worth keeping in mind",
+    "domandeTitolo": "For even better ideas",
+    "domandeAiuto": "Answer even just one question and I’ll suggest new ideas.",
+    "rispostaSegnaposto": "Your answer",
+    "rispondiRigenera": "Answer and get new ideas",
+    "perche": "Why they might like it",
+    "attenzione": "Before you buy",
+    "prezzo": "Estimated price",
+    "prezzoCirca": "about {prezzo}",
+    "cercaAmazon": "Search on Amazon",
+    "cercaGoogle": "Search on Google Shopping",
+    "tiPiace": "Do you like this idea?",
+    "votoSu": "I like it",
+    "votoGiu": "I don’t like it",
+    "grazie": "Thanks, noted!",
+    "rigeneraTitolo": "None of them quite right?",
+    "rigeneraTesto": "I’ll suggest 4 more ideas, different from the ones you’ve already seen.",
+    "rigenera": "Show me other ideas",
+    "parziale": "I only found {numero, plural, one {# idea that fits} other {# ideas that fit}} your budget and filters. Try asking for more ideas or widening the filters.",
+    "nessuna": "I couldn’t find ideas that fit your budget and filters. Try widening the filters or the budget.",
+    "precedenti": "Earlier suggestions",
+    "proposta": "Suggestion {numero}",
+    "notaPrezzi": "Prices are estimates: always check price, availability and delivery times in the shop.",
+    "affiliazione": "As an Amazon Associate, {sito} earns from qualifying purchases.",
+    "demo": "Demo mode: these ideas are fake and only meant for testing the site.",
+    "vuoto": {
+      "titolo": "Your ideas will appear here",
+      "testo": "Fill in the form: in a few seconds I’ll suggest 4 gift ideas.",
+      "azione": "Go to the form"
+    }
+  },
+  "errori": {
+    "titolo": "Something went wrong",
+    "limite": "You’ve asked for a lot of ideas in a short time. Please try again in a little while.",
+    "limiteGlobale": "The service has had a huge number of requests today. Please try again later.",
+    "motore": "I couldn’t put the ideas together this time. Please try again in a moment.",
+    "rifiuto": "I can’t suggest ideas for this request. Try describing it differently.",
+    "dati": "Some of the form details aren’t valid. Please check them and try again.",
+    "configurazione": "The service isn’t set up yet. Please try again later.",
+    "rete": "I can’t connect. Check your connection and try again.",
+    "riprova": "Try again"
+  },
+  "piede": {
+    "avvertenza": "Ideas are generated by artificial intelligence and may contain mistakes: always check price and availability before buying.",
+    "privacy": "Privacy",
+    "cookie": "No tracking cookies."
+  },
+  "nonTrovato": {
+    "titolo": "Page not found",
+    "testo": "This page doesn’t exist or has been moved.",
+    "azione": "Back to the home page"
+  },
+  "privacy": {
+    "titolo": "Privacy policy",
+    "bozza": "Draft to be reviewed by a legal advisor before publication.",
+    "intro": "This page explains what data {sito} processes, why and for how long. In short: we don’t ask who you are, we don’t ask who you’re buying for and we don’t use tracking cookies.",
+    "sezioni": {
+      "titolare": {
+        "titolo": "Who processes the data",
+        "testo": "The data controller is {titolare}. For any privacy request you can write to {email}."
+      },
+      "dati": {
+        "titolo": "What data we process",
+        "punti": {
+          "1": "The information you enter in the form: relationship, occasion, budget, delivery country, age and the optional descriptions (tastes, what they already have, what they can’t stand). We never ask for the name or surname of the person you’re buying for, nor for your details: in fact, we ask you not to enter them.",
+          "2": "Before storing the texts and sending them to the artificial intelligence service, we automatically remove any email addresses and phone numbers.",
+          "3": "The ideas suggested, your 👍/👎 and clicks on the search links, without linking them to your identity.",
+          "4": "Your IP address, only to limit abuse: we immediately turn it into a non-reversible code (hash), we don’t link it to your requests and we delete it within 48 hours.",
+          "5": "We don’t create accounts and we don’t use visitor analytics tools."
+        }
+      },
+      "finalita": {
+        "titolo": "Why we use it",
+        "punti": {
+          "1": "To suggest the ideas you ask for: it’s the service you request (Art. 6(1)(b) GDPR).",
+          "2": "To improve the quality of the ideas, by analysing requests, answers and feedback anonymously (legitimate interest, Art. 6(1)(f) GDPR).",
+          "3": "To protect the service from abuse and excessive costs (legitimate interest, Art. 6(1)(f) GDPR)."
+        }
+      },
+      "fornitori": {
+        "titolo": "Who we share it with",
+        "testo": "We rely on providers that process data on our behalf, as processors: Anthropic (generates the ideas with the Claude model: the form texts are sent to its servers), Supabase (database) and Vercel (hosts the site). Some providers may process data outside the European Union, especially in the United States: in those cases the transfer takes place with the safeguards required by the GDPR, such as the EU-US Data Privacy Framework or standard contractual clauses."
+      },
+      "conservazione": {
+        "titolo": "How long we keep it",
+        "testo": "Requests and ideas, in anonymous form: {mesi} months. Codes used to limit requests: 48 hours."
+      },
+      "cookie": {
+        "titolo": "Cookies",
+        "testo": "We only use one technical cookie, NEXT_LOCALE, which remembers the language you chose and is deleted when you close the browser. No tracking or third-party cookies. If you open a link to Amazon or Google Shopping, their privacy policies and cookies apply from that point."
+      },
+      "affiliazione": {
+        "titolo": "Affiliate links",
+        "testo": "Some links to Amazon may be affiliate links: if you buy, {sito} may receive a small commission at no extra cost to you. Commissions don’t influence the ideas we suggest."
+      },
+      "diritti": {
+        "titolo": "Your rights",
+        "testo": "You can ask for access, rectification, erasure, restriction, objection and portability by writing to {email}. Since we don’t collect information that identifies you, we may not be able to find your requests: if you tell us the day, time and content, we’ll do our best. You can also lodge a complaint with the supervisory authority in your country (in Italy, the Garante per la protezione dei dati personali)."
+      },
+      "minori": {
+        "titolo": "Children",
+        "testo": "The service is not intended for people under 14."
+      },
+      "extraUe": {
+        "titolo": "If you live outside the European Union",
+        "testo": "In the United Kingdom, the UK GDPR and the Data Protection Act 2018 apply, with rights similar to those described here; the supervisory authority is the ICO. In the United States, some state laws (for example in California) grant rights of access and deletion: you can exercise them at the same address. We don’t sell personal data and we don’t share it for targeted advertising."
+      },
+      "modifiche": {
+        "titolo": "Changes",
+        "testo": "If we change this policy, we’ll say so on this page."
+      }
+    },
+    "verificare": {
+      "titolo": "To check before publication",
+      "punti": {
+        "1": "Controller details and privacy contact (in src/config/sito.ts); if the controller is not in the EU, consider an EU/UK representative (Art. 27 GDPR).",
+        "2": "Data processing agreements (DPAs) with Anthropic, Supabase and Vercel; database region (EU recommended).",
+        "3": "Legal basis and legitimate-interest assessment for analysing requests; retention periods.",
+        "4": "Free-text fields: users might write sensitive data (health, religion) about a third party; assess Art. 9 GDPR and data minimisation.",
+        "5": "Minimum age and use by minors in the different countries.",
+        "6": "United Kingdom: UK GDPR, possible ICO registration. United States: state laws (CCPA/CPRA in California and others), any mandatory notices. Other non-EU countries: local regulations.",
+        "7": "Amazon Associates Program requirements for each marketplace (exact wording of the disclosure)."
+      }
+    }
+  }
+}
