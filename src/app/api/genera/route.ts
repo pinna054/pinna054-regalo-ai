@@ -59,7 +59,8 @@ export async function POST(request: Request) {
     return errore(503, "configurazione");
   }
   if (!db()) {
-    if (suVercel()) {
+    // In modalità demo (motore finto) si può provare il sito anche senza database
+    if (suVercel() && !finto) {
       console.error("[genera] Manca DATABASE_URL: su Vercel il database è obbligatorio");
       return errore(503, "configurazione");
     }
