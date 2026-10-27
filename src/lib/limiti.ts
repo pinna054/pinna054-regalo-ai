@@ -36,7 +36,7 @@ async function incrementa(contatori: Contatore[]): Promise<number[]> {
     conteggio: 1,
   }));
   const risultato = await sql<{ chiave: string; conteggio: number }[]>`
-    insert into limiti_richieste ${sql(righe, "chiave", "finestra_inizio", "conteggio")}
+    insert into limiti_richieste ${sql(righe)}
     on conflict (chiave, finestra_inizio)
     do update set conteggio = limiti_richieste.conteggio + 1
     returning chiave, conteggio

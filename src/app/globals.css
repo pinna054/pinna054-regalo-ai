@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Colori e caratteri del sito.
+ * Per cambiare l'aspetto basta modificare questi valori: valgono ovunque.
+ */
+@theme {
+  --color-crema: #fbf6ef;        /* sfondo */
+  --color-carta: #fffdf9;        /* schede */
+  --color-sabbia: #f4ebe0;       /* sfondi secondari */
+  --color-bordo: #e7dacb;        /* bordi */
+  --color-inchiostro: #2b211c;   /* testo */
+  --color-tenue: #6b5d54;        /* testo secondario */
+  --color-terracotta: #b4482f;   /* colore principale (pulsanti, accenti) */
+  --color-terracotta-scuro: #953a25;
+  --color-terracotta-chiaro: #f6e0d6;
+  --color-salvia: #4f6548;       /* colore secondario */
+  --color-salvia-chiaro: #e4ebdc;
+  --color-ocra: #8a5e17;         /* avvisi */
+  --color-ocra-chiaro: #f8ecd5;
+  --color-errore: #a3261b;
+  --color-errore-chiaro: #fbe4e0;
+
+  --font-titoli: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-testo: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-morbida: 0 1px 2px rgb(43 33 28 / 0.04), 0 8px 24px -12px rgb(43 33 28 / 0.18);
+  --shadow-sollevata: 0 2px 4px rgb(43 33 28 / 0.06), 0 18px 40px -18px rgb(43 33 28 / 0.28);
+
+  --animate-comparsa: comparsa 0.45s ease-out both;
+  --animate-dondola: dondola 2.4s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes comparsa {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes dondola {
+  0%,
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-6px);
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-crema);
+    /* leggera grana "carta" con due sfumature, senza immagini */
+    background-image:
+      radial-gradient(circle at 12% -10%, rgb(246 224 214 / 0.55), transparent 42%),
+      radial-gradient(circle at 100% 18%, rgb(228 235 220 / 0.6), transparent 38%);
+    background-repeat: no-repeat;
+    color: var(--color-inchiostro);
+    font-family: var(--font-testo);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-titoli);
+    font-variation-settings: "SOFT" 100;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-terracotta);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-terracotta-chiaro);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Campo di testo, numero, select e area di testo */
+  .campo {
+    @apply w-full rounded-xl border border-bordo bg-white px-3.5 py-3 text-base text-inchiostro shadow-[inset_0_1px_2px_rgb(43_33_28/0.04)] transition-colors placeholder:text-tenue/70 hover:border-tenue/40 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 focus:outline-none;
+  }
+  .campo[aria-invalid="true"] {
+    @apply border-errore ring-2 ring-errore/15;
+  }
+
+  /* Etichetta di un campo */
+  .etichetta {
+    @apply mb-2 block text-[0.95rem] font-semibold text-inchiostro;
+  }
+
+  /* "Pillola" selezionabile (relazione, occasione, tipologie...) */
+  .pillola {
+    @apply inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-bordo bg-white px-4 py-2 text-[0.95rem] text-inchiostro transition select-none hover:border-terracotta/50 hover:bg-terracotta-chiaro/40;
+  }
+  .pillola-input:checked + .pillola {
+    @apply border-terracotta bg-terracotta text-white shadow-morbida hover:bg-terracotta-scuro;
+  }
+  .pillola-input:focus-visible + .pillola {
+    @apply outline-3 outline-offset-2 outline-terracotta;
+  }
+
+  /* Pulsanti */
+  .pulsante {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-terracotta px-6 py-3 text-base font-semibold text-white shadow-morbida transition hover:bg-terracotta-scuro active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .pulsante-secondario {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-inchiostro/15 bg-white px-5 py-2.5 text-[0.95rem] font-semibold text-inchiostro transition hover:border-inchiostro/40 hover:bg-sabbia active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* Scheda con bordo morbido */
+  .scheda {
+    @apply rounded-3xl border border-bordo bg-carta shadow-morbida;
+  }
 }

@@ -175,7 +175,11 @@
       "titolo": "Your ideas will appear here",
       "testo": "Fill in the form: in a few seconds I’ll suggest 4 gift ideas.",
       "azione": "Go to the form"
-    }
+    },
+    "budgetFinoA": "up to {prezzo}",
+    "etaAnni": "{eta} years old",
+    "chiudi": "Close",
+    "riepilogo": "Your request"
   },
   "errori": {
     "titolo": "Something went wrong",

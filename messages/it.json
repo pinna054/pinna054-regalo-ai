@@ -175,7 +175,11 @@
       "titolo": "Qui compariranno le tue idee",
       "testo": "Compila il modulo: in pochi secondi ti propongo 4 idee regalo.",
       "azione": "Vai al modulo"
-    }
+    },
+    "budgetFinoA": "fino a {prezzo}",
+    "etaAnni": "{eta} anni",
+    "chiudi": "Chiudi",
+    "riepilogo": "La tua richiesta"
   },
   "errori": {
     "titolo": "Qualcosa non ha funzionato",

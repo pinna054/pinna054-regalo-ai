@@ -11,6 +11,8 @@ import { SchemaRispostaMotore } from "./schema";
 
 /** Un messaggio della conversazione con il modello. */
 export type MessaggioModello = Anthropic.Beta.BetaMessageParam;
+/** Contenuto di una risposta del modello, da rimandargli nei nuovi tentativi. */
+export type ContenutoRisposta = Anthropic.Beta.BetaMessageContentParam;
 
 export type ParametriChiamata = {
   modello: string;
@@ -33,7 +35,7 @@ export type EsitoChiamata = {
   uso: UsoToken;
   tokenRagionamento: number | null;
   /** Contenuto completo della risposta, da rimandare al modello nei nuovi tentativi */
-  contenuto: MessaggioModello["content"];
+  contenuto: ContenutoRisposta;
 };
 
 export type ChiamaModello = (parametri: ParametriChiamata) => Promise<EsitoChiamata>;
@@ -96,7 +98,7 @@ export const chiamaAnthropic: ChiamaModello = async ({ modello, effort, sistema,
         cacheLettura: risposta.usage.cache_read_input_tokens ?? 0,
       },
       tokenRagionamento: risposta.usage.output_tokens_details?.thinking_tokens ?? null,
-      contenuto: risposta.content as MessaggioModello["content"],
+      contenuto: risposta.content as ContenutoRisposta,
     };
   } catch (errore) {
     if (errore instanceof ErroreMotore) throw errore;
