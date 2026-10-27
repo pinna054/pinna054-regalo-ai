@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# il modello delle variabili d'ambiente va invece salvato
+!.env.example
