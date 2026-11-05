@@ -130,6 +130,26 @@ export function ModuloRegalo() {
 
   async function invia(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    await avvia(stato);
+  }
+
+  /** Compila il modulo con un esempio e parte subito: serve a provare il sito in un tocco. */
+  async function provaEsempio() {
+    const esempio: StatoModulo = {
+      ...statoVuoto(stato.paese),
+      soprannome: t("esempio.soprannome"),
+      relazione: "amico/a",
+      occasione: "compleanno",
+      budget_max: "50",
+      eta: "30",
+      descrizione: t("esempio.descrizione"),
+    };
+    setModificato(esempio);
+    salvaBozza(esempio);
+    await avvia(esempio);
+  }
+
+  async function avvia(stato: StatoModulo) {
     const esito = convalida(stato);
     if (!esito.ok) {
       setErrori(esito.errori);
@@ -194,6 +214,14 @@ export function ModuloRegalo() {
           {t("titolo")}
         </h2>
         <p className="mt-1 text-sm text-tenue">{t("obbligatori")}</p>
+        <button
+          type="button"
+          onClick={() => void provaEsempio()}
+          disabled={inviando || cambioPagina}
+          className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-terracotta/60 bg-terracotta-chiaro/40 px-4 text-[0.95rem] font-semibold text-terracotta-scuro transition hover:bg-terracotta-chiaro"
+        >
+          <span aria-hidden="true">✨</span> {t("esempio.pulsante")}
+        </button>
 
         <div className="mt-7 space-y-8">
           {/* Relazione */}

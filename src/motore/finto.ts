@@ -2,7 +2,8 @@
  * MOTORE FINTO: inventa idee di prova senza chiamare l'AI.
  *
  * Serve solo per sviluppare e provare il sito senza chiave API (MOTORE_FINTO=1).
- * Le idee rispettano budget e filtri ma sono generiche. Non attivarlo mai in produzione.
+ * Le idee sono regali di prova (non scelti sul profilo) che rispettano budget e filtri.
+ * Non attivarlo mai in produzione.
  */
 import type { Ingombro, Tipologia } from "@/config/opzioni";
 import { INGOMBRI } from "@/config/opzioni";
@@ -13,27 +14,61 @@ import type { RispostaMotore } from "./schema";
 type IdeaModello = {
   tipologia: Tipologia;
   ingombro: Ingombro;
-  it: [titolo: string, descrizione: string, query: string];
-  en: [titolo: string, descrizione: string, query: string];
+  tipo: "sicura" | "originale";
+  it: [titolo: string, descrizione: string, perche: string, query: string];
+  en: [titolo: string, descrizione: string, perche: string, query: string];
 };
 
+// Regali di prova, concreti e vari, per vedere come appaiono le carte
 const CATALOGO: IdeaModello[] = [
-  { tipologia: "esperienze", ingombro: "piccolo", it: ["Corso di cucina di una sera", "Una lezione pratica con uno chef, da fare da soli o in coppia.", "corso di cucina esperienza regalo"], en: ["One-evening cooking class", "A hands-on lesson with a chef, alone or as a couple.", "cooking class gift experience"] },
-  { tipologia: "esperienze", ingombro: "piccolo", it: ["Biglietti per un concerto dal vivo", "Due biglietti per un concerto in un locale intimo della sua città.", "biglietti concerto regalo"], en: ["Tickets for a live gig", "Two tickets for a gig in a small venue in their town.", "concert tickets gift"] },
-  { tipologia: "libri e cultura", ingombro: "piccolo", it: ["Giallo nordico in edizione illustrata", "Un classico del giallo scandinavo in un'edizione curata, da tenere in libreria.", "giallo nordico edizione illustrata"], en: ["Illustrated Nordic crime novel", "A Scandinavian crime classic in a beautiful edition.", "nordic noir illustrated edition"] },
-  { tipologia: "libri e cultura", ingombro: "piccolo", it: ["Abbonamento a una rivista di viaggi", "Un anno di una rivista di viaggi e reportage, un numero al mese.", "abbonamento rivista viaggi"], en: ["Travel magazine subscription", "A year of a travel and reportage magazine, one issue a month.", "travel magazine subscription"] },
-  { tipologia: "cibo e bevande", ingombro: "medio", it: ["Cesto di specialità artigianali", "Una selezione di prodotti di piccoli produttori: miele, biscotti, conserve.", "cesto specialità artigianali regalo"], en: ["Hamper of artisan treats", "A selection from small producers: honey, biscuits, preserves.", "artisan food hamper gift"] },
-  { tipologia: "cibo e bevande", ingombro: "medio", it: ["Kit per fare il pane in casa", "Lievito madre essiccato, farine speciali e cestino per la lievitazione.", "kit pane fatto in casa"], en: ["Home bread-making kit", "Dried sourdough starter, special flours and a proofing basket.", "bread making kit"] },
-  { tipologia: "tecnologia", ingombro: "piccolo", it: ["Lampada da lettura ricaricabile", "Una luce da libro leggera, con luce calda regolabile.", "lampada lettura ricaricabile luce calda"], en: ["Rechargeable reading light", "A light clip-on book lamp with adjustable warm light.", "rechargeable book light warm"] },
-  { tipologia: "tecnologia", ingombro: "piccolo", it: ["Altoparlante bluetooth impermeabile", "Piccolo, robusto e con un buon suono, per la doccia o la gita.", "altoparlante bluetooth impermeabile"], en: ["Waterproof Bluetooth speaker", "Small, sturdy and with good sound, for the shower or a day out.", "waterproof bluetooth speaker"] },
-  { tipologia: "casa", ingombro: "medio", it: ["Tazze in ceramica fatte a mano", "Una coppia di tazze artigianali, ognuna leggermente diversa.", "tazze ceramica fatte a mano"], en: ["Handmade ceramic mugs", "A pair of artisan mugs, each slightly different.", "handmade ceramic mugs set"] },
-  { tipologia: "casa", ingombro: "medio", it: ["Pianta facile con vaso decorativo", "Una pianta da interno che perdona le dimenticanze, in un vaso di design.", "pianta da interno vaso decorativo"], en: ["Easy houseplant in a decorative pot", "An indoor plant that forgives forgetfulness, in a designer pot.", "easy houseplant decorative pot"] },
-  { tipologia: "benessere", ingombro: "medio", it: ["Coperta in lana morbida", "Un plaid caldo e leggero per le sere sul divano.", "plaid lana morbida"], en: ["Soft wool throw", "A warm, light throw for evenings on the sofa.", "soft wool throw blanket"] },
-  { tipologia: "benessere", ingombro: "piccolo", it: ["Set per il tè con teiera in vetro", "Teiera con infusore e una selezione di tè sfusi.", "teiera vetro infusore set tè"], en: ["Tea set with glass teapot", "A teapot with infuser and a selection of loose-leaf teas.", "glass teapot infuser tea set"] },
-  { tipologia: "hobby e tempo libero", ingombro: "medio", it: ["Puzzle da 1000 pezzi d'autore", "Un puzzle con l'illustrazione di un artista contemporaneo.", "puzzle 1000 pezzi illustrazione"], en: ["1000-piece art jigsaw", "A jigsaw featuring a contemporary artist's illustration.", "1000 piece jigsaw art"] },
-  { tipologia: "hobby e tempo libero", ingombro: "piccolo", it: ["Kit acquerello da viaggio", "Colori compatti, pennello con serbatoio e taccuino, per dipingere ovunque.", "kit acquerello da viaggio"], en: ["Travel watercolour kit", "Compact paints, a water brush and a sketchbook to paint anywhere.", "travel watercolor kit"] },
-  { tipologia: "accessori", ingombro: "piccolo", it: ["Portafoglio in pelle con incisione", "Un portafoglio sottile con le iniziali incise.", "portafoglio pelle personalizzato"], en: ["Engraved leather wallet", "A slim wallet with engraved initials.", "personalised leather wallet"] },
-  { tipologia: "accessori", ingombro: "piccolo", it: ["Borraccia termica di design", "Tiene le bevande calde o fredde per ore, con un bel disegno.", "borraccia termica design"], en: ["Designer insulated bottle", "Keeps drinks hot or cold for hours, with a nice design.", "insulated water bottle design"] },
+  { tipologia: "esperienze", ingombro: "piccolo", tipo: "originale",
+    it: ["Serata di cucina giapponese con uno chef", "Tre ore ai fornelli per imparare ramen, gyoza e mochi, con cena finale insieme agli altri corsisti.", "Per chi ama cucinare e provare sapori nuovi: torna a casa con ricette da rifare e un ricordo da raccontare.", "corso cucina giapponese esperienza regalo"],
+    en: ["Japanese cooking evening with a chef", "Three hours learning ramen, gyoza and mochi, with a shared dinner at the end.", "For someone who loves cooking and new flavours: they bring home recipes and a story to tell.", "japanese cooking class gift"] },
+  { tipologia: "libri e cultura", ingombro: "piccolo", tipo: "sicura",
+    it: ["Graphic novel di Zerocalcare in edizione cartonata", "Una delle storie più amate dell’autore romano, tra ironia, amicizia e malinconia.", "Si legge in una sera, fa ridere e commuovere: un regalo che quasi tutti apprezzano.", "zerocalcare graphic novel cartonato"],
+    en: ["Hardback graphic novel collection", "A celebrated graphic novel that mixes humour, friendship and nostalgia.", "A one-evening read that makes you laugh and think: hard to get wrong.", "graphic novel hardback bestseller"] },
+  { tipologia: "tecnologia", ingombro: "piccolo", tipo: "originale",
+    it: ["Fotocamera istantanea a pellicola", "Stampa le foto in pochi secondi, in formato tessera da appendere o regalare.", "Perfetta per chi vive di serate con gli amici e ama i ricordi da toccare con mano.", "fotocamera istantanea mini pellicola"],
+    en: ["Instant film camera", "Prints photos in seconds, in a small format to pin up or give away.", "Great for someone who lives for nights out and loves memories you can hold.", "instant film camera mini"] },
+  { tipologia: "cibo e bevande", ingombro: "medio", tipo: "sicura",
+    it: ["Box di cioccolato artigianale da tutto il mondo", "Dodici tavolette di piccoli cioccolatieri, dal Madagascar all’Ecuador, con schede di degustazione.", "Golosa ma non banale: si assaggia una tavoletta alla volta, magari in compagnia.", "box degustazione cioccolato artigianale"],
+    en: ["Craft chocolate tasting box", "Twelve bars from small makers, from Madagascar to Ecuador, with tasting notes.", "Indulgent but not ordinary: one bar at a time, ideally shared.", "craft chocolate tasting box"] },
+  { tipologia: "hobby e tempo libero", ingombro: "piccolo", tipo: "originale",
+    it: ["Kit per ricamare un poster della sua città", "Telaio, fili colorati e tela già disegnata con la mappa della città da ricamare.", "Un passatempo rilassante che diventa un quadro da appendere in casa.", "kit ricamo mappa città"],
+    en: ["Embroidery kit with a city map", "Hoop, threads and a pre-printed fabric of a city map to stitch.", "A relaxing pastime that ends up framed on the wall.", "embroidery kit city map"] },
+  { tipologia: "benessere", ingombro: "piccolo", tipo: "sicura",
+    it: ["Ingresso alle terme per due", "Una giornata di piscine calde, sauna e relax in una spa vicino a casa.", "Un regalo che si condivide: una pausa vera dalla routine, senza pensieri.", "ingresso terme coppia regalo"],
+    en: ["Spa day for two", "A day of warm pools, sauna and relaxing at a nearby spa.", "A gift to share: a real break from the routine.", "spa day for two gift"] },
+  { tipologia: "casa", ingombro: "medio", tipo: "originale",
+    it: ["Proiettore di stelle per la camera", "Riempie il soffitto di galassie e nebulose in movimento, con timer e luce regolabile.", "Trasforma le serate sul divano o le notti insonni in qualcosa di magico.", "proiettore stelle galassia camera"],
+    en: ["Galaxy star projector", "Fills the ceiling with moving galaxies and nebulae, with timer and dimmer.", "Turns sofa evenings or sleepless nights into something magical.", "galaxy star projector bedroom"] },
+  { tipologia: "accessori", ingombro: "piccolo", tipo: "sicura",
+    it: ["Zaino impermeabile minimal", "Linee pulite, scomparto imbottito per il portatile e tessuto che resiste alla pioggia.", "Si usa tutti i giorni, per lavoro o per il weekend: un regalo pratico ma con stile.", "zaino impermeabile minimal portatile"],
+    en: ["Minimal waterproof backpack", "Clean lines, padded laptop sleeve and rain-resistant fabric.", "Used every day, for work or weekends: practical but stylish.", "minimal waterproof backpack laptop"] },
+  { tipologia: "esperienze", ingombro: "piccolo", tipo: "sicura",
+    it: ["Biglietti per un concerto nella sua città", "Due posti per un artista che ascolta spesso, da scegliere nel calendario dei prossimi mesi.", "Una serata da ricordare e da vivere insieme: il regalo è anche il tempo passato lì.", "biglietti concerto regalo"],
+    en: ["Concert tickets in their city", "Two seats for an artist they listen to, picked from upcoming dates.", "A night to remember and share: the gift is also the time together.", "concert tickets gift"] },
+  { tipologia: "libri e cultura", ingombro: "piccolo", tipo: "originale",
+    it: ["Abbonamento a un club del libro a sorpresa", "Ogni mese arriva a casa un romanzo scelto da librai indipendenti, con un piccolo regalo.", "Per chi legge ma non sa mai cosa scegliere: una sorpresa che dura mesi.", "abbonamento libro a sorpresa mensile"],
+    en: ["Surprise book club subscription", "Every month a novel picked by independent booksellers arrives with a small treat.", "For a reader who never knows what to pick: a surprise that lasts months.", "monthly surprise book subscription"] },
+  { tipologia: "cibo e bevande", ingombro: "piccolo", tipo: "originale",
+    it: ["Kit per farsi il kombucha in casa", "Barattolo, coltura viva e tè biologici per fermentare la propria bibita frizzante.", "Un esperimento divertente in cucina per chi ama le cose fatte in casa e un po’ insolite.", "kit kombucha fatto in casa"],
+    en: ["Home kombucha brewing kit", "Jar, live culture and organic teas to brew their own fizzy drink.", "A fun kitchen experiment for someone who loves homemade, slightly unusual things.", "kombucha brewing kit"] },
+  { tipologia: "tecnologia", ingombro: "piccolo", tipo: "sicura",
+    it: ["Cuffie wireless con cancellazione del rumore", "Isolano dal rumore del treno o dell’ufficio, con buona autonomia e custodia compatta.", "Utili ogni giorno, per musica, podcast e chiamate: un regalo che si usa davvero.", "cuffie wireless cancellazione rumore"],
+    en: ["Noise-cancelling wireless earbuds", "Block out train or office noise, with good battery and a compact case.", "Useful every day for music, podcasts and calls.", "noise cancelling wireless earbuds"] },
+  { tipologia: "hobby e tempo libero", ingombro: "medio", tipo: "sicura",
+    it: ["Gioco da tavolo cooperativo per serate in compagnia", "Si vince o si perde tutti insieme: partite da 45 minuti, facili da spiegare.", "Ideale per chi organizza serate con gli amici e vuole un gioco che piace a tutti.", "gioco da tavolo cooperativo"],
+    en: ["Cooperative board game", "Everyone wins or loses together: 45-minute games, easy to explain.", "Ideal for someone who hosts game nights and wants something everyone enjoys.", "cooperative board game"] },
+  { tipologia: "casa", ingombro: "medio", tipo: "sicura",
+    it: ["Set di tazze in ceramica fatte a mano", "Quattro tazze smaltate a mano, ognuna leggermente diversa, per caffè e tisane.", "Un oggetto quotidiano che diventa speciale: ogni mattina un piccolo ricordo di te.", "tazze ceramica fatte a mano set"],
+    en: ["Handmade ceramic mug set", "Four hand-glazed mugs, each slightly different, for coffee or tea.", "An everyday object made special: a small reminder every morning.", "handmade ceramic mugs set"] },
+  { tipologia: "benessere", ingombro: "piccolo", tipo: "originale",
+    it: ["Candela profumata con nome inventato da te", "Cera di soia e un profumo a scelta, con etichetta personalizzata con una frase vostra.", "Un regalo da coccole con un tocco personale che fa sorridere ogni volta che la accende.", "candela profumata personalizzata etichetta"],
+    en: ["Scented candle with a custom label", "Soy wax and a chosen scent, with a label printed with your own phrase.", "A cosy gift with a personal touch that makes them smile every time.", "personalised scented candle label"] },
+  { tipologia: "accessori", ingombro: "piccolo", tipo: "originale",
+    it: ["Portachiavi in ottone inciso a mano", "Piccolo e robusto, con iniziali o una data importante incise da un artigiano.", "Un dettaglio che porta sempre con sé: discreto ma pieno di significato.", "portachiavi ottone inciso personalizzato"],
+    en: ["Hand-engraved brass keyring", "Small and sturdy, with initials or a special date engraved by a craftsman.", "A detail they always carry: discreet but meaningful.", "engraved brass keyring personalised"] },
 ];
 
 const MAX_INGOMBRO = { piccolo: 0, medio: 1, qualsiasi: 2 } as const;
@@ -66,8 +101,8 @@ export const chiamaMotoreFinto: ChiamaModello = async ({ richiesta: r }) => {
   const risposta: RispostaMotore = {
     lettura_profilo:
       lingua === "it"
-        ? `Regalo per ${r.profilo.relazione}, occasione: ${r.richiesta.occasione}. (Idee di prova: il motore vero leggerà la descrizione.)`
-        : `A gift for: ${r.profilo.relazione}, occasion: ${r.richiesta.occasione}. (Test ideas: the real engine will read the description.)`,
+        ? "Una persona curiosa e socievole, a cui piacciono le esperienze da condividere. (Questo è un testo di prova: il motore vero leggerà davvero le tue risposte.)"
+        : "A curious, sociable person who enjoys experiences to share. (This is sample text: the real engine will actually read your answers.)",
     avvisi: descrizioneVuota
       ? [lingua === "it" ? "Il profilo è molto breve: le idee sono generiche." : "The profile is very short: the ideas are generic."]
       : [],
@@ -79,16 +114,13 @@ export const chiamaMotoreFinto: ChiamaModello = async ({ richiesta: r }) => {
     idee: scelte.map(({ modello, titolo }, indice) => ({
       titolo,
       descrizione: modello[lingua][1],
-      perche:
-        lingua === "it"
-          ? "È un’idea di prova scelta in base ai filtri e al budget."
-          : "It’s a test idea chosen based on the filters and budget.",
-      tipo: indice % 2 === 0 ? "sicura" : "originale",
+      perche: modello[lingua][2],
+      tipo: modello.tipo,
       tipologia: modello.tipologia,
       ingombro: modello.ingombro,
       prezzo_min: prezzo(0.15 + indice * 0.05),
       prezzo_max: prezzo(0.75 + indice * 0.05),
-      query_ricerca: modello[lingua][2],
+      query_ricerca: modello[lingua][3],
       attenzione: indice === 1 ? (lingua === "it" ? "Controlla i tempi di consegna." : "Check delivery times.") : "",
     })),
   };

@@ -90,6 +90,11 @@
       "etichetta": "Come lo/la chiami?",
       "segnaposto": "Es. Lucrezia, nonna, Marco",
       "aiuto": "Lo usiamo solo per le domande sul tuo telefono: non viene mai inviato né salvato."
+    },
+    "esempio": {
+      "pulsante": "Non sai da dove partire? Prova con un esempio",
+      "soprannome": "Lucrezia",
+      "descrizione": "Ama viaggiare e uscire con gli amici, cucina bene, ascolta di tutto. Odia le cose inutili."
     }
   },
   "opzioni": {

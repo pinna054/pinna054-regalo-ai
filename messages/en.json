@@ -90,6 +90,11 @@
       "etichetta": "What do you call them?",
       "segnaposto": "E.g. Lucy, Grandma, Mark",
       "aiuto": "Only used for the questions on your device: it is never sent or stored."
+    },
+    "esempio": {
+      "pulsante": "Not sure where to start? Try an example",
+      "soprannome": "Lucy",
+      "descrizione": "Loves travelling and going out with friends, cooks well, listens to everything. Hates useless stuff."
     }
   },
   "opzioni": {
