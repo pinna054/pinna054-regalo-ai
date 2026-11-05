@@ -315,3 +315,16 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
 - Account Vercel collegato a GitHub
 - Facoltativi: tag di affiliazione Amazon per ogni marketplace, password dell'area valutazione,
   dati del titolare per la pagina privacy
+29. **Esperienza "alla Tinder"** (richiesta del proprietario, dopo la fase 1):
+    - dopo il modulo arriva un **quiz**: 8 domande sì/no precise e fantasiose da scorrere
+      (destra = Sì, sinistra = No, pulsante "Non so") e 2 domande aperte da scrivere (si possono saltare).
+      Le domande le scrive il modello con il prompt `prompts/domande-v1.md` (endpoint `/api/domande`,
+      con limiti per IP separati da quelli delle idee). Le risposte entrano nel profilo come `risposte`;
+    - poi le **idee una alla volta**: destra = mi piace (va nei **Preferiti**, con i link per comprare),
+      sinistra = scarta, con "Annulla". Ogni scelta è salvata come 👍/👎 (`idee.voto`), quindi i dati per
+      il team restano gli stessi. Quando resta una carta, il motore prepara altre 4 idee in sottofondo
+      ricevendo le idee piaciute e scartate (`input.piaciute`, `input.scartate`);
+    - **soprannome** facoltativo ("Come lo/la chiami?") per rendere le domande personali
+      ("Lucrezia andrebbe mai a un concerto di Travis Scott?"): resta solo nel browser, al server e al
+      modello il destinatario arriva sempre come "la persona". Così resta valida la regola iniziale di non
+      raccogliere il nome del destinatario.

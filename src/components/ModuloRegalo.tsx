@@ -19,6 +19,7 @@ import { deduciPaese, PAESI, trovaPaese } from "@/config/paesi";
 import { useRouter } from "@/i18n/navigation";
 import { leggiNumero, nomePaese, simboloValuta } from "@/lib/formato";
 import {
+  chiediDomande,
   chiediIdee,
   interpreta,
   leggiBozzaGrezza,
@@ -36,6 +37,7 @@ type ErroriModulo = Partial<Record<CampoConErrore, string>>;
 
 function statoVuoto(paese: string): StatoModulo {
   return {
+    soprannome: "",
     paese,
     relazione: "",
     occasione: "",
@@ -140,27 +142,36 @@ export function ModuloRegalo() {
     setErrori({});
     setErroreInvio(null);
     setInviando(true);
-    const risposta = await chiediIdee({
+    const corpo = {
       lingua,
       modulo: esito.modulo,
-      tipo: "nuova",
+      tipo: "nuova" as const,
       risposte: [],
       escludi_titoli: [],
+      piaciute: [],
+      scartate: [],
       genitore_id: null,
-    });
-    if (!risposta.ok) {
-      setInviando(false);
-      setErroreInvio(risposta.errore);
-      return;
-    }
+    };
+    const base = { lingua, modulo: esito.modulo, risposte: [], voti: {}, soprannome: stato.soprannome.trim() };
 
-    salvaSessione({
-      lingua,
-      modulo: esito.modulo,
-      lotti: [{ risultato: risposta, tipo: "nuova", creato: Date.now() }],
-      risposte: [],
-      voti: {},
-    });
+    // 1. Prima il quiz: domande da scorrere sul destinatario
+    const domande = await chiediDomande(corpo);
+    if (domande.ok) {
+      salvaSessione({
+        ...base,
+        lotti: [],
+        quiz: { domande: domande.domande, risposte: domande.domande.map(() => null), finito: false },
+      });
+    } else {
+      // 2. Se le domande non arrivano, si passa subito alle idee
+      const risposta = await chiediIdee(corpo);
+      if (!risposta.ok) {
+        setInviando(false);
+        setErroreInvio(risposta.errore);
+        return;
+      }
+      salvaSessione({ ...base, lotti: [{ risultato: risposta, tipo: "nuova", creato: Date.now() }] });
+    }
     avviaCambioPagina(() => {
       setInviando(false);
       router.push("/idee");
@@ -176,7 +187,7 @@ export function ModuloRegalo() {
 
   return (
     <>
-      {(inviando || cambioPagina) && <Caricamento />}
+      {(inviando || cambioPagina) && <Caricamento variante="domande" />}
 
       <form onSubmit={invia} noValidate className="scheda p-5 sm:p-8" aria-labelledby={id("titolo")}>
         <h2 id={id("titolo")} className="text-[1.75rem] leading-tight font-semibold sm:text-3xl">
@@ -206,6 +217,26 @@ export function ModuloRegalo() {
               </Pillola>
             ))}
           </GruppoScelte>
+
+          {/* Soprannome: resta solo nel browser e serve a personalizzare le domande */}
+          <div>
+            <label htmlFor={id("campo-soprannome")} className="etichetta">
+              {t("soprannome.etichetta")} <Facoltativo testo={t("facoltativo")} />
+            </label>
+            <input
+              id={id("campo-soprannome")}
+              className="campo max-w-xs"
+              maxLength={30}
+              autoComplete="off"
+              placeholder={t("soprannome.segnaposto")}
+              aria-describedby={id("aiuto-soprannome")}
+              value={stato.soprannome}
+              onChange={(e) => aggiorna("soprannome", e.target.value)}
+            />
+            <p id={id("aiuto-soprannome")} className="mt-1.5 text-sm text-tenue">
+              {t("soprannome.aiuto")}
+            </p>
+          </div>
 
           {/* Occasione */}
           <GruppoScelte

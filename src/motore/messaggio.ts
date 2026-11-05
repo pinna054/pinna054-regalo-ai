@@ -91,10 +91,20 @@ export function costruisciMessaggio(r: RichiestaMotore): string {
   ];
 
   if (r.risposte.length > 0) {
-    righe.push("", "Risposte di chi fa il regalo alle tue domande precedenti:");
+    righe.push("", "Risposte di chi fa il regalo a domande sul destinatario (\"la persona\" è il destinatario):");
     for (const { domanda, risposta } of r.risposte) {
       righe.push(`- Domanda: ${domanda}`, `  Risposta: <risposta>${risposta}</risposta>`);
     }
+  }
+
+  if (r.piaciute.length > 0) {
+    righe.push("", "Idee che a chi fa il regalo sono piaciute (proponine altre nello stesso spirito, senza ripeterle):");
+    for (const titolo of r.piaciute) righe.push(`- ${titolo}`);
+  }
+
+  if (r.scartate.length > 0) {
+    righe.push("", "Idee scartate da chi fa il regalo (evita idee simili):");
+    for (const titolo of r.scartate) righe.push(`- ${titolo}`);
   }
 
   if (r.escludi_titoli.length > 0) {

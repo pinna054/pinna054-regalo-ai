@@ -4,13 +4,15 @@
  */
 import type { IngombroMassimo, Occasione, Relazione, Tipologia } from "@/config/opzioni";
 import type { RichiestaApi } from "@/motore/richiesta";
-import type { RispostaGenera, RispostaGeneraOk } from "@/motore/tipi-api";
+import type { DomandaQuiz, RispostaDomande, RispostaGenera, RispostaGeneraOk } from "@/motore/tipi-api";
 
 const CHIAVE_BOZZA = "regali:modulo";
 const CHIAVE_SESSIONE = "regali:idee";
 
 /** Il modulo così come lo compila l'utente (i numeri restano testo finché non si invia). */
 export type StatoModulo = {
+  /** Come l'utente chiama il destinatario: resta SOLO nel browser, non va mai al server */
+  soprannome: string;
   paese: string;
   relazione: Relazione | "";
   occasione: Occasione | "";
@@ -42,6 +44,10 @@ export type Sessione = {
   risposte: RichiestaApi["risposte"];
   /** Voti dati: id dell'idea → 1 (👍) o -1 (👎) */
   voti: Record<string, 1 | -1>;
+  /** Soprannome del destinatario per le domande (solo nel browser) */
+  soprannome?: string;
+  /** Il quiz iniziale: domande e risposte ("si", "no", "nonso" o testo) */
+  quiz?: { domande: DomandaQuiz[]; risposte: (string | null)[]; finito: boolean };
 };
 
 function leggi<T>(chiave: string): T | null {
@@ -113,6 +119,31 @@ export async function chiediIdee(corpo: RichiestaApi): Promise<RispostaGenera> {
   } catch {
     return { ok: false, errore: "rete" };
   }
+}
+
+/** Chiede le domande del quiz al server. Non lancia mai errori. */
+export async function chiediDomande(corpo: RichiestaApi): Promise<RispostaDomande> {
+  try {
+    const risposta = await fetch("/api/domande", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(corpo),
+    });
+    const dati = (await risposta.json().catch(() => null)) as RispostaDomande | null;
+    if (dati && typeof dati.ok === "boolean") return dati;
+    return { ok: false, errore: risposta.status === 429 ? "limite" : "motore" };
+  } catch {
+    return { ok: false, errore: "rete" };
+  }
+}
+
+/**
+ * Inserisce il soprannome al posto di {nome}. Senza soprannome usa il testo di riserva
+ * (es. "questa persona"). La prima lettera della frase diventa maiuscola.
+ */
+export function conNome(testo: string, nome: string, riserva: string): string {
+  const frase = testo.replaceAll("{nome}", nome.trim() || riserva);
+  return frase.charAt(0).toLocaleUpperCase() + frase.slice(1);
 }
 
 /** Invia il voto senza bloccare la pagina (voto 0 = toglie il voto). */

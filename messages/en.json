@@ -85,6 +85,11 @@
       "eta": "Enter an age between 0 and 120.",
       "paese": "Choose the delivery country.",
       "generico": "Please check the highlighted fields."
+    },
+    "soprannome": {
+      "etichetta": "What do you call them?",
+      "segnaposto": "E.g. Lucy, Grandma, Mark",
+      "aiuto": "Only used for the questions on your device: it is never sent or stored."
     }
   },
   "opzioni": {
@@ -139,7 +144,9 @@
       "4": "Looking for something original too…",
       "5": "Final touches…"
     },
-    "nota": "This usually takes 15–30 seconds."
+    "nota": "This usually takes 15–30 seconds.",
+    "domandeTitolo": "Preparing a few questions…",
+    "domandeNota": "Answer by swiping: it takes a minute and the ideas will be spot on."
   },
   "idee": {
     "titolo": "Here are your ideas",
@@ -179,7 +186,21 @@
     "budgetFinoA": "up to {prezzo}",
     "etaAnni": "{eta} years old",
     "chiudi": "Close",
-    "riepilogo": "Your request"
+    "riepilogo": "Your request",
+    "scopri": "Discover",
+    "preferiti": "Favourites",
+    "istruzioni": "Swipe right if you like it, left if not.",
+    "piace": "Like",
+    "scarta": "Pass",
+    "annulla": "Undo last choice",
+    "aggiuntaPreferiti": "Added to favourites",
+    "cercoAltre": "Finding more ideas for you…",
+    "finite": "You’ve seen all the ideas",
+    "finiteTesto": "I’ll prepare more, based on what you liked and what you didn’t.",
+    "altreIdee": "Show me more ideas",
+    "preferitiVuoti": "No favourites yet: swipe right on the ideas you like.",
+    "togli": "Remove from favourites",
+    "vaiPreferiti": "See favourites"
   },
   "errori": {
     "titolo": "Something went wrong",
@@ -274,5 +295,19 @@
         "7": "Amazon Associates Program requirements for each marketplace (exact wording of the disclosure)."
       }
     }
+  },
+  "quiz": {
+    "titolo": "A few quick questions",
+    "laPersona": "they",
+    "si": "Yes",
+    "no": "No",
+    "nonso": "Not sure",
+    "istruzioni": "Swipe right for Yes, left for No.",
+    "domanda": "Question {numero} of {totale}",
+    "avanti": "Next",
+    "salta": "Skip",
+    "saltaTutto": "Skip the questions",
+    "segnaposto": "Write a few words…",
+    "fine": "Find ideas"
   }
 }

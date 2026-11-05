@@ -63,8 +63,11 @@ export const SchemaRichiestaApi = z.object({
   modulo: SchemaModulo,
   // nuova = primo invio del modulo; rigenera = "altre idee"; risposte = risposte alle domande
   tipo: z.enum(["nuova", "rigenera", "risposte"]).default("nuova"),
-  risposte: z.array(SchemaRisposta).max(4).default([]),
+  risposte: z.array(SchemaRisposta).max(16).default([]),
   escludi_titoli: z.array(z.string().max(200)).max(60).default([]),
+  // Scelte fatte scorrendo le carte: idee che sono piaciute e idee scartate (titoli)
+  piaciute: z.array(z.string().max(200)).max(30).default([]),
+  scartate: z.array(z.string().max(200)).max(30).default([]),
   genitore_id: z.uuid().nullable().default(null),
 });
 export type RichiestaApi = z.infer<typeof SchemaRichiestaApi>;
@@ -97,6 +100,10 @@ export type RichiestaMotore = {
   };
   risposte: { domanda: string; risposta: string }[];
   escludi_titoli: string[];
+  /** Idee che sono piaciute all'utente (scorrendo a destra): il motore ne segue lo spirito */
+  piaciute: string[];
+  /** Idee scartate (scorrendo a sinistra): il motore evita idee simili */
+  scartate: string[];
 };
 
 /**
@@ -165,5 +172,7 @@ export function preparaRichiesta(api: RichiestaApi): RichiestaMotore {
       .map((r) => ({ domanda: r.domanda.trim(), risposta: pulisciTesto(r.risposta) }))
       .filter((r) => r.domanda && r.risposta),
     escludi_titoli: [...new Set(api.escludi_titoli.map((t) => t.trim()).filter(Boolean))],
+    piaciute: [...new Set(api.piaciute.map((t) => t.trim()).filter(Boolean))],
+    scartate: [...new Set(api.scartate.map((t) => t.trim()).filter(Boolean))],
   };
 }

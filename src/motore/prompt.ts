@@ -10,6 +10,8 @@ import path from "node:path";
 
 const CARTELLA = path.join(process.cwd(), "prompts");
 const NOME_VALIDO = /^motore-v\d+$/;
+// Altri prompt: quello delle domande del quiz (domande-v1.md, domande-v2.md, ...)
+const NOME_FILE_VALIDO = /^(motore|domande)-v\d+$/;
 const memoria = new Map<string, string>();
 
 /** Versioni disponibili, dalla più recente: ["motore-v2", "motore-v1"]. */
@@ -24,6 +26,14 @@ export async function elencaVersioniPrompt(): Promise<string[]> {
 /** Testo del prompt di una versione (es. "motore-v1"). */
 export async function caricaPrompt(versione: string): Promise<string> {
   if (!NOME_VALIDO.test(versione)) {
+    throw new Error(`Nome di versione del prompt non valido: "${versione}" (atteso: motore-vN)`);
+  }
+  return caricaPromptFile(versione);
+}
+
+/** Testo di un file di prompt (motore-vN o domande-vN). */
+export async function caricaPromptFile(versione: string): Promise<string> {
+  if (!NOME_FILE_VALIDO.test(versione)) {
     throw new Error(`Nome di versione del prompt non valido: "${versione}" (atteso: motore-vN)`);
   }
   const salvato = memoria.get(versione);

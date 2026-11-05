@@ -1,11 +1,16 @@
 "use client";
 
 /**
- * Pagina dei risultati: lettura del profilo, avvisi, domande utili, 4 schede idea,
- * "Rigenera" e "Rispondi e rigenera". I dati arrivano dalla memoria della scheda (sessionStorage).
+ * Pagina dei risultati, come un'app di incontri ma per i regali:
+ * 1. Quiz: domande sul destinatario da scorrere (sì / no) e qualche domanda aperta;
+ * 2. "Scopri": le idee una alla volta, da scorrere a destra (♥) o a sinistra (✕);
+ *    quando stanno per finire il motore ne prepara altre tenendo conto delle scelte;
+ * 3. "Preferiti": le idee che sono piaciute, con i link per comprarle.
+ * Sotto: cosa ha capito il motore, avvisi e domande utili.
+ * Tutto resta nella memoria della scheda (sessionStorage).
  */
 import { useLocale, useTranslations } from "next-intl";
-import { useId, useState, useSyncExternalStore } from "react";
+import { useId, useRef, useState, useSyncExternalStore } from "react";
 import { CHIAVE_RELAZIONE } from "@/config/opzioni";
 import { SITO } from "@/config/sito";
 import { Link } from "@/i18n/navigation";
@@ -20,18 +25,25 @@ import {
   svuotaTutto,
   type Sessione,
 } from "@/lib/sessione";
-import type { CodiceErroreApi } from "@/motore/tipi-api";
+import type { CodiceErroreApi, IdeaMostrata } from "@/motore/tipi-api";
 import { Caricamento } from "./Caricamento";
 import { IllustrazioneRegalo } from "./Illustrazioni";
-import { SchedaIdea } from "./SchedaIdea";
+import { MazzoIdee } from "./MazzoIdee";
+import { Preferiti } from "./Preferiti";
+import { Quiz } from "./Quiz";
 
 // Valore usato mentre la pagina viene preparata sul server (la memoria del browser non c'è ancora)
 const SUL_SERVER = "__server__";
 // Massimo di titoli già visti da passare al motore
 const MASSIMO_ESCLUSI = 60;
+// Come il motore legge le risposte del quiz
+const RISPOSTA_PER_MOTORE: Record<string, string> = { si: "Sì", no: "No", nonso: "Non so" };
+
+type TipoRichiesta = "nuova" | "rigenera" | "risposte";
 
 export function Risultati() {
   const t = useTranslations("idee");
+  const tQuiz = useTranslations("quiz");
   const tOpzioni = useTranslations("opzioni");
   const tErrori = useTranslations("errori");
   const lingua = useLocale();
@@ -39,257 +51,331 @@ export function Risultati() {
   const grezza = useSyncExternalStore(nessunaIscrizione, leggiSessioneGrezza, () => SUL_SERVER);
   const [modificata, setModificata] = useState<Sessione | null>(null);
   const [inAttesa, setInAttesa] = useState(false);
+  // Ricerca di altre idee mentre si scorrono le carte (senza schermata di attesa)
+  const [cercando, setCercando] = useState(false);
   const [errore, setErrore] = useState<CodiceErroreApi | null>(null);
   const [risposte, setRisposte] = useState<Record<string, string>>({});
+  const [vista, setVista] = useState<"scopri" | "preferiti">("scopri");
+  // Ultima idea scelta, per poter annullare la scelta
+  const [ultimaScelta, setUltimaScelta] = useState<string | null>(null);
+  const [avvisoPreferito, setAvvisoPreferito] = useState(false);
+  const timerAvviso = useRef<ReturnType<typeof setTimeout>>(undefined);
   const prefisso = useId();
 
   if (grezza === SUL_SERVER) return <Scheletro />;
   const salvata = interpreta<Sessione>(grezza);
   // (i campi mancanti in una sessione salvata da una versione precedente prendono un valore vuoto)
-  const sessione = modificata ?? (salvata && { ...salvata, risposte: salvata.risposte ?? [], voti: salvata.voti ?? {} });
-  if (!sessione || !Array.isArray(sessione.lotti) || sessione.lotti.length === 0) return <Vuoto />;
+  const sessione =
+    modificata ??
+    (salvata && { ...salvata, lotti: salvata.lotti ?? [], risposte: salvata.risposte ?? [], voti: salvata.voti ?? {} });
+  if (!sessione || (sessione.lotti.length === 0 && !sessione.quiz)) return <Vuoto />;
 
-  const [ultimo, ...precedenti] = sessione.lotti;
-  const risultato = ultimo.risultato;
-  const valuta = risultato.valuta;
+  const risultato = sessione.lotti[0]?.risultato;
+  const quizInCorso = sessione.quiz && !sessione.quiz.finito;
 
   function aggiorna(nuova: Sessione) {
     setModificata(nuova);
     salvaSessione(nuova);
   }
 
-  async function nuoveIdee(tipo: "rigenera" | "risposte", s: Sessione) {
+  async function nuoveIdee(tipo: TipoRichiesta, s: Sessione, inSottofondo = false) {
     const nuoveRisposte =
-      tipo === "risposte"
+      tipo === "risposte" && risultato
         ? [
             ...s.risposte,
             ...risultato.domande_utili
               .map((domanda) => ({ domanda, risposta: (risposte[domanda] ?? "").trim() }))
               .filter((r) => r.risposta),
-          ].slice(-4)
+          ].slice(-16)
         : s.risposte;
-    // "Rigenera": il motore riceve tutti i titoli già visti e propone idee diverse
-    const escludi =
-      tipo === "rigenera"
-        ? s.lotti.flatMap((l) => l.risultato.idee.map((i) => i.titolo)).slice(0, MASSIMO_ESCLUSI)
-        : [];
+    // Il motore riceve i titoli già visti (da non ripetere) e le scelte fatte con le carte
+    const tutte = s.lotti.flatMap((l) => l.risultato.idee);
+    const escludi = tipo === "rigenera" ? tutte.map((i) => i.titolo).slice(0, MASSIMO_ESCLUSI) : [];
+    const piaciute = tutte.filter((i) => s.voti[i.id] === 1).map((i) => i.titolo).slice(0, 30);
+    const scartate = tutte.filter((i) => s.voti[i.id] === -1).map((i) => i.titolo).slice(0, 30);
 
     setErrore(null);
-    setInAttesa(true);
+    if (inSottofondo) setCercando(true);
+    else setInAttesa(true);
     const risposta = await chiediIdee({
       lingua,
       modulo: s.modulo,
       tipo,
       risposte: nuoveRisposte,
       escludi_titoli: escludi,
-      genitore_id: risultato.generazione_id,
+      piaciute,
+      scartate,
+      genitore_id: s.lotti[0]?.risultato.generazione_id ?? null,
     });
     setInAttesa(false);
+    setCercando(false);
     if (!risposta.ok) {
       setErrore(risposta.errore);
       return;
     }
+    // Rilegge la sessione salvata: nel frattempo l'utente può aver scelto altre carte
+    const attuale = interpreta<Sessione>(leggiSessioneGrezza()) ?? s;
     aggiorna({
-      ...s,
+      ...attuale,
       lingua,
       risposte: nuoveRisposte,
-      lotti: [{ risultato: risposta, tipo, creato: Date.now() }, ...s.lotti],
+      lotti: [{ risultato: risposta, tipo, creato: Date.now() }, ...attuale.lotti],
     });
-    setRisposte({});
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!inSottofondo) {
+      setRisposte({});
+      setVista("scopri");
+    }
   }
 
-  function vota(s: Sessione, ideaId: string, voto: 1 | -1) {
-    const nuovo = s.voti[ideaId] === voto ? 0 : voto;
+  /** Fine del quiz: le risposte entrano nel profilo e si chiedono le prime idee. */
+  function concludiQuiz(s: Sessione) {
+    const quiz = s.quiz;
+    if (!quiz) return;
+    const dalQuiz = quiz.domande.flatMap((d, i) => {
+      const r = quiz.risposte[i];
+      if (!r) return [];
+      // al motore il destinatario arriva sempre come "la persona", mai con il soprannome
+      return [{ domanda: d.testo.replaceAll("{nome}", "la persona"), risposta: RISPOSTA_PER_MOTORE[r] ?? r }];
+    });
+    const nuova = { ...s, risposte: dalQuiz.slice(0, 16), quiz: { ...quiz, finito: true } };
+    aggiorna(nuova);
+    void nuoveIdee("nuova", nuova);
+  }
+
+  function rispondiQuiz(vista: Sessione, indice: number, valore: string) {
+    const s = interpreta<Sessione>(leggiSessioneGrezza()) ?? vista;
+    if (!s.quiz) return;
+    const risposteQuiz = [...s.quiz.risposte];
+    risposteQuiz[indice] = valore;
+    const nuova = { ...s, quiz: { ...s.quiz, risposte: risposteQuiz } };
+    if (risposteQuiz.every((r) => r !== null)) concludiQuiz(nuova);
+    else aggiorna(nuova);
+  }
+
+  /** Scelta su una carta: 1 = mi piace (va nei preferiti), -1 = scartata, 0 = annullata. */
+  function scegli(vista: Sessione, ideaId: string, voto: 1 | -1 | 0) {
+    // Parte dalla sessione salvata più recente: nel frattempo può essere arrivato un nuovo gruppo di idee
+    const s = interpreta<Sessione>(leggiSessioneGrezza()) ?? vista;
     const voti = { ...s.voti };
-    if (nuovo === 0) delete voti[ideaId];
-    else voti[ideaId] = nuovo;
-    aggiorna({ ...s, voti });
-    inviaVoto(ideaId, nuovo);
+    if (voto === 0) delete voti[ideaId];
+    else voti[ideaId] = voto;
+    const nuova = { ...s, voti };
+    aggiorna(nuova);
+    inviaVoto(ideaId, voto);
+    setUltimaScelta(voto === 0 ? null : ideaId);
+    if (voto === 1) {
+      setAvvisoPreferito(true);
+      clearTimeout(timerAvviso.current);
+      timerAvviso.current = setTimeout(() => setAvvisoPreferito(false), 1600);
+    }
+    // Quando resta al massimo una carta, il motore ne prepara altre in sottofondo
+    if (voto !== 0 && !cercando && !inAttesa && daScegliere(nuova).length <= 1) {
+      void nuoveIdee("rigenera", nuova, true);
+    }
   }
 
   const m = sessione.modulo;
+  const valuta = risultato?.valuta;
   const riepilogo = [
-    tOpzioni(`relazione.${CHIAVE_RELAZIONE[m.relazione]}`),
+    sessione.soprannome || tOpzioni(`relazione.${CHIAVE_RELAZIONE[m.relazione]}`),
     m.occasione === "altra" ? m.occasione_altra : tOpzioni(`occasione.${m.occasione}`),
-    m.budget_min !== null
-      ? formattaFascia(m.budget_min, m.budget_max, valuta, lingua)
-      : t("budgetFinoA", { prezzo: formattaPrezzo(m.budget_max, valuta, lingua) }),
+    valuta
+      ? m.budget_min !== null
+        ? formattaFascia(m.budget_min, m.budget_max, valuta, lingua)
+        : t("budgetFinoA", { prezzo: formattaPrezzo(m.budget_max, valuta, lingua) })
+      : null,
     m.eta !== null ? t("etaAnni", { eta: m.eta }) : null,
-    nomePaese(risultato.paese, lingua),
+    nomePaese(risultato?.paese ?? m.paese, lingua),
   ].filter(Boolean);
 
-  const ideeVisibili = sessione.lotti.flatMap((l) => l.risultato.idee);
-  const mostraAffiliazione = ideeVisibili.some((i) => i.affiliato);
-  const haRisposte = risultato.domande_utili.some((d) => (risposte[d] ?? "").trim());
+  const mazzo = daScegliere(sessione);
+  const preferite = tutteLeIdee(sessione).filter(({ idea }) => sessione.voti[idea.id] === 1);
+  const mostraAffiliazione = sessione.lotti.some((l) => l.risultato.idee.some((i) => i.affiliato));
+  const haRisposte = risultato?.domande_utili.some((d) => (risposte[d] ?? "").trim()) ?? false;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
       {inAttesa && <Caricamento />}
 
-      {/* Intestazione dei risultati */}
-      <div className="flex flex-wrap items-end justify-between gap-4 pt-6 sm:pt-10">
-        <div>
-          <h1 className="text-[2.2rem] leading-tight font-semibold tracking-tight sm:text-5xl">{t("titolo")}</h1>
-          <p className="sr-only">{t("riepilogo")}</p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {riepilogo.map((voce, indice) => (
-              <li key={indice} className="rounded-full border border-bordo bg-carta px-3 py-1 text-sm text-tenue">
-                {voce}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href={{ pathname: "/", hash: "modulo" }} className="pulsante-secondario">
-            <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true">
-              <path fill="currentColor" d="M13.6 2.6a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8l-9 9-4.4 1.1 1.1-4.4 8.5-9.5Z" />
-            </svg>
-            {t("modifica")}
-          </Link>
-          {/* Link normale (non gestito da Next.js): ricarica la home con il modulo vuoto */}
-          <a href={`/${lingua}`} onClick={svuotaTutto} className="pulsante-secondario">
-            {t("nuovaRicerca")}
-          </a>
-        </div>
+      {/* Intestazione compatta, così le carte restano in vista anche sul telefono */}
+      <div className="pt-4 sm:pt-8">
+        <h1 className="text-[1.9rem] leading-tight font-semibold tracking-tight sm:text-4xl">
+          {quizInCorso ? tQuiz("titolo") : t("titolo")}
+        </h1>
+        <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={t("riepilogo")}>
+          {riepilogo.map((voce, indice) => (
+            <li key={indice} className="rounded-full border border-bordo bg-carta px-2.5 py-0.5 text-sm text-tenue">
+              {voce}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {risultato.demo && (
-        <p className="mt-6 rounded-2xl border-2 border-dashed border-ocra/50 bg-ocra-chiaro px-4 py-3 font-semibold text-ocra">
+      {risultato?.demo && (
+        <p className="mt-3 rounded-xl border border-dashed border-ocra/50 bg-ocra-chiaro px-3 py-1.5 text-sm font-semibold text-ocra">
           {t("demo")}
         </p>
       )}
 
-      {/* Lettura del profilo, avvisi, domande */}
-      <div className="mt-8 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <section className="scheda p-5 sm:p-6" aria-labelledby={`${prefisso}-lettura`}>
-          <h2 id={`${prefisso}-lettura`} className="text-sm font-semibold tracking-wide text-terracotta uppercase [font-family:var(--font-testo)]">
-            {t("letturaTitolo")}
-          </h2>
-          <p className="mt-2 font-titoli text-xl leading-snug [font-variation-settings:'SOFT'_100]">
-            {risultato.lettura_profilo}
-          </p>
-          {risultato.avvisi.length > 0 && (
-            <div className="mt-5 rounded-2xl bg-ocra-chiaro/80 px-4 py-3 text-ocra">
-              <h3 className="text-sm font-bold [font-family:var(--font-testo)]">{t("avvisiTitolo")}</h3>
-              <ul className="mt-1.5 list-disc space-y-1 pl-5 leading-snug">
-                {risultato.avvisi.map((avviso, i) => (
-                  <li key={i}>{avviso}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
-
-        {risultato.domande_utili.length > 0 && (
-          <section className="scheda bg-salvia-chiaro/40 p-5 sm:p-6" aria-labelledby={`${prefisso}-domande`}>
-            <h2 id={`${prefisso}-domande`} className="text-xl font-semibold">
-              {t("domandeTitolo")}
-            </h2>
-            <p className="mt-1 text-sm text-tenue">{t("domandeAiuto")}</p>
-            <form
-              className="mt-4 space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (haRisposte) void nuoveIdee("risposte", sessione);
-              }}
-            >
-              {risultato.domande_utili.map((domanda, i) => (
-                <div key={domanda}>
-                  <label htmlFor={`${prefisso}-risposta-${i}`} className="mb-1.5 block font-medium">
-                    {domanda}
-                  </label>
-                  <input
-                    id={`${prefisso}-risposta-${i}`}
-                    className="campo"
-                    maxLength={500}
-                    placeholder={t("rispostaSegnaposto")}
-                    value={risposte[domanda] ?? ""}
-                    onChange={(e) => setRisposte({ ...risposte, [domanda]: e.target.value })}
-                  />
-                </div>
-              ))}
-              <button type="submit" className="pulsante w-full" disabled={!haRisposte || inAttesa}>
-                {t("rispondiRigenera")}
-              </button>
-            </form>
-          </section>
-        )}
-      </div>
-
-      {/* Le idee */}
-      {risultato.parziale && (
-        <p className="mt-6 rounded-2xl bg-sabbia px-4 py-3 text-tenue">
-          {risultato.idee.length === 0 ? t("nessuna") : t("parziale", { numero: risultato.idee.length })}
-        </p>
-      )}
-      <div key={risultato.generazione_id} data-lotto="attuale" className="mt-6 grid gap-5 md:grid-cols-2">
-        {risultato.idee.map((idea, i) => (
-          <SchedaIdea
-            key={idea.id}
-            idea={idea}
-            valuta={valuta}
-            ordine={i}
-            voto={sessione.voti[idea.id]}
-            onVota={(voto) => vota(sessione, idea.id, voto)}
+      {quizInCorso && sessione.quiz ? (
+        <div className="mt-5">
+          <Quiz
+            domande={sessione.quiz.domande}
+            risposte={sessione.quiz.risposte}
+            soprannome={sessione.soprannome ?? ""}
+            onRispondi={(indice, valore) => rispondiQuiz(sessione, indice, valore)}
+            onSaltaTutto={() => concludiQuiz(sessione)}
           />
-        ))}
-      </div>
-
-      {/* Rigenera */}
-      <section className="mt-10 flex flex-col items-center rounded-3xl border border-dashed border-bordo px-5 py-8 text-center">
-        <h2 className="text-2xl font-semibold">{t("rigeneraTitolo")}</h2>
-        <p className="mt-2 max-w-md text-tenue">{t("rigeneraTesto")}</p>
-        <button
-          type="button"
-          className="pulsante mt-5"
-          disabled={inAttesa}
-          onClick={() => void nuoveIdee("rigenera", sessione)}
-        >
-          <svg viewBox="0 0 20 20" className="size-5" aria-hidden="true">
-            <path fill="currentColor" d="M10 3a7 7 0 0 1 6.3 4H14a1 1 0 1 0 0 2h4.5a.5.5 0 0 0 .5-.5V4a1 1 0 1 0-2 0v1.4A9 9 0 0 0 1.1 9.9a1 1 0 0 0 2 .2A7 7 0 0 1 10 3Zm7.9 6.9a1 1 0 0 0-1.1.9A7 7 0 0 1 3.7 13H6a1 1 0 1 0 0-2H1.5a.5.5 0 0 0-.5.5V16a1 1 0 1 0 2 0v-1.4a9 9 0 0 0 15.9-3.6 1 1 0 0 0-1-1.1Z" />
-          </svg>
-          {t("rigenera")}
-        </button>
-      </section>
-
-      {/* Proposte precedenti */}
-      {precedenti.length > 0 && (
-        <details className="group mt-8 rounded-3xl border border-bordo bg-carta/60">
-          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-5 font-semibold">
-            {t("precedenti")} ({precedenti.length})
-            <svg viewBox="0 0 20 20" className="size-4 text-tenue transition-transform group-open:rotate-180" aria-hidden="true">
-              <path fill="currentColor" d="M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4Z" />
-            </svg>
-          </summary>
-          <div className="space-y-8 px-4 pb-6 sm:px-5">
-            {precedenti.map((lotto, indice) => (
-              <section key={lotto.risultato.generazione_id}>
-                <h3 className="mb-3 text-lg font-semibold">
-                  {t("proposta", { numero: precedenti.length - indice })}
-                </h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {lotto.risultato.idee.map((idea) => (
-                    <SchedaIdea
-                      key={idea.id}
-                      idea={idea}
-                      valuta={lotto.risultato.valuta}
-                      voto={sessione.voti[idea.id]}
-                      onVota={(voto) => vota(sessione, idea.id, voto)}
-                    />
-                  ))}
-                </div>
-              </section>
+        </div>
+      ) : (
+        <>
+          {/* Schede: Scopri / Preferiti */}
+          <div
+            className="sticky top-2 z-30 mx-auto mt-5 flex w-fit gap-1 rounded-full border border-bordo bg-carta/95 p-1 shadow-morbida backdrop-blur"
+            role="tablist"
+          >
+            {(["scopri", "preferiti"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={vista === v}
+                onClick={() => setVista(v)}
+                className={`min-h-10 rounded-full px-5 text-[0.95rem] font-semibold transition ${
+                  vista === v ? "bg-inchiostro text-crema" : "text-tenue hover:text-inchiostro"
+                }`}
+              >
+                {v === "scopri" ? t("scopri") : `${t("preferiti")} (${preferite.length})`}
+              </button>
             ))}
           </div>
-        </details>
+
+          <div className="mt-5" role="tabpanel">
+            {vista === "preferiti" ? (
+              <Preferiti idee={preferite} onTogli={(idea) => scegli(sessione, idea.id, 0)} />
+            ) : mazzo.length > 0 ? (
+              <MazzoIdee
+                idee={mazzo}
+                onScegli={(idea, voto) => scegli(sessione, idea.id, voto)}
+                onAnnulla={ultimaScelta ? () => scegli(sessione, ultimaScelta, 0) : null}
+              />
+            ) : (
+              <section className="mx-auto flex max-w-md flex-col items-center rounded-3xl border border-dashed border-bordo px-5 py-10 text-center">
+                {cercando || inAttesa ? (
+                  <>
+                    <div className="size-10 animate-spin rounded-full border-4 border-sabbia border-t-terracotta" aria-hidden="true" />
+                    <p className="mt-4 font-semibold" role="status">
+                      {t("cercoAltre")}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-semibold">{t("finite")}</h2>
+                    <p className="mt-2 text-tenue">{t("finiteTesto")}</p>
+                    <button
+                      type="button"
+                      className="pulsante mt-5"
+                      onClick={() => void nuoveIdee(sessione.lotti.length ? "rigenera" : "nuova", sessione, true)}
+                    >
+                      {t("altreIdee")}
+                    </button>
+                    {preferite.length > 0 && (
+                      <button type="button" className="pulsante-secondario mt-3" onClick={() => setVista("preferiti")}>
+                        {t("vaiPreferiti")}
+                      </button>
+                    )}
+                  </>
+                )}
+              </section>
+            )}
+          </div>
+        </>
       )}
 
-      {/* Note */}
-      <div className="mt-8 space-y-2 text-sm leading-relaxed text-tenue">
+      {/* Cosa ha capito il motore, avvisi e domande utili */}
+      {risultato && !quizInCorso && (
+        <div className="mx-auto mt-10 grid max-w-3xl gap-4">
+          <section className="scheda p-5 sm:p-6" aria-labelledby={`${prefisso}-lettura`}>
+            <h2
+              id={`${prefisso}-lettura`}
+              className="text-sm font-semibold tracking-wide text-terracotta uppercase [font-family:var(--font-testo)]"
+            >
+              {t("letturaTitolo")}
+            </h2>
+            <p className="mt-2 font-titoli text-xl leading-snug [font-variation-settings:'SOFT'_100]">{risultato.lettura_profilo}</p>
+            {risultato.avvisi.length > 0 && (
+              <div className="mt-5 rounded-2xl bg-ocra-chiaro/80 px-4 py-3 text-ocra">
+                <h3 className="text-sm font-bold [font-family:var(--font-testo)]">{t("avvisiTitolo")}</h3>
+                <ul className="mt-1.5 list-disc space-y-1 pl-5 leading-snug">
+                  {risultato.avvisi.map((avviso, i) => (
+                    <li key={i}>{avviso}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+
+          {risultato.domande_utili.length > 0 && (
+            <section className="scheda bg-salvia-chiaro/40 p-5 sm:p-6" aria-labelledby={`${prefisso}-domande`}>
+              <h2 id={`${prefisso}-domande`} className="text-xl font-semibold">
+                {t("domandeTitolo")}
+              </h2>
+              <p className="mt-1 text-sm text-tenue">{t("domandeAiuto")}</p>
+              <form
+                className="mt-4 space-y-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (haRisposte) void nuoveIdee("risposte", sessione);
+                }}
+              >
+                {risultato.domande_utili.map((domanda, i) => (
+                  <div key={domanda}>
+                    <label htmlFor={`${prefisso}-risposta-${i}`} className="mb-1.5 block font-medium">
+                      {domanda}
+                    </label>
+                    <input
+                      id={`${prefisso}-risposta-${i}`}
+                      className="campo"
+                      maxLength={500}
+                      placeholder={t("rispostaSegnaposto")}
+                      value={risposte[domanda] ?? ""}
+                      onChange={(e) => setRisposte({ ...risposte, [domanda]: e.target.value })}
+                    />
+                  </div>
+                ))}
+                <button type="submit" className="pulsante w-full" disabled={!haRisposte || inAttesa}>
+                  {t("rispondiRigenera")}
+                </button>
+              </form>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* Azioni e note */}
+      <div className="mx-auto mt-8 flex max-w-3xl flex-wrap justify-center gap-2">
+        <Link href={{ pathname: "/", hash: "modulo" }} className="pulsante-secondario">
+          {t("modifica")}
+        </Link>
+        {/* Link normale (non gestito da Next.js): ricarica la home con il modulo vuoto */}
+        <a href={`/${lingua}`} onClick={svuotaTutto} className="pulsante-secondario">
+          {t("nuovaRicerca")}
+        </a>
+      </div>
+      <div className="mx-auto mt-6 max-w-3xl space-y-2 text-sm leading-relaxed text-tenue">
         <p>{t("notaPrezzi")}</p>
         {mostraAffiliazione && <p>{t("affiliazione", { sito: SITO.nome })}</p>}
       </div>
+
+      {/* Avviso breve quando un'idea finisce nei preferiti */}
+      {avvisoPreferito && (
+        <p
+          role="status"
+          className="fixed inset-x-0 bottom-6 z-40 mx-auto flex w-fit animate-comparsa items-center gap-2 rounded-full bg-inchiostro px-5 py-2.5 font-semibold text-crema shadow-sollevata"
+        >
+          <span aria-hidden="true">♥</span> {t("aggiuntaPreferiti")}
+        </p>
+      )}
 
       {/* Messaggio di errore (in basso, sempre visibile) */}
       {errore && (
@@ -308,7 +394,10 @@ export function Risultati() {
             aria-label={t("chiudi")}
           >
             <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true">
-              <path fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0L10 8.6l3.3-3.3a1 1 0 1 1 1.4 1.4L11.4 10l3.3 3.3a1 1 0 0 1-1.4 1.4L10 11.4l-3.3 3.3a1 1 0 0 1-1.4-1.4L8.6 10 5.3 6.7a1 1 0 0 1 0-1.4Z" />
+              <path
+                fill="currentColor"
+                d="M5.3 5.3a1 1 0 0 1 1.4 0L10 8.6l3.3-3.3a1 1 0 1 1 1.4 1.4L11.4 10l3.3 3.3a1 1 0 0 1-1.4 1.4L10 11.4l-3.3 3.3a1 1 0 0 1-1.4-1.4L8.6 10 5.3 6.7a1 1 0 0 1 0-1.4Z"
+              />
             </svg>
           </button>
         </div>
@@ -317,16 +406,22 @@ export function Risultati() {
   );
 }
 
+/** Tutte le idee ricevute, dalla più vecchia alla più recente, con la loro valuta. */
+function tutteLeIdee(s: Sessione): { idea: IdeaMostrata; valuta: string }[] {
+  return [...s.lotti].reverse().flatMap((l) => l.risultato.idee.map((idea) => ({ idea, valuta: l.risultato.valuta })));
+}
+
+/** Le carte ancora da scegliere (né piaciute né scartate). */
+function daScegliere(s: Sessione) {
+  return tutteLeIdee(s).filter(({ idea }) => s.voti[idea.id] === undefined);
+}
+
 /** Mostrato per un attimo mentre la pagina si carica. */
 function Scheletro() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-10 sm:px-6" aria-hidden="true">
-      <div className="h-12 w-2/3 animate-pulse rounded-2xl bg-sabbia" />
-      <div className="mt-8 grid gap-5 md:grid-cols-2">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-72 animate-pulse rounded-3xl bg-sabbia/70" />
-        ))}
-      </div>
+    <div className="mx-auto w-full max-w-md px-4 pt-8" aria-hidden="true">
+      <div className="h-10 w-2/3 animate-pulse rounded-2xl bg-sabbia" />
+      <div className="mt-8 h-96 animate-pulse rounded-3xl bg-sabbia/70" />
     </div>
   );
 }

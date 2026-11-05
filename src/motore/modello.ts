@@ -23,6 +23,8 @@ export type ParametriChiamata = {
   richiesta: RichiestaMotore;
   /** Numero della chiamata (1, 2, 3): usato solo dal motore finto */
   numero: number;
+  /** Formato JSON imposto (se manca: quello delle idee regalo) */
+  formato?: ReturnType<typeof betaZodOutputFormat>;
 };
 
 export type EsitoChiamata = {
@@ -65,7 +67,7 @@ function clientAnthropic(): Anthropic {
 }
 
 /** Chiamata vera all'API Anthropic. */
-export const chiamaAnthropic: ChiamaModello = async ({ modello, effort, sistema, messaggi }) => {
+export const chiamaAnthropic: ChiamaModello = async ({ modello, effort, sistema, messaggi, formato }) => {
   try {
     const risposta = await clientAnthropic().beta.messages.create({
       model: modello,
@@ -78,7 +80,7 @@ export const chiamaAnthropic: ChiamaModello = async ({ modello, effort, sistema,
       system: [{ type: "text", text: sistema, cache_control: { type: "ephemeral" } }],
       messages: messaggi,
       output_config: {
-        format: FORMATO_RISPOSTA,
+        format: formato ?? FORMATO_RISPOSTA,
         ...(effort ? { effort } : {}),
       },
     });

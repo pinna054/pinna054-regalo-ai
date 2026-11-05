@@ -53,13 +53,15 @@ async function incrementa(contatori: Contatore[]): Promise<number[]> {
 /** Controlla i limiti per una nuova richiesta di idee. */
 export async function controllaLimitiGenerazione(
   ip: string,
+  // "genera" per le idee, "domande" per il quiz: contatori separati con gli stessi limiti
+  azione: "genera" | "domande" = "genera",
 ): Promise<"ok" | "limite" | "limiteGlobale"> {
   const { perOra, perGiorno, globaleGiorno } = limiti();
   const codice = hashIp(ip);
   const [ora, giorno, globale] = await incrementa([
-    { chiave: `genera:ora:${codice}`, secondi: 3600 },
-    { chiave: `genera:giorno:${codice}`, secondi: 86400 },
-    { chiave: "genera:globale", secondi: 86400 },
+    { chiave: `${azione}:ora:${codice}`, secondi: 3600 },
+    { chiave: `${azione}:giorno:${codice}`, secondi: 86400 },
+    { chiave: `${azione}:globale`, secondi: 86400 },
   ]);
   if (ora > perOra || giorno > perGiorno) return "limite";
   if (globale > globaleGiorno) return "limiteGlobale";

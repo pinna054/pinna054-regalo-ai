@@ -102,3 +102,45 @@ export const chiamaMotoreFinto: ChiamaModello = async ({ richiesta: r }) => {
     contenuto: [{ type: "text", text: JSON.stringify(risposta) }],
   };
 };
+
+/** Domande finte per il quiz (solo con MOTORE_FINTO=1). */
+export const chiamaDomandeFinte: ChiamaModello = async ({ richiesta: r }) => {
+  await new Promise((fatto) => setTimeout(fatto, 800));
+  const it = r.richiesta.lingua === "it";
+  const domande = (
+    it
+      ? [
+          ["si_no", "{nome} andrebbe mai a un concerto di Travis Scott?"],
+          ["si_no", "{nome} comprerebbe mai il tofu al supermercato?"],
+          ["si_no", "{nome} passerebbe un weekend in una baita senza wifi?"],
+          ["si_no", "{nome} guarderebbe tutta una serie in un giorno solo?"],
+          ["si_no", "{nome} si iscriverebbe a una gara di cucina in TV?"],
+          ["si_no", "{nome} userebbe ancora una macchina fotografica a rullino?"],
+          ["si_no", "{nome} farebbe un corso di ceramica il sabato mattina?"],
+          ["si_no", "{nome} sceglierebbe una spa invece di una discoteca?"],
+          ["aperta", "Qual è l’ultima cosa di cui {nome} ti ha parlato con entusiasmo?"],
+          ["aperta", "Com’è una giornata perfetta per {nome}?"],
+        ]
+      : [
+          ["si_no", "Would {nome} ever go to a Travis Scott concert?"],
+          ["si_no", "Would {nome} ever buy tofu at the supermarket?"],
+          ["si_no", "Would {nome} spend a weekend in a cabin with no wifi?"],
+          ["si_no", "Would {nome} binge a whole series in one day?"],
+          ["si_no", "Would {nome} sign up for a TV cooking contest?"],
+          ["si_no", "Would {nome} still use a film camera?"],
+          ["si_no", "Would {nome} take a pottery class on Saturday mornings?"],
+          ["si_no", "Would {nome} pick a spa over a night club?"],
+          ["aperta", "What’s the last thing {nome} talked about with excitement?"],
+          ["aperta", "What does a perfect day look like for {nome}?"],
+        ]
+  ).map(([tipo, testo]) => ({ tipo, testo }));
+  const testo = JSON.stringify({ domande });
+  return {
+    testo,
+    motivoFine: "end_turn",
+    modelloUsato: "finto",
+    uso: { input: 0, output: 0, cacheScrittura: 0, cacheLettura: 0 },
+    tokenRagionamento: null,
+    contenuto: [{ type: "text", text: testo }],
+  };
+};

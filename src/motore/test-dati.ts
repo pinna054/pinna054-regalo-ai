@@ -25,6 +25,8 @@ export function richiestaDiProva(modifiche: Partial<RichiestaMotore["richiesta"]
     },
     risposte: [],
     escludi_titoli: [],
+    piaciute: [],
+    scartate: [],
   };
 }
 

@@ -8,7 +8,7 @@ import { Marchio } from "./Illustrazioni";
 const NUMERO_FRASI = 5;
 
 /** Va mostrato solo durante l'attesa: {inAttesa && <Caricamento />} */
-export function Caricamento() {
+export function Caricamento({ variante = "idee" }: { variante?: "idee" | "domande" }) {
   const t = useTranslations("caricamento");
   const [frase, setFrase] = useState(1);
 
@@ -28,14 +28,16 @@ export function Caricamento() {
         <div className="mx-auto mb-6 w-fit animate-dondola">
           <Marchio className="size-16 drop-shadow-md" />
         </div>
-        <p className="font-titoli text-2xl font-semibold">{t("titolo")}</p>
-        <p key={frase} className="mt-3 min-h-6 animate-comparsa text-lg text-tenue">
-          {t(`frasi.${frase}`)}
-        </p>
+        <p className="font-titoli text-2xl font-semibold">{variante === "domande" ? t("domandeTitolo") : t("titolo")}</p>
+        {variante === "idee" && (
+          <p key={frase} className="mt-3 min-h-6 animate-comparsa text-lg text-tenue">
+            {t(`frasi.${frase}`)}
+          </p>
+        )}
         <div className="mx-auto mt-6 h-1.5 w-48 overflow-hidden rounded-full bg-sabbia">
           <div className="h-full rounded-full bg-terracotta transition-[width] duration-[3500ms] ease-linear" style={{ width: `${(frase / NUMERO_FRASI) * 100}%` }} />
         </div>
-        <p className="mt-6 text-sm text-tenue">{t("nota")}</p>
+        <p className="mt-6 text-sm text-tenue">{variante === "domande" ? t("domandeNota") : t("nota")}</p>
       </div>
     </div>
   );

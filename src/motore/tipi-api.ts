@@ -39,3 +39,8 @@ export type RispostaGeneraOk = {
 };
 
 export type RispostaGenera = RispostaGeneraOk | { ok: false; errore: CodiceErroreApi };
+
+/** Una domanda del quiz (con il segnaposto {nome} al posto del destinatario). */
+export type DomandaQuiz = { tipo: "si_no" | "aperta"; testo: string };
+
+export type RispostaDomande = { ok: true; domande: DomandaQuiz[] } | { ok: false; errore: CodiceErroreApi };

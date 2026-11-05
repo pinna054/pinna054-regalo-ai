@@ -32,6 +32,15 @@ describe("messaggio per il modello", () => {
     ).toContain("Occasione: altra: «Diwali»");
   });
 
+  it("include le idee piaciute e quelle scartate scorrendo le carte", () => {
+    const r = richiestaDiProva();
+    r.piaciute = ["Corso di cucina thai"];
+    r.scartate = ["Tazza con scritta"];
+    const testo = costruisciMessaggio(r);
+    expect(testo).toContain("sono piaciute (proponine altre nello stesso spirito, senza ripeterle):\n- Corso di cucina thai");
+    expect(testo).toContain("Idee scartate da chi fa il regalo (evita idee simili):\n- Tazza con scritta");
+  });
+
   it("include risposte e titoli da non ripetere", () => {
     const r = richiestaDiProva({ budget_min: 20, budget_max: 40 });
     r.risposte = [{ domanda: "Viaggia spesso?", risposta: "Sì, in treno" }];

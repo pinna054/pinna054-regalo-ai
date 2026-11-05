@@ -8,6 +8,9 @@ per cercarle su Amazon e Google Shopping nel paese di consegna.
 
 - Multilingua: italiano e inglese (`/it`, `/en`), lingua dedotta dal browser.
 - Paesi di consegna: Italia, Regno Unito, Germania, Francia, Spagna, Stati Uniti.
+- Funziona come un'app di incontri, ma per i regali: dopo il modulo un quiz di domande da scorrere
+  (sì / no) e qualche domanda aperta, poi le idee una alla volta (destra = mi piace, sinistra = scarta)
+  e i **Preferiti** con i link per comprarle.
 - Ogni generazione viene registrata in forma anonima per migliorare il motore.
 
 Scopo, fasi, struttura del database e decisioni tecniche sono in **[PROGETTO.md](PROGETTO.md)**.
@@ -151,6 +154,7 @@ Redeploy** perché la modifica abbia effetto.
 | **aggiungere un paese** | aggiungi una voce in `src/config/paesi.ts` (valuta, dominio Amazon, Google) |
 | cambiare **colori o caratteri** | `src/app/globals.css` (sezione `@theme`) |
 | provare un **nuovo prompt** | crea `prompts/motore-v2.md` e imposta `MOTORE_PROMPT=motore-v2` |
+| cambiare le **domande del quiz** | modifica `prompts/domande-v1.md` (tono, numero di domande, regole) |
 | cambiare **modello** o **effort** | variabili `ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT` |
 | cambiare i **limiti di richieste** | variabili `LIMITE_ORA`, `LIMITE_GIORNO`, `LIMITE_GLOBALE_GIORNO` |
 

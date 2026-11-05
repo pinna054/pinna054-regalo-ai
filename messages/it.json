@@ -85,6 +85,11 @@
       "eta": "Scrivi un’età tra 0 e 120 anni.",
       "paese": "Scegli il paese di consegna.",
       "generico": "Controlla i campi evidenziati."
+    },
+    "soprannome": {
+      "etichetta": "Come lo/la chiami?",
+      "segnaposto": "Es. Lucrezia, nonna, Marco",
+      "aiuto": "Lo usiamo solo per le domande sul tuo telefono: non viene mai inviato né salvato."
     }
   },
   "opzioni": {
@@ -139,7 +144,9 @@
       "4": "Cerco anche qualcosa di originale…",
       "5": "Ultimi ritocchi…"
     },
-    "nota": "Di solito ci vogliono 15–30 secondi."
+    "nota": "Di solito ci vogliono 15–30 secondi.",
+    "domandeTitolo": "Preparo qualche domanda…",
+    "domandeNota": "Rispondi scorrendo: ci vuole un minuto e le idee saranno più centrate."
   },
   "idee": {
     "titolo": "Ecco le tue idee",
@@ -179,7 +186,21 @@
     "budgetFinoA": "fino a {prezzo}",
     "etaAnni": "{eta} anni",
     "chiudi": "Chiudi",
-    "riepilogo": "La tua richiesta"
+    "riepilogo": "La tua richiesta",
+    "scopri": "Scopri",
+    "preferiti": "Preferiti",
+    "istruzioni": "Scorri a destra se ti piace, a sinistra se no.",
+    "piace": "Mi piace",
+    "scarta": "Scarta",
+    "annulla": "Annulla l’ultima scelta",
+    "aggiuntaPreferiti": "Aggiunta ai preferiti",
+    "cercoAltre": "Sto cercando altre idee per te…",
+    "finite": "Hai visto tutte le idee",
+    "finiteTesto": "Ne preparo altre tenendo conto di cosa ti è piaciuto e cosa no.",
+    "altreIdee": "Mostrami altre idee",
+    "preferitiVuoti": "Ancora nessun preferito: scorri a destra le idee che ti piacciono.",
+    "togli": "Togli dai preferiti",
+    "vaiPreferiti": "Vedi i preferiti"
   },
   "errori": {
     "titolo": "Qualcosa non ha funzionato",
@@ -274,5 +295,19 @@
         "7": "Requisiti del Programma Affiliazione Amazon per ogni marketplace (testo esatto dell’avviso)."
       }
     }
+  },
+  "quiz": {
+    "titolo": "Qualche domanda veloce",
+    "laPersona": "questa persona",
+    "si": "Sì",
+    "no": "No",
+    "nonso": "Non so",
+    "istruzioni": "Scorri a destra per Sì, a sinistra per No.",
+    "domanda": "Domanda {numero} di {totale}",
+    "avanti": "Avanti",
+    "salta": "Salta",
+    "saltaTutto": "Salta le domande",
+    "segnaposto": "Scrivi qualche parola…",
+    "fine": "Trova le idee"
   }
 }
