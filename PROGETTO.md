@@ -227,7 +227,7 @@ Tutte lato server, mai visibili nel browser. Elenco completo con spiegazioni in 
 
 Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambiare.
 
-1. **Nome provvisorio "Pensierino"**, definito solo in `src/config/sito.ts`.
+1. **Nome "GIFTY"** (all'inizio provvisorio "Pensierino"), definito solo in `src/config/sito.ts`; logo: una volpe rossa disegnata in SVG.
 2. **Next.js 16 (App Router) + TypeScript + Tailwind 4**, gestore pacchetti npm.
 3. **Multilingua con next-intl**, URL con prefisso di lingua (`/it/...`, `/en/...`).
    L'elenco delle lingue si ricava automaticamente dai file in `messages/`: per aggiungere una lingua

@@ -5,8 +5,8 @@
  * testi e pagina privacy.
  */
 export const SITO = {
-  // Nome provvisorio: cambialo qui e si aggiorna ovunque.
-  nome: "Pensierino",
+  // Nome del sito: cambialo qui e si aggiorna ovunque.
+  nome: "GIFTY",
 
   // Dati per la pagina privacy: da completare prima della pubblicazione.
   titolare: "[Nome e indirizzo del titolare del trattamento]",

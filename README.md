@@ -1,6 +1,6 @@
-# Pensierino — il regalo giusto, scelto per te
+# GIFTY — il regalo giusto, scelto per te
 
-> "Pensierino" è un nome provvisorio: si cambia in un solo punto, `src/config/sito.ts`.
+> Il nome del sito si cambia in un solo punto, `src/config/sito.ts`; il logo (la volpe rossa) è in `src/components/Illustrazioni.tsx` e `src/app/icon.svg`.
 
 Sito che sceglie il regalo al posto tuo. Descrivi il destinatario (relazione, età, occasione,
 budget, gusti, cosa non gli piace) e un motore AI propone **4 idee regalo concrete**, con i link
