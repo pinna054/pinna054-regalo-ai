@@ -57,7 +57,8 @@ export class ErroreMotore extends Error {
 const FORMATO_RISPOSTA = betaZodOutputFormat(SchemaRispostaMotore);
 
 let client: Anthropic | null = null;
-function clientAnthropic(): Anthropic {
+/** Client Anthropic condiviso (la chiave resta sul server). */
+export function clientAnthropic(): Anthropic {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new ErroreMotore("configurazione", "Manca la variabile ANTHROPIC_API_KEY");
   }

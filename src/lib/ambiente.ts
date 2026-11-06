@@ -63,3 +63,15 @@ export function segretoHashIp(): string {
     "sviluppo-locale-non-segreto"
   );
 }
+
+/**
+ * Limiti di Gifty (endpoint /api/ai), per IP. Una persona che usa il sito normalmente fa
+ * circa 7 domande + 2-4 lotti di idee: 40 chiamate all'ora bastano per 3-4 persone diverse.
+ */
+export function limitiAi() {
+  return {
+    perOra: numero("LIMITE_AI_ORA", 40),
+    perGiorno: numero("LIMITE_AI_GIORNO", 120),
+    globaleGiorno: numero("LIMITE_AI_GLOBALE_GIORNO", 5000),
+  };
+}

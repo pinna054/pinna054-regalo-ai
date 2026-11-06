@@ -13,6 +13,12 @@ per cercarle su Amazon e Google Shopping nel paese di consegna.
   e i **Preferiti** con i link per comprarle.
 - Ogni generazione viene registrata in forma anonima per migliorare il motore.
 
+**La pagina principale (`/`) è Gifty** (`public/gifty.html`): la volpe fa le domande una alla volta
+(scritte dall'AI), poi inventa idee regalo da scorrere (destra = sì, sinistra = no, su = perfetto).
+L'AI passa dal nostro server (`/api/ai`): la chiave non arriva mai al browser. Senza chiave, o se
+l'AI non risponde, la pagina passa da sola in **modalità demo** con domande e idee di esempio.
+La versione precedente del sito (modulo + quiz) resta su `/it` e `/en`.
+
 Scopo, fasi, struttura del database e decisioni tecniche sono in **[PROGETTO.md](PROGETTO.md)**.
 
 ---
@@ -109,7 +115,11 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Apri <http://localhost:3000>: verrai portato su `/it` o `/en` in base alla lingua del browser.
+Apri <http://localhost:3000>: c'è Gifty. La versione precedente del sito è su `/it` e `/en`.
+
+**Provare Gifty con l'AI vera**: in `.env.local` basta `ANTHROPIC_API_KEY=...` (togli `MOTORE_FINTO=1`
+se c'è), poi riavvia `npm run dev`. Senza `DATABASE_URL` i limiti per utente restano in memoria: va
+bene sul tuo computer. Senza chiave la pagina parte in modalità demo (avviso sotto il pulsante).
 
 **Provare senza chiavi**: in `.env.local` scrivi `MOTORE_FINTO=1` e lascia vuota `DATABASE_URL`.
 Il sito funziona con idee finte (c'è un avviso ben visibile) e senza salvare nulla.
@@ -134,6 +144,7 @@ Altri comandi utili:
    - `DATABASE_URL` (obbligatoria: senza database il sito pubblicato non genera idee)
    - `SEGRETO_HASH_IP`: una stringa lunga e casuale (consigliata)
    - facoltative: `ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT`, `MOTORE_PROMPT`, `AMAZON_TAG_…`, `LIMITE_…`
+   - **non** impostare `MOTORE_FINTO` (con `MOTORE_FINTO=1` Gifty resta in modalità demo)
 5. Premi **Deploy**. Dopo un paio di minuti il sito è online all'indirizzo indicato da Vercel.
 
 Da quel momento ogni modifica salvata su GitHub (branch principale) viene pubblicata da sola.
@@ -157,6 +168,9 @@ Redeploy** perché la modifica abbia effetto.
 | cambiare le **domande del quiz** | modifica `prompts/domande-v1.md` (tono, numero di domande, regole) |
 | cambiare **modello** o **effort** | variabili `ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT` |
 | cambiare i **limiti di richieste** | variabili `LIMITE_ORA`, `LIMITE_GIORNO`, `LIMITE_GLOBALE_GIORNO` |
+| cambiare **grafica o testi di Gifty** (pagina principale) | `public/gifty.html` |
+| cambiare i **prompt di Gifty** | `src/gifty/prompt.ts` (se cambi i campi del JSON, aggiorna anche `src/gifty/ai.ts`) |
+| cambiare i **limiti di Gifty** | variabili `LIMITE_AI_ORA` (40), `LIMITE_AI_GIORNO` (120), `LIMITE_AI_GLOBALE_GIORNO` (5000) |
 
 Note:
 

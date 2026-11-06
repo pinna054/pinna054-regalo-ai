@@ -5,7 +5,7 @@
  * Senza database (solo in sviluppo) i contatori restano in memoria.
  */
 import "server-only";
-import { limiti } from "./ambiente";
+import { limiti, limitiAi } from "./ambiente";
 import { db } from "./db";
 import { hashIp } from "./ip";
 
@@ -62,6 +62,20 @@ export async function controllaLimitiGenerazione(
     { chiave: `${azione}:ora:${codice}`, secondi: 3600 },
     { chiave: `${azione}:giorno:${codice}`, secondi: 86400 },
     { chiave: `${azione}:globale`, secondi: 86400 },
+  ]);
+  if (ora > perOra || giorno > perGiorno) return "limite";
+  if (globale > globaleGiorno) return "limiteGlobale";
+  return "ok";
+}
+
+/** Controlla i limiti di Gifty (/api/ai): ogni domanda e ogni lotto di idee conta 1. */
+export async function controllaLimitiAi(ip: string): Promise<"ok" | "limite" | "limiteGlobale"> {
+  const { perOra, perGiorno, globaleGiorno } = limitiAi();
+  const codice = hashIp(ip);
+  const [ora, giorno, globale] = await incrementa([
+    { chiave: `ai:ora:${codice}`, secondi: 3600 },
+    { chiave: `ai:giorno:${codice}`, secondi: 86400 },
+    { chiave: "ai:globale", secondi: 86400 },
   ]);
   if (ora > perOra || giorno > perGiorno) return "limite";
   if (globale > globaleGiorno) return "limiteGlobale";

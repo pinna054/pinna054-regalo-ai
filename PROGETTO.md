@@ -328,3 +328,19 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
       ("Lucrezia andrebbe mai a un concerto di Travis Scott?"): resta solo nel browser, al server e al
       modello il destinatario arriva sempre come "la persona". Così resta valida la regola iniziale di non
       raccogliere il nome del destinatario.
+30. **Gifty diventa la pagina principale** (prototipo del proprietario, `public/gifty.html`):
+    - grafica, logo, testi, domande, swipe e prompt **identici** al prototipo; la pagina resta un file
+      HTML statico servito su `/` (`src/proxy.ts`), il resto del sito resta su `/it` e `/en`;
+    - nel prototipo l'AI era chiamata con `claude.use("sample")`, che funziona solo dentro Claude: ora la
+      pagina chiama **`/api/ai`** sul nostro server, che usa l'SDK Anthropic con `ANTHROPIC_MODEL`
+      (predefinito `claude-sonnet-5-5`) e la chiave `ANTHROPIC_API_KEY`, che resta solo sul server;
+    - il browser manda solo le risposte e i nomi delle idee, **il prompt lo costruisce il server**
+      (`src/gifty/prompt.ts`, testo identico al prototipo, verificato con un confronto automatico):
+      così nessuno può usare l'endpoint per far scrivere all'AI altro. Il JSON è imposto con gli
+      structured outputs e validato con zod (un nuovo tentativo se non è valido);
+    - domande con effort `low` (devono arrivare in fretta), idee con `ANTHROPIC_EFFORT`;
+    - **limiti per utente** (IP, salvato solo come hash): 40 chiamate all'ora, 120 al giorno, 5000 al
+      giorno per tutto il sito; con database i contatori sono nella tabella `limiti_richieste`, senza
+      restano in memoria (va bene solo in locale);
+    - **modalità demo**: se manca la chiave, se l'AI non risponde o se il limite è raggiunto, la pagina
+      passa da sola alle domande e alle idee di esempio del prototipo, con l'avviso del prototipo.
