@@ -9,17 +9,16 @@ import { z } from "zod";
 import type { LivelloEffort } from "@/config/modelli";
 import { clientAnthropic } from "@/motore/modello";
 
-/** Domanda generata dall'AI (stessi campi che il prototipo si aspetta). */
-export const SchemaDomanda = z.object({
-  emoji: z.string(),
-  question: z.string(),
-  hint: z.string(),
-  options: z.array(z.string()),
-  multi: z.boolean(),
+/** Un round di domande da scorrere, più la domanda aperta (usata solo nel round 1). */
+export const SchemaDomande = z.object({
+  questions: z.array(
+    z.object({ emoji: z.string(), question: z.string(), yes_reaction: z.string(), no_reaction: z.string() }),
+  ),
+  open_question: z.object({ emoji: z.string(), question: z.string(), hint: z.string() }),
 });
-export type Domanda = z.infer<typeof SchemaDomanda>;
+export type Domande = z.infer<typeof SchemaDomande>;
 
-/** Idea regalo generata dall'AI. */
+/** Idea regalo generata dall'AI ("photo" = parole per cercare una foto vera). */
 export const SchemaRegalo = z.object({
   name: z.string(),
   tagline: z.string(),
@@ -30,8 +29,13 @@ export const SchemaRegalo = z.object({
   colors: z.array(z.string()),
   tags: z.array(z.string()),
   search: z.string(),
+  photo: z.string(),
 });
-export const SchemaRegali = z.object({ gifts: z.array(SchemaRegalo) });
+export const SchemaRegali = z.object({
+  portrait: z.string(),
+  badges: z.array(z.string()),
+  gifts: z.array(SchemaRegalo),
+});
 export type Regalo = z.infer<typeof SchemaRegalo>;
 
 /** Errore che il sito sa gestire: "non_disponibile" fa passare la pagina in modalità demo. */

@@ -148,6 +148,40 @@
   .toast.on{opacity:1}
 
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ===== Gioco: domande da scorrere, Conosciometro, foto vere ===== */
+  .demo-pill{display:none;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--super);border-color:rgba(255,211,107,.35);cursor:default}
+  .demo-pill.on{display:inline-flex}
+  .qcard{background:radial-gradient(420px 300px at 80% 0%,rgba(255,122,47,.22),transparent 60%),linear-gradient(170deg,var(--fern),var(--moss) 60%)}
+  .qcard.r2{background:radial-gradient(420px 300px at 15% 0%,rgba(95,224,168,.20),transparent 60%),linear-gradient(170deg,var(--fern),var(--moss) 60%)}
+  .qart{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:56px 26px 34px;text-align:center}
+  .qart .em{font-size:clamp(72px,22vw,98px);filter:drop-shadow(0 16px 22px rgba(0,0,0,.45));animation:float 5s ease-in-out infinite}
+  .qart h3{font-family:var(--display);font-size:clamp(25px,7.2vw,31px);line-height:1.1;letter-spacing:-.7px;text-wrap:balance}
+  .qmeta{position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--lichen)}
+  .qmeta b{background:rgba(246,239,230,.92);color:#1d0d03;border-radius:999px;padding:6px 11px}
+  .stamp.idk{left:50%;top:auto;bottom:22px;transform:translateX(-50%) rotate(-5deg);color:var(--super)}
+  .btn.idk{color:var(--super);font-family:var(--display);font-weight:800;font-size:22px}
+  .skipq{display:block;margin:6px auto 0;background:none;border:0;color:var(--ember);font-weight:600;font-size:14px;cursor:pointer;padding:6px;visibility:hidden}
+  .skipq.on{visibility:visible}
+  .art.photo{background-size:cover!important;background-position:center!important}
+  .art.photo::after{display:none}
+  .art.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,26,22,.35),transparent 35%,transparent 70%,rgba(14,26,22,.55));z-index:1}
+  .art.photo .em{display:none}
+  .credit{position:absolute;left:12px;bottom:10px;z-index:2;font-size:11px;color:rgba(246,239,230,.9);text-decoration:none;background:rgba(14,26,22,.6);padding:3px 9px;border-radius:999px}
+  .row .e.photo{background-size:cover!important;background-position:center!important}
+  .score{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;overflow:auto;padding:8px 0 14px}
+  .score .kicker{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lichen)}
+  .ring{--p:0;width:172px;height:172px;border-radius:50%;background:conic-gradient(var(--fox) calc(var(--p)*1%),var(--fern) 0);display:grid;place-items:center;position:relative;box-shadow:0 18px 44px rgba(255,122,47,.28);flex-shrink:0}
+  .ring::before{content:"";position:absolute;inset:13px;border-radius:50%;background:var(--pine)}
+  .ring span{position:relative;font-family:var(--display);font-weight:800;font-size:48px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+  .score h2{font-family:var(--display);font-size:clamp(26px,7.5vw,32px);letter-spacing:-.8px;line-height:1.05;text-wrap:balance}
+  .lvl{color:var(--ember);font-weight:700;font-size:16px;text-wrap:balance}
+  .portrait{background:var(--moss);border:1px solid var(--fern);border-radius:18px;padding:14px 16px;font-size:15px;line-height:1.45;color:#d6e0d9;max-width:36ch;display:flex;gap:10px;text-align:left;align-items:flex-start}
+  .portrait svg{width:26px;height:26px;flex-shrink:0}
+  .portrait.wait svg{animation:sniff 1.1s ease-in-out infinite}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .badges span{background:rgba(255,211,107,.10);border:1px solid rgba(255,211,107,.35);color:var(--super);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700}
+  .res-score{display:inline-block;margin-top:8px;font-size:13px;font-weight:700;color:var(--ember)}
 </style>
 </head>
 <body>
@@ -174,12 +208,13 @@
       <svg width="34" height="34"><use href="#fox"/></svg>Gifty
     </button>
     <div class="hdr-right">
+      <span class="pill demo-pill" id="demoPill">Demo</span>
       <span class="pill likes" id="likesPill">♥ <span id="likesN">0</span></span>
       <button class="pill" id="langBtn">EN</button>
     </div>
   </header>
 
-  <!-- Welcome -->
+  <!-- Benvenuto -->
   <section class="screen active" id="sHome">
     <div class="hero">
       <svg class="hero-fox" viewBox="0 0 64 64"><use href="#fox"/></svg>
@@ -195,7 +230,7 @@
     <div class="demo-note" id="demoNote"></div>
   </section>
 
-  <!-- Questions -->
+  <!-- Domande con i pulsanti: per chi, occasione, budget, nome e la domanda aperta -->
   <section class="screen" id="sQ">
     <div class="qtop">
       <button class="back" id="qBack" aria-label="Back">←</button>
@@ -205,11 +240,39 @@
     <div class="qbody" id="qbody"></div>
     <div class="qfoot">
       <button class="cta" id="qNext" disabled data-i="next"></button>
-      <button class="skip" id="qSkip" data-i="enough"></button>
+      <button class="skip" id="qSkip"></button>
     </div>
   </section>
 
-  <!-- Swipe -->
+  <!-- Il gioco: domande da scorrere -->
+  <section class="screen" id="sSwipe">
+    <div class="deck" id="qdeck"></div>
+    <div class="actions">
+      <button class="btn big no" id="qNoBtn" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="btn small idk" id="qIdkBtn" aria-label="?">?</button>
+      <button class="btn big yes" id="qYesBtn" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></button>
+    </div>
+    <div class="hint" data-i="swipeHint"></div>
+    <button class="skipq" id="qEnough" data-i="enough"></button>
+  </section>
+
+  <!-- Conosciometro -->
+  <section class="screen" id="sScore">
+    <div class="score">
+      <div class="kicker" data-i="scoreKicker"></div>
+      <div class="ring" id="ring"><span id="scorePct">0%</span></div>
+      <h2 id="scoreTitle"></h2>
+      <div class="lvl" id="scoreLevel"></div>
+      <div class="portrait wait" id="portrait"></div>
+      <div class="badges" id="badges"></div>
+    </div>
+    <div class="res-actions">
+      <button class="cta" id="giftsBtn" data-i="showGifts"></button>
+      <button class="cta ghost" id="shareBtn" data-i="challenge"></button>
+    </div>
+  </section>
+
+  <!-- Regali da scorrere -->
   <section class="screen" id="sDeck">
     <div class="deck" id="deck"></div>
     <div class="actions">
@@ -222,9 +285,9 @@
     <div class="hint" data-i="hint"></div>
   </section>
 
-  <!-- Results -->
+  <!-- Risultati -->
   <section class="screen" id="sRes">
-    <div class="res-head"><h2 data-i="resTitle"></h2><p id="resSub"></p></div>
+    <div class="res-head"><h2 data-i="resTitle"></h2><p id="resSub"></p><span class="res-score" id="resScore"></span></div>
     <div class="list" id="list"></div>
     <div class="res-actions">
       <button class="cta" id="moreBtn" data-i="more"></button>
@@ -239,31 +302,53 @@
 /* ===================== Testi ===================== */
 const T = {
   it:{name:"italiano",heroTitle:"Il regalo che <em>nessuno</em> aveva ancora pensato.",
-    heroSub:"La volpe di Gifty ti fa qualche domanda sulla persona, poi inventa idee sempre nuove. Tu scorri, lei impara.",
-    st1:"Racconti chi è",st2:"Scorri le idee",st3:"Trovi quello giusto",go:"Trova un regalo",
+    heroSub:"Rispondi a domande assurde sulla persona, scopri quanto la conosci davvero. Poi la volpe inventa idee sempre nuove. Tu scorri, lei impara.",
+    st1:"Gioca: quanto la conosci?",st2:"Scorri le idee",st3:"Trovi quello giusto",go:"Inizia il gioco",
     next:"Avanti",enough:"Basta domande, mostrami i regali",other:"Altro? Scrivilo tu…",
-    qOf:(a,b)=>`${a} di ${b}`,thinkingQ:"La volpe sta pensando alla prossima domanda…",
-    thinkingG:"La volpe sta inventando i regali…",thinkingSub:"Ogni idea è nuova, creata sul profilo che hai descritto.",
+    qOf:(a,b)=>`${a} di ${b}`,
+    thinkingG:"La volpe sta inventando i regali…",thinkingSub:"Ogni idea è nuova, creata su quello che le hai raccontato.",
     hint:"Trascina · ← no · → sì · ↑ perfetto",yes:"Sì",no:"No",perfect:"Perfetto",
     new:"Idea nuova",resTitle:"I tuoi regali",resSub:n=>`${n} idee salvate, la migliore in cima.`,
     resNone:"Non hai ancora salvato nessuna idea. Torna a scorrere!",more:"Inventa altre idee",restart:"Nuova persona",
-    search:"Cerca online →",super:"★ Perfetto",demo:"Modalità demo: l'AI non è disponibile in questa vista, uso idee di esempio.",
+    search:"Cerca online →",super:"★ Perfetto",demo:"Modalità demo: domande e regali di esempio, l'AI non è attiva.",
     errAI:"La volpe si è persa. Riprova tra un attimo.",retry:"Riprova",saved:"Salvato ♥",
+    nameQ:"Come si chiama?",nameHint:"Resta solo sul tuo telefono: serve a rendere il gioco più divertente.",namePh:"Nome o soprannome",nameSkip:"Preferisco non dirlo",
+    loadQ1:"La volpe sta preparando il gioco…",loadQ2:"La volpe scava più a fondo…",loadQSub:"Domande su misura per {nome}.",
+    round:r=>`Round ${r}`,swipeHint:"Trascina · ← no · → sì · ↑ non so",idk:"Boh",
+    aYes:"Sì",aNo:"No",aIdk:"Non so",idkReact:["Mistero! La volpe indaga 🕵️","Ok, punto interrogativo 🤔","Ci arriviamo lo stesso"],
+    openSkip:"Salta",openPh:"Scrivi qui…",
+    scoreKicker:"Conosciometro",scoreTitle:"Quanto conosci {nome}",
+    levels:[[100,"Anima gemella certificata 🏆"],[80,"Conosci {nome} come le tue tasche 🦊"],[60,"Niente male, ma qualche segreto ti sfugge 👀"],[40,"Vi conoscete… di vista? 😅"],[0,"Chi è costui? 🕵️"]],
+    portraitWait:"La volpe sta tirando le somme…",showGifts:"Vedi i regali",challenge:"Sfida un amico",
+    shareText:(p,n)=>`Conosco ${n} al ${p}% 🦊 E tu quanto conosci i tuoi amici? Gioca su Gifty:`,copied:"Link copiato!",
+    resScore:(p,n)=>`Conosciometro: ${p}% su ${n}`,photo:"Foto",
+    anon:{"Partner":"la tua dolce metà","Mamma":"tua mamma","Papà":"tuo papà"},anonDefault:"questa persona",
     fixed:[
       {emoji:"🎁",question:"Per chi è il regalo?",hint:"Partiamo dal legame che hai con questa persona.",options:["Partner","Mamma","Papà","Amico/a","Collega","Figlio/a","Nonno/a","Fratello/Sorella"],multi:false},
       {emoji:"🗓️",question:"Per quale occasione?",hint:"Cambia molto il tono del regalo.",options:["Compleanno","Natale","Anniversario","Laurea","Ringraziamento","Senza motivo"],multi:false},
       {emoji:"💶",question:"Quanto vuoi spendere?",hint:"Resteremo dentro questo budget.",options:["Fino a 30 €","30–70 €","70–150 €","150–300 €","Oltre 300 €"],multi:false}]},
   en:{name:"English",heroTitle:"The gift <em>nobody</em> has thought of yet.",
-    heroSub:"Gifty's fox asks a few questions about the person, then invents fresh ideas every time. You swipe, it learns.",
-    st1:"Tell us who they are",st2:"Swipe the ideas",st3:"Find the one",go:"Find a gift",
+    heroSub:"Answer absurd questions about them and find out how well you really know them. Then the fox invents fresh ideas. You swipe, it learns.",
+    st1:"Play: how well do you know them?",st2:"Swipe the ideas",st3:"Find the one",go:"Start the game",
     next:"Next",enough:"Enough questions, show me gifts",other:"Something else? Type it…",
-    qOf:(a,b)=>`${a} of ${b}`,thinkingQ:"The fox is thinking of the next question…",
-    thinkingG:"The fox is inventing gifts…",thinkingSub:"Every idea is new, made for the profile you described.",
+    qOf:(a,b)=>`${a} of ${b}`,
+    thinkingG:"The fox is inventing gifts…",thinkingSub:"Every idea is new, made from what you told it.",
     hint:"Drag · ← no · → yes · ↑ perfect",yes:"Yes",no:"Nope",perfect:"Perfect",
     new:"Fresh idea",resTitle:"Your gifts",resSub:n=>`${n} ideas saved, best one on top.`,
     resNone:"You haven't saved any ideas yet. Keep swiping!",more:"Invent more ideas",restart:"New person",
-    search:"Search online →",super:"★ Perfect",demo:"Demo mode: AI isn't available in this view, showing sample ideas.",
+    search:"Search online →",super:"★ Perfect",demo:"Demo mode: sample questions and gifts, AI is off.",
     errAI:"The fox got lost. Try again in a moment.",retry:"Try again",saved:"Saved ♥",
+    nameQ:"What's their name?",nameHint:"It stays on your phone: it just makes the game more fun.",namePh:"Name or nickname",nameSkip:"I'd rather not say",
+    loadQ1:"The fox is setting up the game…",loadQ2:"The fox is digging deeper…",loadQSub:"Questions made for {nome}.",
+    round:r=>`Round ${r}`,swipeHint:"Drag · ← no · → yes · ↑ don't know",idk:"Dunno",
+    aYes:"Yes",aNo:"No",aIdk:"Don't know",idkReact:["A mystery! The fox investigates 🕵️","OK, question mark 🤔","We'll get there anyway"],
+    openSkip:"Skip",openPh:"Type here…",
+    scoreKicker:"Know-o-meter",scoreTitle:"How well you know {nome}",
+    levels:[[100,"Certified soulmate 🏆"],[80,"You know {nome} inside out 🦊"],[60,"Not bad, but some secrets escape you 👀"],[40,"Do you… actually know each other? 😅"],[0,"Who is this person? 🕵️"]],
+    portraitWait:"The fox is adding it all up…",showGifts:"See the gifts",challenge:"Challenge a friend",
+    shareText:(p,n)=>`I know ${n} ${p}% 🦊 How well do you know your friends? Play on Gifty:`,copied:"Link copied!",
+    resScore:(p,n)=>`Know-o-meter: ${p}% on ${n}`,photo:"Photo",
+    anon:{"Partner":"your other half","Mom":"your mom","Dad":"your dad"},anonDefault:"this person",
     fixed:[
       {emoji:"🎁",question:"Who is the gift for?",hint:"Let's start with how you know them.",options:["Partner","Mom","Dad","Friend","Colleague","Son/Daughter","Grandparent","Sibling"],multi:false},
       {emoji:"🗓️",question:"What's the occasion?",hint:"It changes the tone of the gift a lot.",options:["Birthday","Christmas","Anniversary","Graduation","Thank you","Just because"],multi:false},
@@ -271,72 +356,75 @@ const T = {
 };
 let lang="it";
 const t=k=>T[lang][k];
-const MAX_Q=10, MIN_Q=5, BATCH=6;
+const BATCH=6, MIN_SWIPES=5;
 
 /* ===================== Stato ===================== */
-let sample=null; // true quando l'AI del server (/api/ai) è attiva, altrimenti modalità demo
-const S={answers:[],current:null,deck:[],shown:[],liked:[],disliked:[],history:[],loadingGifts:false,genId:0};
+// mode: "fixed" (3 domande base) · "name" · "open" (domanda aperta)
+const S={mode:"fixed",answers:[],current:null,nome:"",nameDone:false,
+  round:0,qdeck:[],swipes:[],asked:[],open:null,openAnswer:null,prefetch:null,loadingQ:false,errorQ:false,
+  deck:[],shown:[],liked:[],disliked:[],history:[],loadingGifts:false,genId:0,portrait:null,badges:[],score:null,demo:false};
 
 /* ===================== Utilità ===================== */
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const hex=c=>/^#[0-9a-f]{6}$/i.test(c||"")?c:null;
-function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1300)}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function toast(msg,ms=1300){const el=$("toast");el.textContent=msg;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),ms)}
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));$("likesPill").classList.toggle("on",id==="sDeck"||id==="sRes")}
 function applyTexts(){document.querySelectorAll("[data-i]").forEach(el=>{const v=t(el.dataset.i);if(typeof v==="string")el.innerHTML=v})}
 const foxSVG='<svg viewBox="0 0 64 64"><use href="#fox"/></svg>';
+function setDemo(on){S.demo=on;$("demoPill").classList.toggle("on",on);$("demoNote").textContent=on?t("demo"):""}
 
-/* Chiede all'AI tramite il nostro server (/api/ai): la chiave API resta sul server e il prompt
-   lo costruisce il server. Se l'AI non risponde o il limite di richieste è raggiunto,
-   l'errore ha code "not_granted" e la pagina passa in modalità demo. */
+/* Il nome resta nel browser: nei testi scambiati con il server c'è il segnaposto {nome}. */
+function displayName(){
+  if(S.nome)return S.nome;
+  const rel=S.answers[0]&&S.answers[0].a[0];
+  return (t("anon")[rel])||t("anonDefault");
+}
+function nameIt(s){const out=String(s??"").replace(/\{nome\}/g,displayName());return out.charAt(0).toUpperCase()+out.slice(1)}
+function scrubName(txt){
+  if(!S.nome)return txt;
+  return txt.replace(new RegExp(S.nome.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),"{nome}");
+}
+function profileForAI(){
+  const label={yes:t("aYes"),no:t("aNo"),idk:t("aIdk")};
+  const out=S.answers.map(a=>({q:a.q,a:a.a.map(scrubName)}));
+  S.swipes.forEach(s=>out.push({q:s.q,a:[label[s.a]]}));
+  if(S.openAnswer)out.push({q:S.openAnswer.q,a:[scrubName(S.openAnswer.a)]});
+  return out;
+}
+
+/* Chiede al nostro server (/api/ai): la chiave API e i prompt restano sul server.
+   Se l'AI non è disponibile il server risponde in modalità demo ("demo": true).
+   Se anche il server non risponde, la pagina usa le poche domande e idee di riserva qui sotto. */
 async function askAI(body){
-  let res, data=null;
+  let res,data=null;
   try{
     res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...body,lingua:lang})});
     data=await res.json().catch(()=>null);
-  }catch(e){ const err=new Error("network"); err.code="not_granted"; throw err; }
-  if(res.ok&&data&&typeof data==="object") return data;
-  const err=new Error((data&&data.errore)||"ai");
-  if(res.status===503||res.status===429) err.code="not_granted";
-  throw err;
+  }catch(e){const err=new Error("network");err.offline=true;throw err}
+  if(res.ok&&data&&typeof data==="object"){if(data.demo)setDemo(true);return data}
+  const err=new Error((data&&data.errore)||"ai");err.offline=res.status!==502;throw err;
 }
-const answersForAI=()=>S.answers.map(a=>({q:a.q,a:a.a}));
 
-/* ===================== Domande ===================== */
-function startQuestions(){S.answers=[];S.liked=[];S.disliked=[];S.shown=[];S.history=[];S.deck=[];updateLikes();nextQuestion()}
-
-async function nextQuestion(){
+/* ===================== Domande base (con i pulsanti) ===================== */
+function startQuestions(){
+  Object.assign(S,{mode:"fixed",answers:[],current:null,nome:"",nameDone:false,round:0,qdeck:[],swipes:[],asked:[],open:null,openAnswer:null,prefetch:null,loadingQ:false,errorQ:false,
+    deck:[],shown:[],liked:[],disliked:[],history:[],loadingGifts:false,portrait:null,badges:[],score:null});
+  S.genId++;updateLikes();nextQuestion();
+}
+function nextQuestion(){
   const n=S.answers.length;
-  if(n<3){ S.current={...t("fixed")[n]}; renderQuestion(); return; }
-  if(n>=MAX_Q){ startGifts(); return; }
-  show("sQ"); renderDots(); $("qbody").innerHTML=`<div class="thinking">${foxSVG}<p>${t("thinkingQ")}</p></div>`;
-  $("qNext").disabled=true; $("qSkip").style.visibility="hidden";
-  const myN=n;
-  try{
-    let q;
-    if(sample){
-      // Il prompt (identico al prototipo) è sul server: src/gifty/prompt.ts
-      q=await askAI({tipo:"domanda",risposte:answersForAI()});
-    }else q=localQuestion(myN);
-    if(S.answers.length!==myN) return;
-    if(!q||!q.question||!Array.isArray(q.options)||!q.options.length) throw new Error("bad");
-    S.current={emoji:q.emoji||"🦊",question:q.question,hint:q.hint||"",options:q.options.slice(0,6).map(String),multi:!!q.multi};
-    renderQuestion();
-  }catch(e){
-    if(e&&e.code==="not_granted"){sample=null;$("demoNote").textContent=t("demo");return nextQuestion();}
-    $("qbody").innerHTML=`<div class="thinking">${foxSVG}<p class="err">${t("errAI")}</p><button class="cta ghost" id="retryQ">${t("retry")}</button></div>`;
-    $("retryQ").onclick=nextQuestion;
-  }
+  if(n<3){S.mode="fixed";S.current={...t("fixed")[n]};renderQuestion();return}
+  if(!S.nameDone){askName();return}
+  startRound(1);
 }
-
-function renderDots(){
-  const n=S.answers.length, total=Math.max(MIN_Q,Math.min(MAX_Q,n+3));
-  $("dots").innerHTML=Array.from({length:total},(_,i)=>`<i class="${i<n?"done":""}"></i>`).join("");
-  $("qnum").textContent=t("qOf")(Math.min(n+1,MAX_Q),MAX_Q);
+function renderDots(step,total){
+  $("dots").innerHTML=Array.from({length:total},(_,i)=>`<i class="${i<step?"done":""}"></i>`).join("");
+  $("qnum").textContent=t("qOf")(Math.min(step+1,total),total);
 }
-
 function renderQuestion(){
-  show("sQ"); renderDots();
+  show("sQ"); renderDots(S.answers.length,4); $("qBack").style.visibility="visible";
   const q=S.current; q.sel=q.sel||new Set();
   $("qbody").innerHTML=`<div class="qemoji">${esc(q.emoji)}</div><h2>${esc(q.question)}</h2><p class="qhint">${esc(q.hint)}</p>
     <div class="opts">${q.options.map((o,i)=>`<button class="opt${q.sel.has(o)?" on":""}" data-k="${i}">${esc(o)}</button>`).join("")}</div>
@@ -347,10 +435,15 @@ function renderQuestion(){
     else{q.sel=new Set([o]);commitAnswer();}
   });
   const fi=$("freeIn"); fi.oninput=updateNext; fi.onkeydown=e=>{if(e.key==="Enter"&&!$("qNext").disabled)commitAnswer()};
-  $("qSkip").style.visibility=S.answers.length>=MIN_Q-1?"visible":"hidden";
+  $("qSkip").style.visibility="hidden";
   updateNext();
 }
-function updateNext(){const q=S.current;const fi=$("freeIn");$("qNext").disabled=!(q&&(q.sel.size||(fi&&fi.value.trim())))}
+function updateNext(){
+  const fi=$("freeIn"), txt=fi&&fi.value.trim();
+  if(S.mode==="fixed"){const q=S.current;$("qNext").disabled=!(q&&(q.sel.size||txt))}
+  else if(S.mode==="name")$("qNext").disabled=!txt;
+  else $("qNext").disabled=!txt;
+}
 function commitAnswer(){
   const q=S.current;const fi=$("freeIn");const a=[...q.sel];
   if(fi&&fi.value.trim())a.push(fi.value.trim());
@@ -358,48 +451,180 @@ function commitAnswer(){
   S.answers.push({q:q.question,a,emoji:q.emoji});S.current=null;nextQuestion();
 }
 function goBack(){
+  if(S.mode==="name"){const last=S.answers.pop();S.mode="fixed";S.current={...t("fixed")[S.answers.length],sel:new Set(last?last.a:[])};renderQuestion();return}
+  if(S.mode!=="fixed")return;
   if(!S.answers.length){show("sHome");return}
   const last=S.answers.pop();
-  S.current={emoji:last.emoji,question:last.q,hint:"",options:last.a.slice(),multi:false,sel:new Set(last.a)};
-  if(S.answers.length<3){S.current={...t("fixed")[S.answers.length],sel:new Set(last.a)}}
+  S.current={...t("fixed")[S.answers.length],sel:new Set(last.a)};
   renderQuestion();
 }
 
+/* ===================== Nome (resta sul telefono) ===================== */
+function askName(){
+  S.mode="name"; show("sQ"); renderDots(3,4); $("qBack").style.visibility="visible";
+  $("qbody").innerHTML=`<div class="qemoji">🦊</div><h2>${esc(t("nameQ"))}</h2><p class="qhint">${esc(t("nameHint"))}</p>
+    <div class="free"><input id="freeIn" placeholder="${esc(t("namePh"))}" maxlength="30" autocomplete="off" value="${esc(S.nome)}"></div>`;
+  const fi=$("freeIn"); fi.oninput=updateNext; fi.onkeydown=e=>{if(e.key==="Enter"&&!$("qNext").disabled)onNext()};
+  $("qSkip").textContent=t("nameSkip"); $("qSkip").style.visibility="visible";
+  updateNext(); setTimeout(()=>fi.focus(),50);
+}
+function onNext(){
+  if(S.mode==="fixed")return commitAnswer();
+  const v=$("freeIn").value.trim(); if(!v)return;
+  if(S.mode==="name"){S.nome=v.replace(/[{}]/g,"");S.nameDone=true;startRound(1);return}
+  if(S.mode==="open"){S.openAnswer={q:S.open.question,a:v};startRound(2)}
+}
+function onSkip(){
+  if(S.mode==="name"){S.nome="";S.nameDone=true;startRound(1);return}
+  if(S.mode==="open"){S.openAnswer=null;startRound(2)}
+}
+
+/* ===================== Il gioco: domande da scorrere ===================== */
+function loadRound(r){
+  return askAI({tipo:"domande",giro:r,risposte:profileForAI(),chieste:S.asked})
+    .catch(e=>{if(!e.offline)throw e;setDemo(true);return localRound(r)});
+}
+async function startRound(r){
+  S.mode="swipe"; S.round=r; S.qdeck=[]; S.errorQ=false; S.loadingQ=true;
+  show("sSwipe"); renderQDeck();
+  const gen=S.genId;
+  try{
+    const data=(S.prefetch&&S.prefetch.r===r)?await S.prefetch.p:await loadRound(r);
+    if(gen!==S.genId)return;
+    S.prefetch=null;
+    const qs=(data.questions||[]).filter(q=>q&&q.question);
+    if(!qs.length)throw new Error("bad");
+    qs.forEach(q=>S.asked.push(q.question));
+    S.qdeck=qs.map(q=>({...q,round:r}));
+    if(r===1&&data.open_question&&data.open_question.question)S.open=data.open_question;
+  }catch(e){S.prefetch=null;S.errorQ=true}
+  S.loadingQ=false; renderQDeck();
+}
+function qCardHTML(q,i,total){
+  return `<div class="qart">
+      <div class="qmeta"><b>${esc(t("round")(q.round))}</b><span>${i} / ${total}</span></div>
+      <span class="em">${esc(q.emoji||"🦊")}</span>
+      <h3>${esc(nameIt(q.question))}</h3>
+      <div class="stamp yes">${t("yes")}</div><div class="stamp no">${t("no")}</div><div class="stamp idk">${t("idk")}</div>
+    </div>`;
+}
+function renderQDeck(){
+  const el=$("qdeck"); el.innerHTML="";
+  $("qEnough").classList.toggle("on",S.swipes.length>=MIN_SWIPES);
+  if(!S.qdeck.length){
+    el.innerHTML=S.errorQ
+      ?`<div class="loading-card">${foxSVG}<p class="err">${t("errAI")}</p><button class="cta ghost" id="retryQ">${t("retry")}</button></div>`
+      :`<div class="loading-card">${foxSVG}<p style="font-family:var(--display);font-size:19px;font-weight:700;color:var(--snow)">${t(S.round===2?"loadQ2":"loadQ1")}</p><small>${esc(nameIt(t("loadQSub")))}</small></div>`;
+    const rb=$("retryQ"); if(rb)rb.onclick=()=>startRound(S.round);
+    return;
+  }
+  const done=S.swipes.filter(s=>s.round===S.round).length, total=done+S.qdeck.length;
+  S.qdeck.slice(0,3).reverse().forEach((q,i,arr)=>{
+    const depth=arr.length-1-i, c=document.createElement("div");
+    c.className="card qcard"+(q.round===2?" r2":""); c.innerHTML=qCardHTML(q,done+depth+1,total);
+    c.style.transform=`translateY(${depth*12}px) scale(${1-depth*.045})`; c.style.zIndex=10-depth;
+    if(depth>0)c.style.filter=`brightness(${1-depth*.18})`;
+    if(depth===0)attachDrag(c,swipeQ,{yes:".stamp.yes",no:".stamp.no",up:".stamp.idk"});
+    el.appendChild(c);
+  });
+}
+function swipeQ(dir){
+  if(!S.qdeck.length)return;
+  const a=dir==="super"?"idk":dir;
+  const q=S.qdeck[0], card=document.querySelector("#qdeck .card:last-child");
+  flyOut(card,dir,a==="idk"?".stamp.idk":`.stamp.${a}`);
+  S.swipes.push({q:q.question,a,round:q.round});
+  toast(nameIt(a==="yes"?q.yes_reaction:a==="no"?q.no_reaction:pick(t("idkReact"))),1500);
+  S.qdeck.shift();
+  setTimeout(()=>{renderQDeck();if(!S.qdeck.length&&!S.loadingQ)endRound()},240);
+}
+function endRound(){
+  if(S.round===1){
+    // Il round 2 si prepara subito, mentre l'utente risponde alla domanda aperta
+    S.prefetch={r:2,p:loadRound(2)};
+    if(S.open){askOpen();return}
+    startRound(2);return;
+  }
+  showScore();
+}
+function askOpen(){
+  S.mode="open"; show("sQ");
+  $("dots").innerHTML=""; $("qnum").textContent=""; $("qBack").style.visibility="hidden";
+  const q=S.open;
+  $("qbody").innerHTML=`<div class="qemoji">${esc(q.emoji||"🔍")}</div><h2>${esc(nameIt(q.question))}</h2><p class="qhint">${esc(nameIt(q.hint))}</p>
+    <div class="free"><input id="freeIn" placeholder="${esc(t("openPh"))}" maxlength="150" autocomplete="off"></div>`;
+  const fi=$("freeIn"); fi.oninput=updateNext; fi.onkeydown=e=>{if(e.key==="Enter"&&!$("qNext").disabled)onNext()};
+  $("qSkip").textContent=t("openSkip"); $("qSkip").style.visibility="visible";
+  updateNext(); setTimeout(()=>fi.focus(),50);
+}
+
+/* ===================== Conosciometro ===================== */
+function computeScore(){
+  const n=S.swipes.length; if(!n)return 0;
+  return Math.round(S.swipes.filter(s=>s.a!=="idk").length/n*100);
+}
+function showScore(){
+  S.mode="score"; show("sScore");
+  const p=computeScore(); S.score=p;
+  $("scoreTitle").textContent=nameIt(t("scoreTitle"));
+  $("scoreLevel").textContent=nameIt(t("levels").find(([min])=>p>=min)[1]);
+  // il numero sale fino al punteggio
+  const ring=$("ring"); let v=0; clearInterval(showScore.timer);
+  showScore.timer=setInterval(()=>{v=Math.min(p,v+2);ring.style.setProperty("--p",v);$("scorePct").textContent=v+"%";if(v>=p)clearInterval(showScore.timer)},18);
+  renderPortrait();
+  if(!S.deck.length&&!S.loadingGifts)fetchGifts();
+}
+function renderPortrait(){
+  const el=$("portrait");
+  el.style.display=S.portrait&&!S.portrait.trim()?"none":"";
+  if(S.portrait){el.classList.remove("wait");el.innerHTML=`${foxSVG}<span>${esc(nameIt(S.portrait))}</span>`}
+  else{el.classList.add("wait");el.innerHTML=`${foxSVG}<span>${esc(t("portraitWait"))}</span>`}
+  $("badges").innerHTML=S.badges.map(b=>`<span>${esc(nameIt(b))}</span>`).join("");
+}
+async function share(){
+  const text=t("shareText")(S.score??computeScore(),displayName()), url=location.origin+"/";
+  try{ if(navigator.share){await navigator.share({title:"Gifty",text,url});return} }catch(e){return}
+  try{await navigator.clipboard.writeText(text+" "+url);toast(t("copied"))}catch(e){}
+}
+
 /* ===================== Regali ===================== */
-function startGifts(){show("sDeck");renderDeck();fetchGifts()}
+function startGifts(){S.mode="gifts";show("sDeck");renderDeck();if(!S.deck.length&&!S.loadingGifts)fetchGifts()}
 
 async function fetchGifts(){
   if(S.loadingGifts)return; S.loadingGifts=true; renderDeck();
   const gen=++S.genId;
   try{
-    let gifts;
-    if(sample){
-      // Il prompt (identico al prototipo) è sul server: src/gifty/prompt.ts
-      const r=await askAI({tipo:"regali",risposte:answersForAI(),
+    let r;
+    try{
+      r=await askAI({tipo:"regali",risposte:profileForAI(),
         piaciute:S.liked.map(l=>l.g.name),scartate:S.disliked.map(g=>g.name),mostrate:S.shown});
-      gifts=(r.gifts||[]).filter(g=>g&&g.name);
-    }else gifts=localGifts();
+    }catch(e){if(!e.offline)throw e;setDemo(true);r={gifts:localGifts(),portrait:"",badges:[]}}
     if(gen!==S.genId)return;
-    gifts.forEach(g=>{S.shown.push(g.name);S.deck.push(g)});
+    if(!S.portrait&&r.portrait){S.portrait=r.portrait;S.badges=(r.badges||[]).slice(0,3);renderPortrait()}
+    (r.gifts||[]).filter(g=>g&&g.name).forEach(g=>{S.shown.push(g.name);S.deck.push(g)});
   }catch(e){
-    if(e&&e.code==="not_granted"){sample=null;$("demoNote").textContent=t("demo");S.loadingGifts=false;return fetchGifts();}
+    if(gen!==S.genId)return;
     S.error=true;
   }
+  if(!S.portrait){S.portrait=" ";renderPortrait()}
   S.loadingGifts=false; renderDeck();
 }
 
 function cardHTML(g){
   const c1=hex(g.colors&&g.colors[0])||"#3a2414", c2=hex(g.colors&&g.colors[1])||"#ff7a2f";
-  const price=Number(g.price);
-  return `<div class="art" style="background:radial-gradient(circle at 30% 25%,${c2} 0%,transparent 58%),radial-gradient(circle at 85% 90%,${c2}88 0%,transparent 45%),linear-gradient(160deg,${c1},#0e1a16)">
+  const price=Number(g.price), f=g.foto&&/^https:\/\/images\.pexels\.com\//.test(g.foto.url)?g.foto:null;
+  const bg=f?`background:url('${esc(f.url)}') center/cover,${c1}`
+    :`background:radial-gradient(circle at 30% 25%,${c2} 0%,transparent 58%),radial-gradient(circle at 85% 90%,${c2}88 0%,transparent 45%),linear-gradient(160deg,${c1},#0e1a16)`;
+  return `<div class="art${f?" photo":""}" style="${bg}">
       <span class="new-tag">${t("new")}</span>${isFinite(price)&&price>0?`<span class="price-tag">€ ${Math.round(price)}</span>`:""}
       <span class="em">${esc(g.emoji||"🎁")}</span>
+      ${f?`<a class="credit" href="${esc(f.link)}" target="_blank" rel="noopener">📷 ${esc(f.autore||t("photo"))} · Pexels</a>`:""}
       <div class="stamp yes">${t("yes")}</div><div class="stamp no">${t("no")}</div><div class="stamp super">${t("perfect")}</div>
     </div>
     <div class="info">
-      <h3>${esc(g.name)}</h3>${g.tagline?`<div class="tl">${esc(g.tagline)}</div>`:""}
-      <p>${esc(g.description)}</p>
-      ${g.why?`<div class="why"><svg viewBox="0 0 64 64"><use href="#fox"/></svg><span>${esc(g.why)}</span></div>`:""}
+      <h3>${esc(nameIt(g.name))}</h3>${g.tagline?`<div class="tl">${esc(nameIt(g.tagline))}</div>`:""}
+      <p>${esc(nameIt(g.description))}</p>
+      ${g.why?`<div class="why"><svg viewBox="0 0 64 64"><use href="#fox"/></svg><span>${esc(nameIt(g.why))}</span></div>`:""}
       ${Array.isArray(g.tags)&&g.tags.length?`<div class="tags">${g.tags.slice(0,3).map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div>`:""}
     </div>`;
 }
@@ -413,20 +638,23 @@ function renderDeck(){
     const rb=$("retryG"); if(rb) rb.onclick=()=>{S.error=false;fetchGifts()};
     return;
   }
+  // le foto delle prossime carte si caricano in anticipo
+  S.deck.slice(0,5).forEach(g=>{if(g.foto&&g.foto.url){const im=new Image();im.src=g.foto.url}});
   S.deck.slice(0,3).reverse().forEach((g,i,arr)=>{
     const depth=arr.length-1-i, c=document.createElement("div");
     c.className="card"; c.innerHTML=cardHTML(g);
     c.style.transform=`translateY(${depth*12}px) scale(${1-depth*.045})`; c.style.zIndex=10-depth;
     if(depth>0)c.style.filter=`brightness(${1-depth*.18})`;
-    if(depth===0)attachDrag(c);
+    if(depth===0)attachDrag(c,swipe,{yes:".stamp.yes",no:".stamp.no",up:".stamp.super"});
     el.appendChild(c);
   });
   if(S.deck.length<=2&&!S.loadingGifts){S.error=false;fetchGifts()}
 }
 
-function attachDrag(card){
+/* Trascinamento di una carta: a destra "yes", a sinistra "no", in alto "super" */
+function attachDrag(card,onSwipe,stamps){
   let sx=0,sy=0,dx=0,dy=0,drag=false;
-  const st={yes:card.querySelector(".stamp.yes"),no:card.querySelector(".stamp.no"),sup:card.querySelector(".stamp.super")};
+  const st={yes:card.querySelector(stamps.yes),no:card.querySelector(stamps.no),sup:card.querySelector(stamps.up)};
   card.addEventListener("pointerdown",e=>{if(e.target.closest("a"))return;drag=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition="none"});
   card.addEventListener("pointermove",e=>{
     if(!drag)return; dx=e.clientX-sx; dy=e.clientY-sy;
@@ -436,22 +664,24 @@ function attachDrag(card){
   });
   const end=()=>{
     if(!drag)return; drag=false;
-    if(dx>110)swipe("yes"); else if(dx<-110)swipe("no"); else if(dy<-110&&Math.abs(dx)<80)swipe("super");
+    if(dx>110)onSwipe("yes"); else if(dx<-110)onSwipe("no"); else if(dy<-110&&Math.abs(dx)<80)onSwipe("super");
     else{card.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1)";card.style.transform="";Object.values(st).forEach(s=>s.style.opacity=0)}
     dx=dy=0;
   };
   card.addEventListener("pointerup",end); card.addEventListener("pointercancel",end);
 }
+function flyOut(card,dir,stampSel){
+  if(!card)return;
+  const x=dir==="yes"?640:dir==="no"?-640:0, y=dir==="super"?-900:80;
+  card.style.transition="transform .38s ease-in, opacity .38s";
+  card.style.transform=`translate(${x}px,${y}px) rotate(${x/18}deg)`; card.style.opacity="0";
+  const s=card.querySelector(stampSel); if(s)s.style.opacity=1;
+}
 
 function swipe(dir){
   if(!S.deck.length)return;
   const g=S.deck[0], card=document.querySelector("#deck .card:last-child");
-  if(card){
-    const x=dir==="yes"?640:dir==="no"?-640:0, y=dir==="super"?-900:80;
-    card.style.transition="transform .38s ease-in, opacity .38s";
-    card.style.transform=`translate(${x}px,${y}px) rotate(${x/18}deg)`; card.style.opacity="0";
-    const s=card.querySelector(`.stamp.${dir}`); if(s)s.style.opacity=1;
-  }
+  flyOut(card,dir,`.stamp.${dir}`);
   S.history.push({g,dir});
   if(dir==="no")S.disliked.push(g); else {S.liked.push({g,sup:dir==="super",i:S.liked.length}); toast(dir==="super"?t("super"):t("saved"));}
   S.deck.shift(); updateLikes();
@@ -471,32 +701,34 @@ function showResults(){
   show("sRes");
   const ranked=[...S.liked].sort((a,b)=>(b.sup-a.sup)||(b.i-a.i));
   $("resSub").textContent=ranked.length?t("resSub")(ranked.length):t("resNone");
+  $("resScore").textContent=S.score!=null?t("resScore")(S.score,displayName()):"";
   $("list").innerHTML=ranked.map((l,i)=>{
     const g=l.g, c1=hex(g.colors&&g.colors[0])||"#3a2414", c2=hex(g.colors&&g.colors[1])||"#ff7a2f";
+    const f=g.foto&&/^https:\/\/images\.pexels\.com\//.test(g.foto.url)?g.foto:null;
     const q=encodeURIComponent(g.search||g.name);
-    return `<div class="row${i===0?" top":""}"><div class="e" style="background:linear-gradient(150deg,${c2},${c1})">${esc(g.emoji||"🎁")}</div>
-      <div><h4>${esc(g.name)}</h4><div class="meta">${Number(g.price)>0?`<span class="pr">€ ${Math.round(g.price)}</span>`:""}${l.sup?`<span class="badge">${t("super")}</span>`:""}</div>
-      <p>${esc(g.why||g.description)}</p><a href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${t("search")}</a></div></div>`;
+    const thumb=f?`<div class="e photo" style="background:url('${esc(f.url)}') center/cover"></div>`
+      :`<div class="e" style="background:linear-gradient(150deg,${c2},${c1})">${esc(g.emoji||"🎁")}</div>`;
+    return `<div class="row${i===0?" top":""}">${thumb}
+      <div><h4>${esc(nameIt(g.name))}</h4><div class="meta">${Number(g.price)>0?`<span class="pr">€ ${Math.round(g.price)}</span>`:""}${l.sup?`<span class="badge">${t("super")}</span>`:""}</div>
+      <p>${esc(nameIt(g.why||g.description))}</p><a href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${t("search")}</a></div></div>`;
   }).join("");
 }
 
-/* ===================== Modalità demo (senza AI) ===================== */
+/* ===================== Riserva se il server non risponde ===================== */
 const LOCAL_Q={
-  it:[{emoji:"🎂",question:"Quanti anni ha, più o meno?",hint:"Ci aiuta a calibrare il tono.",options:["Meno di 12","12–18","19–30","31–50","51–70","Oltre 70"],multi:false},
-      {emoji:"✨",question:"Come la descriveresti in poche parole?",hint:"Scegli tutte quelle che valgono.",options:["Curiosa","Pratica","Romantica","Avventurosa","Ironica","Elegante"],multi:true},
-      {emoji:"🎯",question:"Cosa ama fare nel tempo libero?",hint:"Le passioni sono la miniera d'oro.",options:["Cucinare","Sport","Leggere","Viaggiare","Tecnologia","Arte e musica"],multi:true},
-      {emoji:"🎟️",question:"Meglio un oggetto o un'esperienza?",hint:"Qualcosa da tenere o da vivere.",options:["Oggetto","Esperienza","Tutti e due"],multi:false},
-      {emoji:"🏠",question:"Com'è casa sua?",hint:"Lo stile dice molto.",options:["Minimal","Accogliente","Colorata","Piena di piante","Sempre in ordine"],multi:false},
-      {emoji:"🙊",question:"Cosa non comprerebbe mai per sé?",hint:"Spesso è il regalo perfetto.",options:["Qualcosa di lusso","Un corso","Un gadget","Una giornata relax","Un oggetto su misura"],multi:false},
-      {emoji:"🧭",question:"C'è qualcosa che ha appena iniziato?",hint:"Un nuovo hobby, lavoro, casa…",options:["Nuova casa","Nuovo lavoro","Nuovo hobby","Diventato genitore","Niente di nuovo"],multi:false}],
-  en:[{emoji:"🎂",question:"Roughly how old are they?",hint:"Helps us set the tone.",options:["Under 12","12–18","19–30","31–50","51–70","Over 70"],multi:false},
-      {emoji:"✨",question:"How would you describe them?",hint:"Pick all that apply.",options:["Curious","Practical","Romantic","Adventurous","Funny","Elegant"],multi:true},
-      {emoji:"🎯",question:"What do they love doing?",hint:"Passions are the gold mine.",options:["Cooking","Sport","Reading","Travel","Tech","Art & music"],multi:true},
-      {emoji:"🎟️",question:"An object or an experience?",hint:"Something to keep or to live.",options:["Object","Experience","Both"],multi:false},
-      {emoji:"🏠",question:"What's their home like?",hint:"Style says a lot.",options:["Minimal","Cosy","Colourful","Full of plants","Always tidy"],multi:false},
-      {emoji:"🙊",question:"What would they never buy themselves?",hint:"Often the perfect gift.",options:["Something luxurious","A course","A gadget","A spa day","Something made to measure"],multi:false},
-      {emoji:"🧭",question:"Anything they've just started?",hint:"A new hobby, job, home…",options:["New home","New job","New hobby","New parent","Nothing new"],multi:false}]};
-function localQuestion(n){const b=LOCAL_Q[lang];return b[(n-3)%b.length]}
+  it:[["🎤","{nome} andrebbe mai a un concerto di Travis Scott?"],["🥢","{nome} comprerebbe mai il tofu?"],["🎮","{nome} ha passato una notte intera su un videogioco?"],
+      ["🏕️","{nome} dormirebbe in tenda sotto le stelle?"],["☕","{nome} beve l'espresso rigorosamente senza zucchero?"],["🪴","{nome} parla alle sue piante?"],
+      ["🎤","{nome} canterebbe al karaoke davanti a degli sconosciuti?"],["🧳","{nome} partirebbe domani per Tokyo con solo uno zaino?"],["🍕","{nome} metterebbe l'ananas sulla pizza?"],
+      ["📚","{nome} ha più libri che posti dove metterli?"],["🏃","{nome} si sveglierebbe alle 6 per correre?"],["📸","{nome} fotografa sempre il cibo prima di mangiarlo?"],["🧘","{nome} ha mai fatto yoga all'alba?"]],
+  en:[["🎤","Would {nome} ever go to a Travis Scott concert?"],["🥢","Would {nome} ever buy tofu?"],["🎮","Has {nome} ever spent a whole night on a video game?"],
+      ["🏕️","Would {nome} sleep in a tent under the stars?"],["☕","Does {nome} drink espresso strictly without sugar?"],["🪴","Does {nome} talk to their plants?"],
+      ["🎤","Would {nome} sing karaoke in front of strangers?"],["🧳","Would {nome} leave for Tokyo tomorrow with just a backpack?"],["🍕","Would {nome} put pineapple on pizza?"],
+      ["📚","Does {nome} own more books than shelf space?"],["🏃","Would {nome} get up at 6 to go running?"],["📸","Does {nome} always photograph food before eating?"],["🧘","Has {nome} ever done yoga at sunrise?"]]};
+function localRound(r){
+  const n=r===1?7:6, pool=LOCAL_Q[lang].filter(([,q])=>!S.asked.includes(q)).slice(0,n);
+  return {questions:pool.map(([emoji,question])=>({emoji,question,yes_reaction:pick(t("idkReact")),no_reaction:pick(t("idkReact"))})),
+    open_question:r===1?{emoji:"🔍",question:lang==="it"?"Qual è l'ultima cosa di cui {nome} ti ha parlato con entusiasmo?":"What's the last thing {nome} talked about with excitement?",hint:""}:null};
+}
 const LOCAL_G=[
  ["Kit pasta fresca con mattarello","Handmade pasta kit","🍝",48,["#5a1d10","#ff8a4c"]],["Corso di ceramica per due","Pottery class for two","🏺",110,["#3b2a1c","#d99a64"]],
  ["Mappa stellare della loro data","Star map of their date","🌌",45,["#0c1430","#6f8cff"]],["Volo in mongolfiera all'alba","Sunrise hot-air balloon ride","🎈",260,["#3a1430","#ff7aa8"]],
@@ -513,28 +745,39 @@ function localGifts(){
 $("goBtn").onclick=startQuestions;
 $("homeBtn").onclick=()=>show("sHome");
 $("qBack").onclick=goBack;
-$("qNext").onclick=commitAnswer;
-$("qSkip").onclick=()=>{S.current=null;startGifts()};
+$("qNext").onclick=onNext;
+$("qSkip").onclick=onSkip;
+$("qYesBtn").onclick=()=>swipeQ("yes"); $("qNoBtn").onclick=()=>swipeQ("no"); $("qIdkBtn").onclick=()=>swipeQ("super");
+$("qEnough").onclick=()=>{S.genId++;S.qdeck=[];S.loadingQ=false;S.prefetch=null;showScore()};
+$("giftsBtn").onclick=startGifts;
+$("shareBtn").onclick=share;
 $("yesBtn").onclick=()=>swipe("yes"); $("noBtn").onclick=()=>swipe("no"); $("superBtn").onclick=()=>swipe("super");
 $("undoBtn").onclick=undo; $("doneBtn").onclick=showResults;
 $("moreBtn").onclick=()=>{show("sDeck");renderDeck();if(!S.loadingGifts&&S.deck.length<3)fetchGifts()};
 $("restartBtn").onclick=startQuestions;
 $("likesPill").onclick=showResults;
 document.addEventListener("keydown",e=>{
-  if(!$("sDeck").classList.contains("active"))return;
-  if(e.key==="ArrowRight")swipe("yes"); if(e.key==="ArrowLeft")swipe("no"); if(e.key==="ArrowUp")swipe("super");
+  if(e.target&&e.target.tagName==="INPUT")return;
+  const d=e.key==="ArrowRight"?"yes":e.key==="ArrowLeft"?"no":e.key==="ArrowUp"?"super":null;
+  if(!d)return;
+  if($("sSwipe").classList.contains("active"))swipeQ(d);
+  else if($("sDeck").classList.contains("active"))swipe(d);
 });
 $("langBtn").onclick=()=>{
   lang=lang==="it"?"en":"it"; document.documentElement.lang=lang; $("langBtn").textContent=lang==="it"?"EN":"IT";
-  applyTexts(); if(!sample&&$("demoNote").textContent)$("demoNote").textContent=t("demo");
-  if($("sQ").classList.contains("active")&&S.current&&S.answers.length<3){S.current={...t("fixed")[S.answers.length]};renderQuestion()}
+  applyTexts(); if(S.demo)$("demoNote").textContent=t("demo");
+  if($("sQ").classList.contains("active")){
+    if(S.mode==="fixed"&&S.current){S.current={...t("fixed")[S.answers.length]};renderQuestion()}
+    else if(S.mode==="name")askName();
+  }
+  if($("sSwipe").classList.contains("active"))renderQDeck();
+  if($("sScore").classList.contains("active"))showScore();
   if($("sRes").classList.contains("active"))showResults();
 };
 applyTexts();
 (async()=>{
   // Chiede al server se l'AI è configurata (chiave ANTHROPIC_API_KEY presente)
-  try{ const r=await fetch("/api/ai",{cache:"no-store"}); sample=r.ok&&(await r.json()).attiva===true; }catch(e){ sample=false; }
-  if(!sample)$("demoNote").textContent=t("demo");
+  try{ const r=await fetch("/api/ai",{cache:"no-store"}); setDemo(!(r.ok&&(await r.json()).attiva===true)); }catch(e){ setDemo(true); }
 })();
 </script>
 </body>

@@ -345,3 +345,20 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
     - l'AI di Gifty dipende solo da `ANTHROPIC_API_KEY` (`MOTORE_FINTO` vale solo per `/it` e `/en`);
     - **modalità demo**: se manca la chiave, se l'AI non risponde o se il limite è raggiunto, la pagina
       passa da sola alle domande e alle idee di esempio del prototipo, con l'avviso del prototipo.
+31. **Gifty diventa un gioco** (richiesta del proprietario):
+    - dopo le 3 domande base si chiede il **nome** (facoltativo): resta nel browser, al server e all'AI
+      arriva sempre il segnaposto `{nome}` (anche nelle risposte scritte, dove il nome viene sostituito);
+      senza nome si usa la relazione ("tua mamma") o "questa persona";
+    - **due round di domande sì/no da scorrere** (7 + 6), goliardiche e concrete, scritte dall'AI in blocco
+      (prompt `gifty-v2`): il round 1 esplora aree diverse, il round 2 scava su quello che è emerso; tra i due
+      una **domanda aperta**. Ogni domanda ha la reazione della volpe al sì e al no. Il round 2 si prepara
+      mentre l'utente scrive la risposta aperta, così non si aspetta;
+    - **Conosciometro**: percentuale di risposte date con sicurezza (non "non so"), un livello, il ritratto
+      ironico e 3 titoli scritti dall'AI, pulsante "Sfida un amico" (condivisione del telefono);
+    - idee regalo **meno scontate** (vietati i regali generici, ogni idea incrocia almeno due risposte) con
+      **foto vere da Pexels** (`PEXELS_API_KEY`, gratuita): il modello scrive 2-4 parole inglesi per la foto,
+      il server la cerca, la tiene in memoria 24 ore e accetta solo immagini di images.pexels.com; la carta
+      cita fotografo e Pexels come chiede la licenza. Sono foto rappresentative, non la foto del prodotto
+      esatto (per quella servirebbero le API dei negozi, es. Amazon PA-API);
+    - **demo**: se l'AI non è attiva, non risponde o il limite è raggiunto, il server risponde con la demo
+      (archivio di 56 domande e catalogo di ~70 regali, scelti in base alle risposte) invece che con un errore.
