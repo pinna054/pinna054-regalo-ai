@@ -117,8 +117,8 @@ npm run dev
 
 Apri <http://localhost:3000>: c'è Gifty. La versione precedente del sito è su `/it` e `/en`.
 
-**Provare Gifty con l'AI vera**: in `.env.local` basta `ANTHROPIC_API_KEY=...` (togli `MOTORE_FINTO=1`
-se c'è), poi riavvia `npm run dev`. Senza `DATABASE_URL` i limiti per utente restano in memoria: va
+**Provare Gifty con l'AI vera**: in `.env.local` basta `ANTHROPIC_API_KEY=...`, poi riavvia
+`npm run dev` (`MOTORE_FINTO` riguarda solo la versione precedente su `/it` e `/en`). Senza `DATABASE_URL` i limiti per utente restano in memoria: va
 bene sul tuo computer. Senza chiave la pagina parte in modalità demo (avviso sotto il pulsante).
 
 **Provare senza chiavi**: in `.env.local` scrivi `MOTORE_FINTO=1` e lascia vuota `DATABASE_URL`.
@@ -144,7 +144,7 @@ Altri comandi utili:
    - `DATABASE_URL` (obbligatoria: senza database il sito pubblicato non genera idee)
    - `SEGRETO_HASH_IP`: una stringa lunga e casuale (consigliata)
    - facoltative: `ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT`, `MOTORE_PROMPT`, `AMAZON_TAG_…`, `LIMITE_…`
-   - **non** impostare `MOTORE_FINTO` (con `MOTORE_FINTO=1` Gifty resta in modalità demo)
+   - Gifty usa l'AI appena c'è `ANTHROPIC_API_KEY`; `MOTORE_FINTO=1` tiene in demo solo `/it` e `/en`
 5. Premi **Deploy**. Dopo un paio di minuti il sito è online all'indirizzo indicato da Vercel.
 
 Da quel momento ogni modifica salvata su GitHub (branch principale) viene pubblicata da sola.

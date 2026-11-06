@@ -342,5 +342,6 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
     - **limiti per utente** (IP, salvato solo come hash): 40 chiamate all'ora, 120 al giorno, 5000 al
       giorno per tutto il sito; con database i contatori sono nella tabella `limiti_richieste`, senza
       restano in memoria (va bene solo in locale);
+    - l'AI di Gifty dipende solo da `ANTHROPIC_API_KEY` (`MOTORE_FINTO` vale solo per `/it` e `/en`);
     - **modalità demo**: se manca la chiave, se l'AI non risponde o se il limite è raggiunto, la pagina
       passa da sola alle domande e alle idee di esempio del prototipo, con l'avviso del prototipo.

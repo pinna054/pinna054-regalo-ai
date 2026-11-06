@@ -12,7 +12,7 @@
  */
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { effortMotore, modelloMotore, motoreFinto } from "@/lib/ambiente";
+import { effortMotore, modelloMotore } from "@/lib/ambiente";
 import { ipRichiesta } from "@/lib/ip";
 import { controllaLimitiAi } from "@/lib/limiti";
 import { chiediAlModello, ErroreAi, SchemaDomanda, SchemaRegali } from "@/gifty/ai";
@@ -44,9 +44,12 @@ const SchemaRichiesta = z.discriminatedUnion("tipo", [
   }),
 ]);
 
-/** True se l'AI è configurata (chiave presente e modalità finta spenta). */
+/**
+ * True se l'AI è configurata: basta la chiave. MOTORE_FINTO vale solo per la versione
+ * precedente del sito (/it, /en), non per Gifty.
+ */
 function aiAttiva(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY?.trim()) && !motoreFinto();
+  return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
 export async function GET() {
