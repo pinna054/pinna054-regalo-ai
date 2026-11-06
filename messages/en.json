@@ -10,22 +10,22 @@
     "lingua": "Language"
   },
   "home": {
-    "occhiello": "Gift ideas, made to measure",
+    "occhiello": "The right gift, in a few swipes",
     "titolo": "Tell me who they are. I’ll handle the gift.",
-    "sottotitolo": "Describe the person in a few lines: I’ll suggest 4 concrete ideas within your budget, with links to find them online.",
+    "sottotitolo": "Describe them in a couple of lines, answer a few questions by swiping cards and discover tailored gifts: keep the ones you like with a ♥ and find them online.",
     "inizia": "Get started",
     "passi": {
       "uno": {
         "titolo": "Describe them",
-        "testo": "Who they are to you, the occasion, your budget and a few details about their tastes and personality."
+        "testo": "Who they are to you, the occasion and your budget. Takes seconds."
       },
       "due": {
-        "titolo": "Get 4 ideas",
-        "testo": "At least one safe bet and one more original pick, each with the reason it could work."
+        "titolo": "Swipe to answer",
+        "testo": "Curious, precise questions: right for yes, left for no."
       },
       "tre": {
-        "titolo": "Find it online",
-        "testo": "One tap searches for the idea on Amazon or Google Shopping, in the right country."
+        "titolo": "Pick and gift",
+        "testo": "Swipe through ideas, save the ones you ♥ and find them on Amazon or Google Shopping."
       }
     }
   },
@@ -182,7 +182,7 @@
     "proposta": "Suggestion {numero}",
     "notaPrezzi": "Prices are estimates: always check price, availability and delivery times in the shop.",
     "affiliazione": "As an Amazon Associate, {sito} earns from qualifying purchases.",
-    "demo": "Demo mode: these ideas are fake and only meant for testing the site.",
+    "demo": "Preview: questions and gifts are demo examples, chosen from your answers.",
     "vuoto": {
       "titolo": "Your ideas will appear here",
       "testo": "Fill in the form: in a few seconds I’ll suggest 4 gift ideas.",

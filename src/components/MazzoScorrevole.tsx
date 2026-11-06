@@ -117,7 +117,8 @@ export function MazzoScorrevole<T>({ elementi, chiave, disegna, onScegli, etiche
         })}
       </div>
 
-      <div className="mt-5 flex items-center justify-center gap-5">
+      {/* Pulsanti: restano visibili in basso anche quando la carta è lunga */}
+      <div className="sticky bottom-3 z-20 mx-auto mt-5 flex w-fit items-center justify-center gap-5 rounded-full border border-bordo/60 bg-crema/95 px-3 py-2 shadow-sollevata backdrop-blur-md">
         <PulsanteTondo etichetta={etichette.sinistra} onClick={() => scegli(-1)} grande colore="text-terracotta hover:bg-terracotta-chiaro">
           {icone.sinistra}
         </PulsanteTondo>

@@ -24,7 +24,7 @@ export function Marchio({ className = "size-8" }: { className?: string }) {
   );
 }
 
-/** Illustrazione della home: un regalo con il cartellino che dondola. */
+/** Illustrazione della home: la volpe che sbuca da dietro un regalo con il cartellino che dondola. */
 export function IllustrazioneRegalo({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 240 220" className={className} aria-hidden="true" fill="none">
@@ -36,6 +36,24 @@ export function IllustrazioneRegalo({ className = "" }: { className?: string }) 
       <circle cx="214" cy="128" r="3.5" fill="#b4482f" opacity="0.45" />
       <path d="M26 112c6-6 10 4 16-2" stroke="#b4482f" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
       <path d="M180 22c4 6-6 9-2 15" stroke="#4f6548" strokeWidth="3" strokeLinecap="round" opacity="0.55" />
+      {/* la volpe che sbuca da dietro il regalo */}
+      <g transform="translate(126 -9) scale(3.1) rotate(10 16 16)">
+        <path d="M4.5 3.5 L13 10.5 L6.5 15 Z" fill="#c94a24" stroke="#2b211c" strokeWidth="0.9" strokeLinejoin="round" />
+        <path d="M27.5 3.5 L19 10.5 L25.5 15 Z" fill="#c94a24" stroke="#2b211c" strokeWidth="0.9" strokeLinejoin="round" />
+        <path d="M6.5 6.5 L11 10.6 L7.5 13 Z" fill="#2b211c" />
+        <path d="M25.5 6.5 L21 10.6 L24.5 13 Z" fill="#2b211c" />
+        <path
+          d="M3.5 11 Q9 9.5 16 10.5 Q23 9.5 28.5 11 L26.5 19 Q22 24 16 29 Q10 24 5.5 19 Z"
+          fill="#e0602f"
+          stroke="#2b211c"
+          strokeWidth="0.9"
+          strokeLinejoin="round"
+        />
+        <path d="M6.3 19 Q11 18.2 13.8 22.5 L16 27.2 L18.2 22.5 Q21 18.2 25.7 19 Q21.6 23.6 16 28.2 Q10.4 23.6 6.3 19 Z" fill="#fffdf9" />
+        <path d="M10.2 16.2 Q12 14.6 13.6 16.3" stroke="#2b211c" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+        <path d="M18.4 16.3 Q20 14.6 21.8 16.2" stroke="#2b211c" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+        <ellipse cx="16" cy="26.6" rx="1.6" ry="1.2" fill="#2b211c" />
+      </g>
       <g transform="rotate(-5 118 130)">
         {/* scatola */}
         <rect x="56" y="98" width="124" height="96" rx="10" fill="#f6e0d6" stroke="#2b211c" strokeWidth="3" />

@@ -10,22 +10,22 @@
     "lingua": "Lingua"
   },
   "home": {
-    "occhiello": "Idee regalo su misura",
+    "occhiello": "Il regalo giusto, in pochi swipe",
     "titolo": "Raccontami chi è. Al regalo ci penso io.",
-    "sottotitolo": "Descrivi la persona in poche righe: ti propongo 4 idee concrete, dentro il tuo budget, con i link per trovarle online.",
+    "sottotitolo": "Racconta in due righe chi è, rispondi a qualche domanda scorrendo le carte e scopri regali su misura: tieni quelli che ti piacciono con un ♥ e trovali online.",
     "inizia": "Inizia",
     "passi": {
       "uno": {
         "titolo": "Racconta",
-        "testo": "Chi è per te, l’occasione, il budget e qualche dettaglio su gusti e carattere."
+        "testo": "Chi è per te, l’occasione e il budget. Bastano pochi secondi."
       },
       "due": {
-        "titolo": "Ricevi 4 idee",
-        "testo": "Almeno una sicura e una più originale, ognuna con il motivo per cui può piacere."
+        "titolo": "Rispondi scorrendo",
+        "testo": "Domande curiose e precise: a destra sì, a sinistra no."
       },
       "tre": {
-        "titolo": "Trovala online",
-        "testo": "Con un tocco cerchi l’idea su Amazon o Google Shopping, nel paese giusto."
+        "titolo": "Scegli e regala",
+        "testo": "Scorri le idee, salva quelle col ♥ e trovale su Amazon o Google Shopping."
       }
     }
   },
@@ -182,7 +182,7 @@
     "proposta": "Proposta {numero}",
     "notaPrezzi": "I prezzi sono stime: controlla sempre prezzo, disponibilità e tempi di consegna sul negozio.",
     "affiliazione": "In qualità di Affiliato Amazon, {sito} riceve un guadagno dagli acquisti idonei.",
-    "demo": "Modalità demo: queste idee sono finte e servono solo a provare il sito.",
+    "demo": "Anteprima: domande e regali sono esempi dimostrativi, scelti in base alle tue risposte.",
     "vuoto": {
       "titolo": "Qui compariranno le tue idee",
       "testo": "Compila il modulo: in pochi secondi ti propongo 4 idee regalo.",

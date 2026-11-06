@@ -1,0 +1,75 @@
+/**
+ * DEMO: i "temi" che collegano le risposte del quiz ai regali di prova,
+ * con le parole che li fanno riconoscere nei testi liberi e le frasi per la lettura del profilo.
+ */
+export const TEMI = [
+  "musica", "feste", "vintage", "arte", "cultura", "cibo", "cucina", "caffe", "te", "benessere",
+  "avventura", "viaggi", "natura", "relax", "ordine", "sport", "piante", "casa", "fai-da-te",
+  "lettura", "tech", "gaming", "giochi", "film", "foto", "scrittura", "ricordi", "animali", "stile",
+] as const;
+export type Tema = (typeof TEMI)[number];
+
+/** Parole (inizio di parola, minuscole) che fanno riconoscere un tema nei testi liberi. */
+export const PAROLE_TEMA: Partial<Record<Tema, string[]>> = {
+  musica: ["music", "concert", "cant", "chitarr", "vinil", "playlist", "band", "spotify", "song"],
+  feste: ["fest", "amici", "uscir", "serat", "party", "friend"],
+  vintage: ["vintage", "usato", "retr", "antic", "mercatin"],
+  arte: ["arte", "art", "mostr", "museo", "museum", "dipin", "disegn", "paint", "draw"],
+  cibo: ["cibo", "mangi", "ristor", "cioccol", "dolc", "sushi", "pizza", "food", "eat", "chocol"],
+  cucina: ["cucin", "ricett", "chef", "forn", "cook", "bake", "recipe"],
+  caffe: ["caff", "espresso", "coffee", "moka"],
+  te: ["tè", "te ", "tisan", "tea", "matcha"],
+  benessere: ["benesser", "yoga", "spa", "massagg", "medit", "wellness", "skin"],
+  avventura: ["avventur", "adrenal", "scoprir", "adventure"],
+  viaggi: ["viagg", "giappon", "tokyo", "partir", "vacanz", "travel", "trip", "islanda", "lisbona", "parigi"],
+  natura: ["natura", "montagn", "trekking", "camminat", "mare", "boschi", "hik", "mountain", "camping", "outdoor"],
+  relax: ["relax", "divan", "tranquill", "riposo", "dormir", "calm", "sofa"],
+  ordine: ["ordin", "organizz", "agenda", "planner", "tidy"],
+  sport: ["sport", "corr", "palestr", "calcio", "padel", "bici", "nuot", "running", "gym", "football", "tennis"],
+  piante: ["piant", "giardin", "fiori", "plant", "garden", "flower"],
+  casa: ["casa", "arred", "trasloc", "home", "interior"],
+  "fai-da-te": ["fai da te", "costruir", "riparar", "maglia", "cucit", "diy", "craft", "knit"],
+  lettura: ["legg", "libr", "romanz", "book", "read", "novel", "fumett"],
+  tech: ["tecnolog", "smartphone", "computer", "app", "gadget", "tech"],
+  gaming: ["videogioc", "playstation", "nintendo", "xbox", "gaming", "game"],
+  giochi: ["gioc", "puzzle", "carte", "board", "quiz"],
+  film: ["film", "serie", "cinema", "netflix", "movie", "series"],
+  foto: ["foto", "fotograf", "camera", "photo", "instagram"],
+  scrittura: ["scriv", "diario", "penn", "quadern", "journal", "writ"],
+  ricordi: ["ricord", "nostalg", "memor"],
+  animali: ["cane", "gatt", "animal", "dog", "cat ", "pet"],
+  stile: ["stile", "elegan", "moda", "fashion", "style", "design"],
+};
+
+/** Frasi per descrivere i gusti nella lettura del profilo. */
+export const FRASE_TEMA: Record<Tema, { it: string; en: string }> = {
+  musica: { it: "la musica dal vivo", en: "live music" },
+  feste: { it: "le serate in compagnia", en: "nights out with friends" },
+  vintage: { it: "le cose con una storia", en: "things with a story" },
+  arte: { it: "l’arte e il bello", en: "art and beautiful things" },
+  cultura: { it: "le esperienze culturali", en: "cultural experiences" },
+  cibo: { it: "la buona tavola", en: "good food" },
+  cucina: { it: "stare ai fornelli", en: "cooking" },
+  caffe: { it: "il rito del caffè", en: "the coffee ritual" },
+  te: { it: "le pause con una tazza calda", en: "breaks with a warm cup" },
+  benessere: { it: "prendersi cura di sé", en: "self-care" },
+  avventura: { it: "le esperienze fuori dal comune", en: "out-of-the-ordinary experiences" },
+  viaggi: { it: "scoprire posti nuovi", en: "discovering new places" },
+  natura: { it: "la natura e gli spazi aperti", en: "nature and the outdoors" },
+  relax: { it: "i ritmi lenti", en: "slow living" },
+  ordine: { it: "le cose ben organizzate", en: "well-organised things" },
+  sport: { it: "lo sport", en: "sport" },
+  piante: { it: "il verde in casa", en: "plants at home" },
+  casa: { it: "una casa accogliente", en: "a cosy home" },
+  "fai-da-te": { it: "creare con le proprie mani", en: "making things by hand" },
+  lettura: { it: "i libri", en: "books" },
+  tech: { it: "la tecnologia", en: "technology" },
+  gaming: { it: "i videogiochi", en: "video games" },
+  giochi: { it: "i giochi in compagnia", en: "games with friends" },
+  film: { it: "film e serie", en: "films and series" },
+  foto: { it: "la fotografia", en: "photography" },
+  scrittura: { it: "scrivere a mano", en: "writing by hand" },
+  ricordi: { it: "custodire i ricordi", en: "keeping memories" },
+  animali: { it: "gli animali", en: "animals" },
+  stile: { it: "i dettagli di stile", en: "stylish details" },
+};

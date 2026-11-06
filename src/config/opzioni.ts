@@ -78,3 +78,15 @@ export type IngombroMassimo = (typeof INGOMBRI_MASSIMI)[number];
 // Tipo di idea
 export const TIPI_IDEA = ["sicura", "originale"] as const;
 export type TipoIdea = (typeof TIPI_IDEA)[number];
+
+/** Aspetto delle carte: icona e colori (sfondo sfumato) per ogni tipologia. */
+export const ASPETTO_TIPOLOGIA: Record<Tipologia, { icona: string; da: string; a: string }> = {
+  esperienze: { icona: "🎟️", da: "#f6e0d6", a: "#f3c9b8" },
+  "libri e cultura": { icona: "📚", da: "#e6e2f3", a: "#cfc7ea" },
+  "cibo e bevande": { icona: "🍫", da: "#f8ecd5", a: "#f1d6a8" },
+  tecnologia: { icona: "🎧", da: "#dfeaf2", a: "#c3d8e8" },
+  casa: { icona: "🏡", da: "#e4ebdc", a: "#cddcbf" },
+  benessere: { icona: "🌿", da: "#e2f0ea", a: "#c4e2d4" },
+  "hobby e tempo libero": { icona: "🎨", da: "#fbe3ea", a: "#f4c6d4" },
+  accessori: { icona: "👜", da: "#efe6dc", a: "#e0cfbd" },
+};
