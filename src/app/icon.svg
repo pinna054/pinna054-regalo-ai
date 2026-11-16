@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <path d="M4.5 3.5 L13 10.5 L6.5 15 Z" fill="#c94a24"/>
-  <path d="M27.5 3.5 L19 10.5 L25.5 15 Z" fill="#c94a24"/>
-  <path d="M6.5 6.5 L11 10.6 L7.5 13 Z" fill="#2b211c"/>
-  <path d="M25.5 6.5 L21 10.6 L24.5 13 Z" fill="#2b211c"/>
-  <path d="M3.5 11 Q9 9.5 16 10.5 Q23 9.5 28.5 11 L26.5 19 Q22 24 16 29 Q10 24 5.5 19 Z" fill="#e0602f"/>
-  <path d="M6.3 19 Q11 18.2 13.8 22.5 L16 27.2 L18.2 22.5 Q21 18.2 25.7 19 Q21.6 23.6 16 28.2 Q10.4 23.6 6.3 19 Z" fill="#fffdf9"/>
-  <path d="M10.2 16.2 Q12 14.6 13.6 16.3" stroke="#2b211c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <path d="M18.4 16.3 Q20 14.6 21.8 16.2" stroke="#2b211c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <ellipse cx="16" cy="26.6" rx="1.6" ry="1.2" fill="#2b211c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0e1a16"/>
+  <g transform="translate(4 4) scale(.875)">
+    <polygon points="9,5 25,21 12,29" fill="#ff7a2f"/><polygon points="55,5 39,21 52,29" fill="#ff7a2f"/>
+    <polygon points="12.5,11 21,21 14,25" fill="#7a2a0c"/><polygon points="51.5,11 43,21 50,25" fill="#7a2a0c"/>
+    <polygon points="7,24 32,17 57,24 47,44 32,59 17,44" fill="#ff7a2f"/><polygon points="32,17 57,24 47,44 32,59" fill="#e5621c"/>
+    <polygon points="7,24 17,44 32,59 25,41" fill="#f6efe6"/><polygon points="57,24 47,44 32,59 39,41" fill="#e9dfd2"/>
+    <polygon points="28.5,54.5 35.5,54.5 32,59.5" fill="#0e1a16"/><polygon points="19,31 27,33 21,35.5" fill="#0e1a16"/><polygon points="45,31 37,33 43,35.5" fill="#0e1a16"/>
+  </g>
 </svg>

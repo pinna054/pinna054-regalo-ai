@@ -45,9 +45,43 @@ const REAZIONI = {
   },
 };
 
+/** Carte "questo o quello": ogni lato porta ai temi dei regali. */
+type CartaAB = { emoji: string; it: [string, string, string]; en: [string, string, string]; temi: [Tema[], Tema[]] };
+const QUESTO_O_QUELLO: CartaAB[] = [
+  { emoji: "🏝️", it: ["{nome} in vacanza: Ibiza o baita in Trentino?", "Ibiza", "Baita"], en: ["{nome} on holiday: Ibiza or a mountain cabin?", "Ibiza", "Cabin"], temi: [["feste", "viaggi"], ["natura", "relax"]] },
+  { emoji: "🍣", it: ["Ultima cena di {nome}: sushi o carbonara?", "Sushi", "Carbonara"], en: ["{nome}'s last supper: sushi or carbonara?", "Sushi", "Carbonara"], temi: [["cibo", "viaggi"], ["cucina", "cibo"]] },
+  { emoji: "💿", it: ["{nome} ascolta la musica: vinile o Spotify?", "Vinile", "Spotify"], en: ["How {nome} listens: vinyl or Spotify?", "Vinyl", "Spotify"], temi: [["vintage", "musica"], ["tech", "musica"]] },
+  { emoji: "🌅", it: ["Il sabato di {nome}: sveglia all'alba o brunch alle 13?", "Alba", "Brunch"], en: ["{nome}'s Saturday: sunrise alarm or 1pm brunch?", "Sunrise", "Brunch"], temi: [["sport", "natura"], ["relax", "cibo"]] },
+  { emoji: "📚", it: ["Serata ideale di {nome}: libro sul divano o serata fuori?", "Libro", "Serata fuori"], en: ["{nome}'s ideal night: book on the sofa or night out?", "Book", "Night out"], temi: [["lettura", "relax"], ["feste", "musica"]] },
+  { emoji: "🎮", it: ["{nome} sceglie: PlayStation o gioco da tavolo?", "PlayStation", "Da tavolo"], en: ["{nome} picks: PlayStation or board game?", "PlayStation", "Board game"], temi: [["gaming", "tech"], ["giochi", "feste"]] },
+  { emoji: "☕", it: ["Al bar {nome} ordina: espresso o matcha latte?", "Espresso", "Matcha"], en: ["At the café {nome} orders: espresso or matcha latte?", "Espresso", "Matcha"], temi: [["caffe"], ["te", "benessere"]] },
+  { emoji: "🖼️", it: ["Domenica di {nome}: museo o mercatino vintage?", "Museo", "Mercatino"], en: ["{nome}'s Sunday: museum or flea market?", "Museum", "Flea market"], temi: [["arte", "cultura"], ["vintage", "stile"]] },
+  { emoji: "🏃", it: ["{nome} si sfoga: palestra o yoga?", "Palestra", "Yoga"], en: ["{nome} lets off steam: gym or yoga?", "Gym", "Yoga"], temi: [["sport"], ["benessere", "relax"]] },
+  { emoji: "🎬", it: ["Venerdì sera di {nome}: cinema o maratona di serie?", "Cinema", "Serie"], en: ["{nome}'s Friday night: cinema or series marathon?", "Cinema", "Series"], temi: [["film", "cultura"], ["film", "relax"]] },
+  { emoji: "🪴", it: ["Casa di {nome}: giungla di piante o minimal giapponese?", "Giungla", "Minimal"], en: ["{nome}'s home: plant jungle or Japanese minimal?", "Jungle", "Minimal"], temi: [["piante", "casa"], ["ordine", "stile"]] },
+  { emoji: "📷", it: ["In viaggio {nome}: mille foto o zero foto?", "Mille foto", "Zero foto"], en: ["On a trip {nome} takes: a thousand photos or none?", "Loads", "None"], temi: [["foto", "ricordi"], ["avventura", "natura"]] },
+];
+
 /** Il "sì" / "no" di una risposta da scorrere. */
 const eSi = (a: string) => ["sì", "si", "yes"].includes(norm(a));
 const eNo = (a: string) => norm(a) === "no";
+
+function cartaSiNo(lingua: Lingua, area: string, d: DomandaDemo) {
+  return {
+    kind: "yn" as "yn" | "ab",
+    emoji: EMOJI_AREA[area] ?? "🦊",
+    question: d[lingua],
+    left: "No",
+    right: lingua === "it" ? "Sì" : "Yes",
+    left_reaction: aCaso(REAZIONI[lingua].no),
+    right_reaction: aCaso(REAZIONI[lingua].si),
+  };
+}
+function cartaAB(lingua: Lingua, c: CartaAB) {
+  const [question, left, right] = c[lingua];
+  const reazione = (scelta: string) => (lingua === "it" ? `${scelta}, ovviamente! 🦊` : `${scelta}, obviously! 🦊`);
+  return { kind: "ab" as "yn" | "ab", emoji: c.emoji, question, left, right, left_reaction: reazione(left), right_reaction: reazione(right) };
+}
 
 /** Un round di domande demo. */
 export function domandeDemo(lingua: Lingua, round: Round, risposte: Risposta[], giaChieste: string[]) {
@@ -69,14 +103,13 @@ export function domandeDemo(lingua: Lingua, round: Round, risposte: Risposta[], 
       if (libera && (giro > 0 || !scelte.some((s) => s.area === area))) scelte.push({ area, d: libera });
     }
   }
+  // 2-3 carte "questo o quello" al posto di altrettante sì/no, in posizioni sparse
+  const ab = mescola(QUESTO_O_QUELLO.filter((c) => !chieste.has(norm(c[lingua][0])))).slice(0, round === 1 ? 3 : 2);
+  const carte: ReturnType<typeof cartaSiNo>[] = scelte.slice(0, DOMANDE_PER_ROUND[round] - ab.length).map(({ area, d }) => cartaSiNo(lingua, area, d));
+  ab.forEach((c, i) => carte.splice(1 + i * 2, 0, cartaAB(lingua, c)));
   const aperta = aCaso(DOMANDE_APERTE);
   return {
-    questions: scelte.map(({ area, d }) => ({
-      emoji: EMOJI_AREA[area] ?? "🦊",
-      question: d[lingua],
-      yes_reaction: aCaso(REAZIONI[lingua].si),
-      no_reaction: aCaso(REAZIONI[lingua].no),
-    })),
+    questions: carte,
     open_question: {
       emoji: "🔍",
       question: aperta[lingua],
@@ -149,7 +182,13 @@ export function regaliDemo(
   for (const r of risposte) {
     const trovata = DOMANDA_PER_TESTO.get(norm(r.q));
     const a = r.a[0] ?? "";
-    if (trovata) aggiungi(trovata.d.temi, eSi(a) ? 3 : eNo(a) ? -2 : 0);
+    const carta = QUESTO_O_QUELLO.find((c) => norm(c.it[0]) === norm(r.q) || norm(c.en[0]) === norm(r.q));
+    if (carta) {
+      // la risposta inizia con il lato scelto (es. "Sushi (invece di Carbonara)")
+      const lati = [carta.it, carta.en].flatMap((t) => [[t[1], 0], [t[2], 1]] as const);
+      const lato = lati.find(([etichetta]) => norm(a).startsWith(norm(etichetta)))?.[1];
+      if (lato !== undefined) aggiungi(carta.temi[lato], 3);
+    } else if (trovata) aggiungi(trovata.d.temi, eSi(a) ? 3 : eNo(a) ? -2 : 0);
     else aggiungi(temiNelTesto(r.a.join(" ")), 2);
   }
   const perTitolo = (titolo: string) => CATALOGO.find((g) => norm(g.it[0]) === norm(titolo) || norm(g.en[0]) === norm(titolo));
@@ -158,7 +197,14 @@ export function regaliDemo(
 
   const { min, max } = budget(risposte);
   const giaVisti = new Set(mostrate.map(norm));
-  const liberi = CATALOGO.filter((g) => !giaVisti.has(norm(g[lingua][0])));
+  // Catalogo finito: si ricomincia (così non finisce mai), prima con le idee mai votate,
+  // poi anche con quelle scartate; quelle piaciute restano nei preferiti e non tornano.
+  const votate = new Set([...piaciute, ...scartate].map(norm));
+  const piaciuteSet = new Set(piaciute.map(norm));
+  const titolo = (g: RegaloDemo) => norm(g[lingua][0]);
+  let liberi = CATALOGO.filter((g) => !giaVisti.has(titolo(g)));
+  if (liberi.length < BATCH) liberi = CATALOGO.filter((g) => !votate.has(titolo(g)));
+  if (liberi.length < BATCH) liberi = CATALOGO.filter((g) => !piaciuteSet.has(titolo(g)));
   const nelBudget = liberi.filter((g) => g.prezzo[0] <= max && g.prezzo[1] >= min);
   const candidati = (nelBudget.length >= BATCH ? nelBudget : liberi)
     .map((g) => ({ g, p: g.temi.reduce((s, t) => s + (punti.get(t) ?? 0), 0) + Math.random() * 2 }))

@@ -12,7 +12,16 @@ import { clientAnthropic } from "@/motore/modello";
 /** Un round di domande da scorrere, più la domanda aperta (usata solo nel round 1). */
 export const SchemaDomande = z.object({
   questions: z.array(
-    z.object({ emoji: z.string(), question: z.string(), yes_reaction: z.string(), no_reaction: z.string() }),
+    z.object({
+      // "yn" = sì/no (left = No, right = Sì) · "ab" = questo o quello
+      kind: z.enum(["yn", "ab"]),
+      emoji: z.string(),
+      question: z.string(),
+      left: z.string(),
+      right: z.string(),
+      left_reaction: z.string(),
+      right_reaction: z.string(),
+    }),
   ),
   open_question: z.object({ emoji: z.string(), question: z.string(), hint: z.string() }),
 });

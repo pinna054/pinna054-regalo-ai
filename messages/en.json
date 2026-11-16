@@ -240,7 +240,7 @@
       "dati": {
         "titolo": "What data we process",
         "punti": {
-          "1": "The information you enter in the form: relationship, occasion, budget, delivery country, age and the optional descriptions (tastes, what they already have, what they can’t stand). We never ask for the name or surname of the person you’re buying for, nor for your details: in fact, we ask you not to enter them.",
+          "1": "The answers you give in the game: relationship, occasion, budget, your answers to the questions about the person and what you write in the open questions. The name of the person you are buying for, if you type it, stays on your phone: the server always receives a placeholder instead. We don't ask for your personal data, and we ask you not to enter any.",
           "2": "Before storing the texts and sending them to the artificial intelligence service, we automatically remove any email addresses and phone numbers.",
           "3": "The ideas suggested, your 👍/👎 and clicks on the search links, without linking them to your identity.",
           "4": "Your IP address, only to limit abuse: we immediately turn it into a non-reversible code (hash), we don’t link it to your requests and we delete it within 48 hours.",
@@ -257,7 +257,7 @@
       },
       "fornitori": {
         "titolo": "Who we share it with",
-        "testo": "We rely on providers that process data on our behalf, as processors: Anthropic (generates the ideas with the Claude model: the form texts are sent to its servers), Supabase (database) and Vercel (hosts the site). Some providers may process data outside the European Union, especially in the United States: in those cases the transfer takes place with the safeguards required by the GDPR, such as the EU-US Data Privacy Framework or standard contractual clauses."
+        "testo": "We rely on providers that process data on our behalf, as processors: Anthropic (invents questions and ideas with the Claude model: your game answers are sent to its servers), Pexels (the archive we search for gift photos: it only receives a few English words describing the gift, never your answers), Supabase (database) and Vercel (hosts the site). Some providers may process data outside the European Union, in particular in the United States: in these cases transfers rely on the safeguards provided by the GDPR, such as the EU-US Data Privacy Framework or standard contractual clauses."
       },
       "conservazione": {
         "titolo": "How long we keep it",

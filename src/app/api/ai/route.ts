@@ -21,7 +21,9 @@ import { BATCH, DOMANDE_PER_ROUND, promptDomande, promptRegali, VERSIONE_PROMPT_
 import { effortMotore, modelloMotore } from "@/lib/ambiente";
 import { ipRichiesta } from "@/lib/ip";
 import { controllaLimiteAzione, controllaLimitiAi } from "@/lib/limiti";
+import { linkAmazon, linkGoogleShopping } from "@/motore/link";
 import { pulisciTesto } from "@/motore/richiesta";
+import { PAESE_PREDEFINITO, trovaPaese } from "@/config/paesi";
 
 export const maxDuration = 60;
 
@@ -50,11 +52,24 @@ export async function GET() {
   return NextResponse.json({ attiva: aiAttiva(), foto: fotoAttive() }, { headers: { "Cache-Control": "no-store" } });
 }
 
+/**
+ * Link per comprare ogni regalo, costruiti SOLO dalla query di ricerca (il modello non scrive URL).
+ * Prezzi in euro → negozi italiani; Amazon con il tag di affiliazione AMAZON_TAG_IT se impostato.
+ */
+function conLink<T extends { search: string; name: string }>(regali: T[], lingua: string) {
+  const paese = trovaPaese(PAESE_PREDEFINITO)!;
+  return regali.map((g) => {
+    const query = g.search || g.name;
+    const amazon = linkAmazon(query, paese);
+    return { ...g, link_amazon: amazon.url, affiliato: amazon.affiliato, link_google: linkGoogleShopping(query, paese, lingua) };
+  });
+}
+
 /** Risposta senza AI (modalità demo). */
 async function rispostaDemo(r: Richiesta) {
   if (r.tipo === "domande") return NextResponse.json({ demo: true, ...domandeDemo(r.lingua, r.giro, r.risposte, r.chieste) });
   const { gifts, ...resto } = regaliDemo(r.lingua, r.risposte, r.piaciute, r.scartate, r.mostrate);
-  return NextResponse.json({ demo: true, ...resto, gifts: await conFoto(gifts) });
+  return NextResponse.json({ demo: true, ...resto, gifts: conLink(await conFoto(gifts), r.lingua) });
 }
 
 export async function POST(request: Request) {
@@ -86,8 +101,11 @@ export async function POST(request: Request) {
         effort: "low",
         maxToken: 6000,
       });
-      // Teniamo solo vere domande, al massimo quante ne prevede il round
-      const questions = domande.questions.filter((q) => q.question.includes("?")).slice(0, DOMANDE_PER_ROUND[r.giro]);
+      // Teniamo le carte complete (una "questo o quello" deve avere le due scelte), al massimo quante ne prevede il round
+      const questions = domande.questions
+        .filter((q) => q.question.trim() && (q.kind === "yn" || (q.left.trim() && q.right.trim())))
+        .map((q) => (q.kind === "yn" ? { ...q, left: "No", right: r.lingua === "it" ? "Sì" : "Yes" } : q))
+        .slice(0, DOMANDE_PER_ROUND[r.giro]);
       console.info(`[ai] domande round ${r.giro} · ${modello} · ${VERSIONE_PROMPT_GIFTY} · ${Date.now() - inizio} ms`);
       return NextResponse.json({ demo: false, questions, open_question: domande.open_question });
     }
@@ -97,7 +115,7 @@ export async function POST(request: Request) {
       SchemaRegali,
       { modello, effort: effortMotore(), maxToken: 16000 },
     );
-    const conLeFoto = await conFoto(gifts.slice(0, BATCH));
+    const conLeFoto = conLink(await conFoto(gifts.slice(0, BATCH)), r.lingua);
     console.info(`[ai] ${gifts.length} regali · ${modello} · ${VERSIONE_PROMPT_GIFTY} · ${Date.now() - inizio} ms`);
     return NextResponse.json({ demo: false, portrait, badges: badges.slice(0, 3), gifts: conLeFoto });
   } catch (e) {

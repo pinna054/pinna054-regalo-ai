@@ -240,7 +240,7 @@
       "dati": {
         "titolo": "Quali dati trattiamo",
         "punti": {
-          "1": "Le informazioni che scrivi nel modulo: relazione, occasione, budget, paese di consegna, età e le descrizioni facoltative (gusti, cosa ha già, cosa non sopporta). Non chiediamo mai nome o cognome della persona a cui fai il regalo, né i tuoi dati: ti chiediamo anzi di non inserirli.",
+          "1": "Le risposte che dai nel gioco: relazione, occasione, budget, le risposte alle domande sulla persona e quello che scrivi nelle domande aperte. Il nome della persona a cui fai il regalo, se lo scrivi, resta solo sul tuo telefono: al server arriva sempre al suo posto un segnaposto. Non ti chiediamo i tuoi dati e ti chiediamo di non inserirne.",
           "2": "Prima di salvarli e di inviarli al servizio di intelligenza artificiale, togliamo automaticamente dai testi eventuali indirizzi email e numeri di telefono.",
           "3": "Le idee proposte, i tuoi 👍/👎 e i click sui link di ricerca, senza collegarli alla tua identità.",
           "4": "L’indirizzo IP, solo per limitare gli abusi: lo trasformiamo subito in un codice non reversibile (hash), non lo colleghiamo alle tue richieste e lo cancelliamo entro 48 ore.",
@@ -257,7 +257,7 @@
       },
       "fornitori": {
         "titolo": "A chi li affidiamo",
-        "testo": "Ci appoggiamo a fornitori che trattano i dati per nostro conto, come responsabili del trattamento: Anthropic (genera le idee con il modello Claude: i testi del modulo vengono inviati ai suoi server), Supabase (database) e Vercel (ospita il sito). Alcuni fornitori possono trattare dati fuori dall’Unione europea, in particolare negli Stati Uniti: in questi casi il trasferimento avviene con le garanzie previste dal GDPR, come l’EU-US Data Privacy Framework o le clausole contrattuali standard."
+        "testo": "Ci appoggiamo a fornitori che trattano i dati per nostro conto, come responsabili del trattamento: Anthropic (inventa domande e idee con il modello Claude: le risposte del gioco vengono inviate ai suoi server), Pexels (archivio da cui cerchiamo le foto dei regali: riceve solo poche parole in inglese che descrivono il regalo, mai le tue risposte), Supabase (database) e Vercel (ospita il sito). Alcuni fornitori possono trattare dati fuori dall’Unione europea, in particolare negli Stati Uniti: in questi casi il trasferimento avviene con le garanzie previste dal GDPR, come l’EU-US Data Privacy Framework o le clausole contrattuali standard."
       },
       "conservazione": {
         "titolo": "Per quanto tempo",

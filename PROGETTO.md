@@ -362,3 +362,13 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
       esatto (per quella servirebbero le API dei negozi, es. Amazon PA-API);
     - **demo**: se l'AI non è attiva, non risponde o il limite è raggiunto, il server risponde con la demo
       (archivio di 56 domande e catalogo di ~70 regali, scelti in base alle risposte) invece che con un errore.
+32. **Esperienza e beta pubblica** (prompt `gifty-v3`):
+    - carte **"questo o quello"** (circa 40%) insieme alle sì/no: si scorre verso l'opzione scelta; le domande
+      partono leggere e finiscono con la più personale; anche la demo ha 12 carte "questo o quello";
+    - **regali infiniti**: ogni lotto ha un "angolo" diverso (esperienze, personalizzati, chicche per veri
+      fan, upgrade quotidiani, cose da imparare, piccoli lussi, design/tech, regali ironici, territori nuovi)
+      che ruota all'infinito escludendo le idee già mostrate; in demo il catalogo ricomincia invece di finire;
+    - **link per comprare** costruiti dal server dalla query (Amazon.it con `AMAZON_TAG_IT` + avviso
+      obbligatorio, Google Shopping), mai scritti dal modello;
+    - anteprima per WhatsApp/social (`public/og-gifty.png`), icona con la volpe di Gifty, caratteri ospitati
+      sul sito (niente Google Fonts), link alla privacy aggiornata (nome solo sul telefono, Pexels).
