@@ -13,11 +13,12 @@ per cercarle su Amazon e Google Shopping nel paese di consegna.
   e i **Preferiti** con i link per comprarle.
 - Ogni generazione viene registrata in forma anonima per migliorare il motore.
 
-**La pagina principale (`/`) è Gifty** (`public/gifty.html`), un gioco: 3 domande base (per chi,
-occasione, budget), il nome (resta sul telefono), poi **due round di domande goliardiche da scorrere**
-scritte dall'AI ("Lucrezia comprerebbe mai il tofu?": destra = sì, sinistra = no, su = non so) con
-una domanda aperta in mezzo, il **Conosciometro** (quanto conosci la persona, con ritratto e titoli
-da condividere) e infine le idee regalo **con foto vere** (Pexels) da scorrere (su = perfetto).
+**La pagina principale (`/`) è Gifty** (`public/gifty.html`): serve a trovare il regalo giusto.
+3 domande base (per chi, occasione, budget), il nome (resta sul telefono), poi **domande veloci da
+scorrere** scritte dall'AI (sì/no e "questo o quello"), due domande aperte (un dettaglio prezioso e cosa
+ha già / cosa non sopporta). Poi l'AI scrive il **dossier** della persona ("Ecco cosa ho capito di…")
+e da lì sceglie i regali: per ognuno si cerca il **prodotto vero** su Google Shopping (foto, prezzo,
+negozio, link). Le idee sono infinite e diverse per ogni persona: a ogni lotto la volpe cambia angolo.
 L'AI passa dal nostro server (`/api/ai`): la chiave non arriva mai al browser. Senza chiave, o se
 l'AI non risponde, la pagina passa da sola in **modalità demo** con domande e idee di esempio.
 La versione precedente del sito (modulo + quiz) resta su `/it` e `/en`.
@@ -173,7 +174,8 @@ Redeploy** perché la modifica abbia effetto.
 | cambiare i **limiti di richieste** | variabili `LIMITE_ORA`, `LIMITE_GIORNO`, `LIMITE_GLOBALE_GIORNO` |
 | cambiare **grafica o testi di Gifty** (pagina principale) | `public/gifty.html` |
 | cambiare i **prompt di Gifty** | `src/gifty/prompt.ts` (se cambi i campi del JSON, aggiorna anche `src/gifty/ai.ts`) |
-| attivare le **foto vere** dei regali | variabile `PEXELS_API_KEY` (gratuita, pexels.com/api) |
+| attivare i **prodotti veri** (foto, prezzo, negozio) | variabile `SERPER_API_KEY` (serper.dev) oppure `SERPAPI_API_KEY` (serpapi.com) |
+| foto di riserva quando il prodotto non si trova | variabile `PEXELS_API_KEY` (gratuita, pexels.com/api) |
 | cambiare **domande e regali della demo** di Gifty | `src/motore/demo/domande.ts`, `src/motore/demo/catalogo.ts` (logica in `src/gifty/demo.ts`) |
 | cambiare i **limiti di Gifty** | variabili `LIMITE_AI_ORA` (40), `LIMITE_AI_GIORNO` (120), `LIMITE_AI_GLOBALE_GIORNO` (5000) |
 

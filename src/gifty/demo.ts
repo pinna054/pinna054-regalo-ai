@@ -13,6 +13,7 @@ import { CATALOGO, type RegaloDemo } from "@/motore/demo/catalogo";
 import { DOMANDE_APERTE, DOMANDE_SI_NO, type DomandaDemo } from "@/motore/demo/domande";
 import { FRASE_TEMA, PAROLE_TEMA, TEMI, type Tema } from "@/motore/demo/temi";
 import { BATCH, DOMANDE_PER_ROUND, type Lingua, type Risposta, type Round } from "./prompt";
+import { budget } from "./budget";
 
 const norm = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, " ").trim();
 function mescola<T>(elenco: T[]): T[] {
@@ -118,16 +119,6 @@ export function domandeDemo(lingua: Lingua, round: Round, risposte: Risposta[], 
   };
 }
 
-/** Budget dalla risposta alla domanda "Quanto vuoi spendere?" (es. "30–70 €", "Over €300"). */
-function budget(risposte: Risposta[]): { min: number; max: number } {
-  const testo = risposte.find((r) => /€/.test(r.a.join(" ")))?.a.join(" ") ?? "";
-  const numeri = (testo.match(/\d+/g) ?? []).map(Number);
-  if (/oltre|over/i.test(testo) && numeri[0]) return { min: numeri[0], max: numeri[0] * 3 };
-  if (numeri.length >= 2) return { min: numeri[0], max: numeri[1] };
-  if (numeri.length === 1) return { min: 0, max: numeri[0] };
-  return { min: 0, max: 100 };
-}
-
 function temiNelTesto(testo: string): Tema[] {
   const t = ` ${testo.toLowerCase()} `;
   return TEMI.filter((tema) => (PAROLE_TEMA[tema] ?? []).some((parola) => t.includes(parola)));
@@ -168,14 +159,8 @@ const BADGE: Partial<Record<Tema, { it: string; en: string }>> = {
   stile: { it: "✨ Icona di stile", en: "✨ Style icon" },
 };
 
-/** Un lotto di regali demo, con ritratto e titoli per il Conosciometro. */
-export function regaliDemo(
-  lingua: Lingua,
-  risposte: Risposta[],
-  piaciute: string[],
-  scartate: string[],
-  mostrate: string[],
-) {
+/** Punteggio dei temi in base alle risposte e alle idee piaciute o scartate. */
+function punteggiTemi(risposte: Risposta[], piaciute: string[] = [], scartate: string[] = []) {
   // Punteggio dei temi
   const punti = new Map<Tema, number>();
   const aggiungi = (temi: Tema[], v: number) => temi.forEach((t) => punti.set(t, (punti.get(t) ?? 0) + v));
@@ -194,6 +179,18 @@ export function regaliDemo(
   const perTitolo = (titolo: string) => CATALOGO.find((g) => norm(g.it[0]) === norm(titolo) || norm(g.en[0]) === norm(titolo));
   piaciute.forEach((t) => aggiungi(perTitolo(t)?.temi ?? [], 2));
   scartate.forEach((t) => aggiungi(perTitolo(t)?.temi ?? [], -1.5));
+  return punti;
+}
+
+/** Un lotto di regali demo. */
+export function regaliDemo(
+  lingua: Lingua,
+  risposte: Risposta[],
+  piaciute: string[],
+  scartate: string[],
+  mostrate: string[],
+) {
+  const punti = punteggiTemi(risposte, piaciute, scartate);
 
   const { min, max } = budget(risposte);
   const giaVisti = new Set(mostrate.map(norm));
@@ -238,6 +235,12 @@ export function regaliDemo(
     };
   });
 
+  return { gifts };
+}
+
+/** Il dossier demo: cosa abbiamo capito, dai temi più forti. */
+export function dossierDemo(lingua: Lingua, risposte: Risposta[]) {
+  const punti = punteggiTemi(risposte);
   // Ritratto e titoli dai temi più forti
   const forti = [...punti.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([t]) => t);
   const frasi = forti.slice(0, 3).map((t) => FRASE_TEMA[t][lingua]);
@@ -251,5 +254,12 @@ export function regaliDemo(
   const badges = forti.flatMap((t) => (BADGE[t] ? [BADGE[t]![lingua]] : [])).slice(0, 3);
   if (badges.length === 0) badges.push(lingua === "it" ? "🦊 Persona speciale" : "🦊 One of a kind");
 
-  return { portrait, badges, gifts };
+  const inizi = {
+    it: ["Passione numero uno di {nome}:", "Subito dopo:", "Da non sottovalutare:", "Altro punto forte:"],
+    en: ["{nome}'s number one passion:", "Close second:", "Don't underestimate:", "Another strong point:"],
+  };
+  const insights = forti.slice(0, 4).map((t, i) => `${inizi[lingua][i]} ${FRASE_TEMA[t][lingua]}.`);
+  const aperte = risposte.filter((r) => !DOMANDA_PER_TESTO.has(norm(r.q)) && r.a.join(" ").length > 12).slice(-1);
+  aperte.forEach((r) => insights.push(lingua === "it" ? `Un dettaglio prezioso: «${r.a.join(" ")}».` : `A precious detail: “${r.a.join(" ")}”.`));
+  return { dossier: "", insights, portrait, badges };
 }

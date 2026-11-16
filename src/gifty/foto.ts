@@ -58,9 +58,3 @@ export async function cercaFoto(parole: string): Promise<Foto | null> {
   cache.set(query, { foto, scade: Date.now() + DURATA_CACHE });
   return foto;
 }
-
-/** Aggiunge la foto a ogni regalo (in parallelo). */
-export async function conFoto<T extends { photo: string }>(regali: T[]): Promise<(T & { foto: Foto | null })[]> {
-  const foto = await Promise.all(regali.map((r) => cercaFoto(r.photo)));
-  return regali.map((r, i) => ({ ...r, foto: foto[i] }));
-}

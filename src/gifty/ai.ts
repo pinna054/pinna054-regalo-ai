@@ -40,10 +40,14 @@ export const SchemaRegalo = z.object({
   search: z.string(),
   photo: z.string(),
 });
-export const SchemaRegali = z.object({
+export const SchemaRegali = z.object({ gifts: z.array(SchemaRegalo) });
+
+/** Il dossier: il profilo che l'AI scrive studiando tutte le risposte, prima dei regali. */
+export const SchemaDossier = z.object({
+  dossier: z.string(),
+  insights: z.array(z.string()),
   portrait: z.string(),
   badges: z.array(z.string()),
-  gifts: z.array(SchemaRegalo),
 });
 export type Regalo = z.infer<typeof SchemaRegalo>;
 

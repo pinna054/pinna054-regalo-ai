@@ -372,3 +372,15 @@ Scelte tecniche fatte con buon senso, senza chiedere conferma. Si possono cambia
       obbligatorio, Google Shopping), mai scritti dal modello;
     - anteprima per WhatsApp/social (`public/og-gifty.png`), icona con la volpe di Gifty, caratteri ospitati
       sul sito (niente Google Fonts), link alla privacy aggiornata (nome solo sul telefono, Pexels).
+33. **Gifty serve a trovare il regalo, il gioco è secondario** (richiesta del proprietario, prompt `gifty-v4`):
+    - tolti Conosciometro e "Sfida un amico": con risposte sì/no il punteggio usciva quasi sempre 100% e non
+      misurava niente;
+    - dopo le domande da scorrere c'è sempre una domanda finale "cosa ha già / cosa non sopporta";
+    - **dossier**: l'AI (effort alto) studia tutte le risposte e scrive un profilo privato dettagliato
+      (passioni e livello, gusti, cosa possiede, no-go, direzioni di regalo) più 4-5 frasi per l'utente
+      ("Ecco cosa ho capito di…"); il dossier torna dal browser a ogni lotto di regali, così le idee
+      nascono da uno studio completo e sono diverse per ogni persona;
+    - **prodotti veri** (`src/gifty/prodotti.ts`): per ogni idea il server cerca l'articolo su Google Shopping
+      Italia con Serper (`SERPER_API_KEY`) o SerpApi (`SERPAPI_API_KEY`), sceglie il primo dentro il budget
+      (+10%) e vicino al prezzo stimato, e mostra foto, prezzo reale, negozio e link; i link arrivano dal
+      servizio di ricerca, mai dal modello. Senza chiave o senza risultati: foto Pexels o emoji.
