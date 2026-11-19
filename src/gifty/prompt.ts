@@ -11,7 +11,7 @@
  */
 import "server-only";
 
-export const VERSIONE_PROMPT_GIFTY = "gifty-v4";
+export const VERSIONE_PROMPT_GIFTY = "gifty-v5";
 
 /** Domande da scorrere per round e idee per lotto. */
 export const DOMANDE_PER_ROUND = { 1: 7, 2: 6 } as const;
@@ -28,6 +28,15 @@ function testoProfilo(risposte: Risposta[]): string {
   return risposte.map((r, i) => `${i + 1}. ${r.q} → ${r.a.join(", ")}`).join("\n");
 }
 
+/** Come cambiano domande e regali in base al legame con la persona. */
+const RELAZIONE = `The relationship changes everything, read it from the first answers and adapt every card and every idea to it:
+- partner / boyfriend / girlfriend: intimate and romantic, shared memories and experiences for two, inside jokes, the life you build together, surprises with emotional weight;
+- mother / father / grandparent: their world and rituals, nostalgia and family memories, the time they would love to spend with the giver, comfort and care, passions they never had time for;
+- friend / sibling: shared adventures, nights out, inside jokes, passions you have in common, cheeky and fun;
+- colleague: neutral and tasteful, work and coffee-break life, nothing too personal or intimate;
+- son / daughter: age-appropriate, their current obsessions (games, creators, sports, music), what is cool for their age.
+Two people with a different relationship must never get the same cards or the same gifts.`;
+
 const LEGENDA = `("Non so" / "Don't know" means the giver wasn't sure; for this-or-that cards the answer shows the choice and the discarded option)`;
 
 const OBIETTIVO_ROUND: Record<Round, string> = {
@@ -41,6 +50,8 @@ export function promptDomande(lingua: Lingua, risposte: Risposta[], round: Round
   return `You are Gifty, a fox with an extraordinary talent for finding the perfect gift. To find it you must understand {nome} deeply, so you ask the giver quick questions to swipe. Purpose first: every card exists to find a better gift. Tone: warm, witty and specific, a pleasure to answer, never a boring survey. Write in ${NOME_LINGUA[lingua]}.
 What we know so far ${LEGENDA}:
 ${testoProfilo(risposte)}
+
+${RELAZIONE}
 
 ${OBIETTIVO_ROUND[round]}
 Already asked, never repeat or rephrase: ${giaChieste.join(" | ") || "none"}
@@ -117,6 +128,8 @@ Disliked ideas (avoid anything similar): ${scartate.join("; ") || "none yet"}
 Already shown, never repeat or make near-duplicates: ${mostrate.join("; ") || "none"}
 Focus of this batch: ${angolo}.
 Creativity seed: ${seed}
+
+${RELAZIONE}
 
 Choose ${BATCH} gifts made only for {nome}: two different people must never get the same list. The giver should think "how did it know?".
 - Every idea must come from the dossier and combine at least two specific answers; use the no-gos and what {nome} already owns to rule things out.

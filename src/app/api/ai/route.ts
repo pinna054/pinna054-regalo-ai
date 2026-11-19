@@ -61,7 +61,10 @@ function aiAttiva(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // /api/ai?prova=1 → una piccola chiamata vera all'AI, per vedere subito se la chiave funziona
+  // (mostra solo lo stato e il messaggio d'errore di Anthropic, mai la chiave)
+  if (new URL(request.url).searchParams.get("prova") === "1") return provaAi(request);
   return NextResponse.json(
     { attiva: aiAttiva(), prodotti: servizioProdotti() !== null, foto: fotoAttive() },
     { headers: { "Cache-Control": "no-store" } },
@@ -98,6 +101,32 @@ async function conProdotti<T extends { search: string; name: string; photo: stri
     }),
   );
   return conLink(arricchiti, r.lingua);
+}
+
+/** Prova di funzionamento dell'AI (limitata come ogni altra chiamata). */
+async function provaAi(request: Request) {
+  const intestazioni = { "Cache-Control": "no-store" };
+  if (!aiAttiva()) return NextResponse.json({ prova: "manca la chiave ANTHROPIC_API_KEY" }, { headers: intestazioni });
+  if ((await controllaLimitiAi(ipRichiesta(request.headers))) !== "ok") {
+    return NextResponse.json({ prova: "limite di richieste raggiunto, riprova tra un'ora" }, { headers: intestazioni });
+  }
+  const inizio = Date.now();
+  try {
+    const d = await chiediAlModello(
+      promptDomande("it", [{ q: "Per chi è il regalo?", a: ["Mamma"] }], 1, []),
+      SchemaDomande,
+      { modello: modelloMotore(), effort: "low", maxToken: 6000 },
+    );
+    return NextResponse.json(
+      { prova: "ok", modello: modelloMotore(), domande: d.questions.length, esempio: d.questions[0]?.question ?? "", millisecondi: Date.now() - inizio },
+      { headers: intestazioni },
+    );
+  } catch (e) {
+    return NextResponse.json(
+      { prova: "errore", modello: modelloMotore(), dettaglio: (e instanceof Error ? e.message : String(e)).slice(0, 400), millisecondi: Date.now() - inizio },
+      { headers: intestazioni },
+    );
+  }
 }
 
 /** Risposta senza AI (modalità demo). */
