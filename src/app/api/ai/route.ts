@@ -24,7 +24,7 @@ import { BATCH, DOMANDE_PER_ROUND, promptDomande, promptDossier, promptRegali, V
 import { modelloMotore } from "@/lib/ambiente";
 import { ipRichiesta } from "@/lib/ip";
 import { controllaLimiteAzione, controllaLimitiAi } from "@/lib/limiti";
-import { linkAmazon, linkGoogleShopping } from "@/motore/link";
+import { linkAmazon, linkGoogleShopping, tagAmazon } from "@/motore/link";
 import { pulisciTesto } from "@/motore/richiesta";
 import { PAESE_PREDEFINITO, trovaPaese } from "@/config/paesi";
 
@@ -76,9 +76,29 @@ export async function GET(request: Request) {
  * Link per comprare ogni regalo, costruiti SOLO dalla query di ricerca (il modello non scrive URL).
  * Prezzi in euro → negozi italiani; Amazon con il tag di affiliazione AMAZON_TAG_IT se impostato.
  */
-function conLink<T extends { search: string; name: string; kind?: "product" | "experience" }>(regali: T[], lingua: string) {
+/** Se il prodotto vero è venduto su Amazon, anche il suo link porta il nostro codice di affiliazione. */
+function conAffiliazione<P extends { link: string }>(prodotto: P | null | undefined, paese: NonNullable<ReturnType<typeof trovaPaese>>) {
+  if (!prodotto) return prodotto ?? null;
+  const tag = tagAmazon(paese);
+  try {
+    const url = new URL(prodotto.link);
+    if (tag && (url.hostname === `www.${paese.amazon.dominio}` || url.hostname === paese.amazon.dominio)) {
+      url.searchParams.set("tag", tag);
+      return { ...prodotto, link: url.toString(), affiliato: true };
+    }
+  } catch {
+    // link non valido: lo lasciamo com'è (il browser lo controlla di nuovo)
+  }
+  return { ...prodotto, affiliato: false };
+}
+
+function conLink<T extends { search: string; name: string; kind?: "product" | "experience"; prodotto?: { link: string } | null }>(
+  regali: T[],
+  lingua: string,
+) {
   const paese = trovaPaese(PAESE_PREDEFINITO)!;
-  return regali.map((g) => {
+  return regali.map((g0) => {
+    const g = { ...g0, prodotto: conAffiliazione(g0.prodotto, paese) };
     const query = g.search || g.name;
     if (g.kind === "experience") {
       // Per un'esperienza: una normale ricerca Google per trovare dove prenotarla, niente Amazon

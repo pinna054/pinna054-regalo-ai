@@ -799,13 +799,13 @@ function showResults(){
       <p>${esc(nameIt(g.why||g.description))}</p><div class="shop">${shopLinks(g,q)}</div></div></div>`;
   }).join("");
   // Avviso obbligatorio del Programma Affiliazione Amazon, solo se ci sono link affiliati
-  $("affNote").textContent=ranked.some(l=>l.g.affiliato)?t("affiliate"):"";
+  $("affNote").textContent=ranked.some(l=>l.g.affiliato||(l.g.prodotto&&l.g.prodotto.affiliato))?t("affiliate"):"";
 }
 
 /* Link per comprare: li costruisce il server; si accettano solo indirizzi di Amazon e Google */
 function shopLinks(g,q){
   const p=prodottoDi(g);
-  const vero=p?`<a href="${esc(p.link)}" target="_blank" rel="nofollow noopener">${esc(t("goShop"))}${p.negozio?` · ${esc(p.negozio)}`:""} →</a>`:"";
+  const vero=p?`<a href="${esc(p.link)}" target="_blank" rel="${p.affiliato?"sponsored nofollow noopener":"nofollow noopener"}">${esc(t("goShop"))}${p.negozio?` · ${esc(p.negozio)}`:""} →</a>`:"";
   return vero+shopSearch(g,q);
 }
 function shopSearch(g,q){
