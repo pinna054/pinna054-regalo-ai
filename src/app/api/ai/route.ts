@@ -16,6 +16,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { chiediAlModello, ErroreAi, SchemaDomande, SchemaDossier, SchemaRegali } from "@/gifty/ai";
 import { budget } from "@/gifty/budget";
+import { genere } from "@/gifty/genere";
 import { domandeDemo, dossierDemo, regaliDemo } from "@/gifty/demo";
 import { cercaFoto, fotoAttive } from "@/gifty/foto";
 import { servizioProdotti, trovaProdotto } from "@/gifty/prodotti";
@@ -100,10 +101,11 @@ async function conProdotti<T extends { search: string; name: string; photo: stri
   r: { lingua: string; risposte: { q: string; a: string[] }[] },
 ) {
   const { max } = budget(r.risposte);
+  const sesso = genere(r.risposte);
   const arricchiti = await Promise.all(
     regali.map(async (g) => {
       // Le esperienze (corsi, viaggi, spettacoli) non si cercano su Google Shopping: uscirebbero oggetti a caso
-      const prodotto = g.kind === "experience" ? null : await trovaProdotto(g.search || g.name, max, g.price, g.name);
+      const prodotto = g.kind === "experience" ? null : await trovaProdotto(g.search || g.name, max, g.price, g.name, sesso);
       const foto = prodotto ? null : await cercaFoto(g.photo);
       return { ...g, prodotto, foto, price: prodotto?.prezzo ?? g.price };
     }),

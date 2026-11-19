@@ -353,6 +353,8 @@ const T = {
     photo:"Foto",
     affiliate:"In qualità di Affiliato Amazon, Gifty riceve un guadagno dagli acquisti idonei.",privacy:"Privacy",
     anon:{"Partner":"la tua dolce metà","Mamma":"tua mamma","Papà":"tuo papà"},anonDefault:"questa persona",
+    genderKnown:["Mamma","Papà"],
+    genderQ:{emoji:"🧑",question:"È un lui o una lei?",hint:"Così la volpe non sbaglia regali (niente cose da uomo per una donna!).",options:["Lei","Lui","Preferisco non dirlo"],multi:false},
     fixed:[
       {emoji:"🎁",question:"Per chi è il regalo?",hint:"Partiamo dal legame che hai con questa persona.",options:["Partner","Mamma","Papà","Amico/a","Collega","Figlio/a","Nonno/a","Fratello/Sorella"],multi:false},
       {emoji:"🗓️",question:"Per quale occasione?",hint:"Cambia molto il tono del regalo.",options:["Compleanno","Natale","Anniversario","Laurea","Ringraziamento","Senza motivo"],multi:false},
@@ -380,6 +382,8 @@ const T = {
     photo:"Photo",
     affiliate:"As an Amazon Associate, Gifty earns from qualifying purchases.",privacy:"Privacy",
     anon:{"Partner":"your other half","Mom":"your mom","Dad":"your dad"},anonDefault:"this person",
+    genderKnown:["Mom","Dad"],
+    genderQ:{emoji:"🧑",question:"Is it a he or a she?",hint:"So the fox won't pick the wrong gifts.",options:["She","He","Rather not say"],multi:false},
     fixed:[
       {emoji:"🎁",question:"Who is the gift for?",hint:"Let's start with how you know them.",options:["Partner","Mom","Dad","Friend","Colleague","Son/Daughter","Grandparent","Sibling"],multi:false},
       {emoji:"🗓️",question:"What's the occasion?",hint:"It changes the tone of the gift a lot.",options:["Birthday","Christmas","Anniversary","Graduation","Thank you","Just because"],multi:false},
@@ -448,9 +452,15 @@ function startQuestions(){
     deck:[],shown:[],liked:[],disliked:[],history:[],loadingGifts:false,portrait:null,badges:[],dossier:"",insights:null,dossierLoading:false,lastAnswer:null,error:false});
   S.genId++;updateLikes();nextQuestion();
 }
+/* Domande base: per chi, (lui o lei, solo se la relazione non lo dice già), occasione, budget */
+function fixedList(){
+  const f=t("fixed"), rel=S.answers[0]&&S.answers[0].a[0];
+  const giaChiaro=rel&&t("genderKnown").includes(rel);
+  return S.answers.length===0||giaChiaro?f:[f[0],t("genderQ"),f[1],f[2]];
+}
 function nextQuestion(){
-  const n=S.answers.length;
-  if(n<3){S.mode="fixed";S.current={...t("fixed")[n]};renderQuestion();return}
+  const n=S.answers.length, list=fixedList();
+  if(n<list.length){S.mode="fixed";S.current={...list[n]};renderQuestion();return}
   if(!S.nameDone){askName();return}
   startRound(1);
 }
@@ -459,7 +469,7 @@ function renderDots(step,total){
   $("qnum").textContent=t("qOf")(Math.min(step+1,total),total);
 }
 function renderQuestion(){
-  show("sQ"); renderDots(S.answers.length,4); $("qBack").style.visibility="visible";
+  show("sQ"); renderDots(S.answers.length,fixedList().length+1); $("qBack").style.visibility="visible";
   const q=S.current; q.sel=q.sel||new Set();
   $("qbody").innerHTML=`<div class="qemoji">${esc(q.emoji)}</div><h2>${esc(q.question)}</h2><p class="qhint">${esc(q.hint)}</p>
     <div class="opts">${q.options.map((o,i)=>`<button class="opt${q.sel.has(o)?" on":""}" data-k="${i}">${esc(o)}</button>`).join("")}</div>
@@ -486,17 +496,17 @@ function commitAnswer(){
   S.answers.push({q:q.question,a,emoji:q.emoji});S.current=null;nextQuestion();
 }
 function goBack(){
-  if(S.mode==="name"){const last=S.answers.pop();S.mode="fixed";S.current={...t("fixed")[S.answers.length],sel:new Set(last?last.a:[])};renderQuestion();return}
+  if(S.mode==="name"){const last=S.answers.pop();S.mode="fixed";S.current={...fixedList()[S.answers.length],sel:new Set(last?last.a:[])};renderQuestion();return}
   if(S.mode!=="fixed")return;
   if(!S.answers.length){show("sHome");return}
   const last=S.answers.pop();
-  S.current={...t("fixed")[S.answers.length],sel:new Set(last.a)};
+  S.current={...fixedList()[S.answers.length],sel:new Set(last.a)};
   renderQuestion();
 }
 
 /* ===================== Nome (resta sul telefono) ===================== */
 function askName(){
-  S.mode="name"; show("sQ"); renderDots(3,4); $("qBack").style.visibility="visible";
+  S.mode="name"; show("sQ"); renderDots(fixedList().length,fixedList().length+1); $("qBack").style.visibility="visible";
   $("qbody").innerHTML=`<div class="qemoji">🦊</div><h2>${esc(t("nameQ"))}</h2><p class="qhint">${esc(t("nameHint"))}</p>
     <div class="free"><input id="freeIn" placeholder="${esc(t("namePh"))}" maxlength="30" autocomplete="off" value="${esc(S.nome)}"></div>`;
   const fi=$("freeIn"); fi.oninput=updateNext; fi.onkeydown=e=>{if(e.key==="Enter"&&!$("qNext").disabled)onNext()};
@@ -856,7 +866,7 @@ $("langBtn").onclick=()=>{
   lang=lang==="it"?"en":"it"; document.documentElement.lang=lang; $("langBtn").textContent=lang==="it"?"EN":"IT";
   applyTexts(); if(S.demo)$("demoNote").textContent=t("demo"); $("privacyLink").href=`/${lang}/privacy`;
   if($("sQ").classList.contains("active")){
-    if(S.mode==="fixed"&&S.current){S.current={...t("fixed")[S.answers.length]};renderQuestion()}
+    if(S.mode==="fixed"&&S.current){S.current={...fixedList()[S.answers.length]};renderQuestion()}
     else if(S.mode==="name")askName();
   }
   if($("sSwipe").classList.contains("active"))renderQDeck();

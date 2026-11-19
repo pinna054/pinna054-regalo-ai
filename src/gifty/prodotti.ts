@@ -10,6 +10,7 @@
  * Le ricerche restano in memoria 24 ore per non pagarle due volte.
  */
 import "server-only";
+import { adattoAlGenere, type Genere } from "./genere";
 
 export type Prodotto = { titolo: string; prezzo: number | null; negozio: string; immagine: string; link: string };
 
@@ -101,7 +102,13 @@ export function corrisponde(titolo: string, ...testi: string[]): boolean {
   return parole.some((p) => t.includes(p.slice(0, Math.min(p.length, 5))));
 }
 
-export async function trovaProdotto(query: string, budgetMax: number, prezzoStimato?: number, nomeIdea = ""): Promise<Prodotto | null> {
+export async function trovaProdotto(
+  query: string,
+  budgetMax: number,
+  prezzoStimato?: number,
+  nomeIdea = "",
+  sesso: Genere = null,
+): Promise<Prodotto | null> {
   const q = query.replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " ").trim().slice(0, 100);
   if (!q || !servizioProdotti()) return null;
   let risultati: Prodotto[];
@@ -118,7 +125,7 @@ export async function trovaProdotto(query: string, budgetMax: number, prezzoStim
     cache.set(q, { risultati, scade: Date.now() + DURATA_CACHE });
   }
   // Solo prodotti dentro il budget e che corrispondono davvero all'idea (niente tazze al posto di un corso!)
-  const nelBudget = risultati.filter((p) => (p.prezzo === null || p.prezzo <= budgetMax * 1.1) && corrisponde(p.titolo, q, nomeIdea));
+  const nelBudget = risultati.filter((p) => (p.prezzo === null || p.prezzo <= budgetMax * 1.1) && corrisponde(p.titolo, q, nomeIdea) && adattoAlGenere(p.titolo, sesso));
   if (!nelBudget.length) return null;
   // Se l'AI ha stimato un prezzo, preferiamo i prodotti più vicini a quella cifra (tra i primi 5)
   if (prezzoStimato && prezzoStimato > 0) {

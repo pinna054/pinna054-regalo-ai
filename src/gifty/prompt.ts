@@ -10,8 +10,9 @@
  * Se modifichi un prompt, cambia anche la versione qui sotto (finisce nei log del server).
  */
 import "server-only";
+import { genere, regolaGenere } from "./genere";
 
-export const VERSIONE_PROMPT_GIFTY = "gifty-v6";
+export const VERSIONE_PROMPT_GIFTY = "gifty-v7";
 
 /** Domande da scorrere per round e idee per lotto. */
 export const DOMANDE_PER_ROUND = { 1: 7, 2: 6 } as const;
@@ -66,6 +67,7 @@ What we know so far ${LEGENDA}:
 ${testoProfilo(risposte)}
 
 ${RELAZIONE}
+${regolaGenere(genere(risposte))}
 
 ${OBIETTIVO_ROUND[round]}
 Already asked, never repeat or rephrase: ${giaChieste.join(" | ") || "none"}
@@ -94,6 +96,7 @@ export function promptDossier(lingua: Lingua, risposte: Risposta[]): string {
 Everything the giver told us ${LEGENDA}:
 ${testoProfilo(risposte)}
 
+${regolaGenere(genere(risposte))}
 Study every answer and how they combine. Infer what is not said explicitly, but never invent facts that contradict the answers.
 Return only JSON with:
 - "dossier": a thorough private brief for the gift team, 150-250 words: who {nome} is (age range, relationship, occasion, budget), passions and how deep each one goes (beginner, enthusiast, expert), tastes and style, daily habits, what {nome} probably already owns (so we avoid duplicates), clear no-gos, what {nome} would never buy for themselves, and 4-6 promising gift directions with reasons. Use {nome} for the name.
@@ -147,6 +150,7 @@ Focus of this batch: ${angolo}.
 Creativity seed: ${seed}
 
 ${RELAZIONE}
+${regolaGenere(genere(risposte))}
 
 Choose ${BATCH} gifts made only for {nome}: two different people must never get the same list.
 Think hard before answering: imagine twenty candidates, then keep only the ${BATCH} that pass ALL these tests:
@@ -154,7 +158,7 @@ Think hard before answering: imagine twenty candidates, then keep only the ${BAT
 2. The "wow" test: {nome} would show it to friends, remember who gave it, and would never have bought it for themselves.
 3. The "real" test: it exists today and can be bought or booked online in Italy within the budget.
 
-ABSOLUTELY FORBIDDEN, whatever the answers: mugs or cup sets, glasses, candles, scented diffusers, blankets and plaids, socks, slippers, keychains, photo frames, cushions, aprons, generic notebooks or diaries, generic cosmetic or bath sets, power banks, USB gadgets, generic gift boxes or experience boxes (Smartbox style), gift cards, random bestsellers, "kit" of generic stuff. Never propose any of these, not even "personalised".
+ABSOLUTELY FORBIDDEN, whatever the answers: mugs or cup sets, glasses, candles, scented diffusers, blankets and plaids, socks, slippers, keychains, photo frames, cushions, aprons, generic notebooks or diaries, generic cosmetic or bath sets, power banks, USB gadgets, clothing, shoes, underwear and anything that needs a size (the giver cannot know it), generic gift boxes or experience boxes (Smartbox style), gift cards, random bestsellers, "kit" of generic stuff. Never propose any of these, not even "personalised".
 
 How to build great gifts:
 - Start from the dossier: the deepest passion, the dream set aside, the ritual, the inside joke, the thing {nome} keeps talking about.
