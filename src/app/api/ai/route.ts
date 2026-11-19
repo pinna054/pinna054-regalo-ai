@@ -18,7 +18,7 @@ import { chiediAlModello, ErroreAi, SchemaDomande, SchemaDossier, SchemaRegali }
 import { budget } from "@/gifty/budget";
 import { genere } from "@/gifty/genere";
 import { domandeDemo, dossierDemo, regaliDemo } from "@/gifty/demo";
-import { cercaFoto, fotoAttive } from "@/gifty/foto";
+import { cercaFoto, cercaFotoWeb, fotoAttive } from "@/gifty/foto";
 import { servizioProdotti, trovaProdotto } from "@/gifty/prodotti";
 import { BATCH, DOMANDE_PER_ROUND, promptDomande, promptDossier, promptRegali, VERSIONE_PROMPT_GIFTY } from "@/gifty/prompt";
 import { modelloMotore } from "@/lib/ambiente";
@@ -126,7 +126,8 @@ async function conProdotti<T extends { search: string; name: string; photo: stri
     regali.map(async (g) => {
       // Le esperienze (corsi, viaggi, spettacoli) non si cercano su Google Shopping: uscirebbero oggetti a caso
       const prodotto = g.kind === "experience" ? null : await trovaProdotto(g.search || g.name, max, g.price, g.name, sesso);
-      const foto = prodotto ? null : await cercaFoto(g.photo);
+      // Senza prodotto (esperienze, oggetti fatti a mano): foto Pexels, altrimenti una foto vera da Google Immagini
+      const foto = prodotto ? null : ((await cercaFoto(g.photo)) ?? (await cercaFotoWeb(g.search || g.name)));
       return { ...g, prodotto, foto, price: prodotto?.prezzo ?? g.price };
     }),
   );

@@ -175,7 +175,7 @@ Redeploy** perché la modifica abbia effetto.
 | cambiare **grafica o testi di Gifty** (pagina principale) | `public/gifty.html` |
 | cambiare i **prompt di Gifty** | `src/gifty/prompt.ts` (se cambi i campi del JSON, aggiorna anche `src/gifty/ai.ts`) |
 | attivare i **prodotti veri** (foto, prezzo, negozio) | variabile `SERPER_API_KEY` (serper.dev) oppure `SERPAPI_API_KEY` (serpapi.com) |
-| foto di riserva quando il prodotto non si trova | variabile `PEXELS_API_KEY` (gratuita, pexels.com/api) |
+| foto per esperienze e oggetti senza prodotto | automatiche con `SERPER_API_KEY` (Google Immagini); `PEXELS_API_KEY` se disponibile |
 | cambiare **domande e regali della demo** di Gifty | `src/motore/demo/domande.ts`, `src/motore/demo/catalogo.ts` (logica in `src/gifty/demo.ts`) |
 | cambiare i **limiti di Gifty** | variabili `LIMITE_AI_ORA` (40), `LIMITE_AI_GIORNO` (120), `LIMITE_AI_GLOBALE_GIORNO` (5000) |
 

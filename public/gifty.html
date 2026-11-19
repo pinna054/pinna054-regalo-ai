@@ -188,6 +188,9 @@
   .art.photo::after{display:none}
   .art.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,26,22,.35),transparent 35%,transparent 70%,rgba(14,26,22,.55));z-index:1}
   .art.photo .em{display:none}
+  .art .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .row .e.photo{position:relative;overflow:hidden}
+  .row .e .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .credit{position:absolute;left:12px;bottom:10px;z-index:2;font-size:11px;color:rgba(246,239,230,.9);text-decoration:none;background:rgba(14,26,22,.6);padding:3px 9px;border-radius:999px}
   .row .e.photo{background-size:cover!important;background-position:center!important}
   .portrait{background:var(--moss);border:1px solid var(--fern);border-radius:18px;padding:14px 16px;font-size:15px;line-height:1.45;color:#d6e0d9;max-width:36ch;display:flex;gap:10px;text-align:left;align-items:flex-start}
@@ -678,17 +681,29 @@ const okUrl=u=>typeof u==="string"&&/^https:\/\/[^\s"'<>()]+$/.test(u);
 // la foto del prodotto può essere un indirizzo https o una miniatura incorporata (data:image/...)
 const okImg=u=>okUrl(u)||(typeof u==="string"&&/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u));
 const prodottoDi=g=>g.prodotto&&okImg(g.prodotto.immagine)&&okUrl(g.prodotto.link)?g.prodotto:null;
+/* Foto di riserva (esperienze e oggetti senza prodotto): solo indirizzi https */
+const fotoDi=g=>g.foto&&okUrl(g.foto.url)?g.foto:null;
+function imgFoto(f){
+  const riserva=okUrl(f.riserva)?f.riserva:"";
+  // se la foto non si carica si passa alla miniatura; se manca anche quella, si torna all'emoji
+  return `<img class="pic" src="${esc(f.url)}" alt="" referrerpolicy="no-referrer" draggable="false" data-riserva="${esc(riserva)}" onerror="fotoNonCaricata(this)">`;
+}
+function fotoNonCaricata(img){
+  const r=img.dataset.riserva;
+  if(r&&img.src!==r){img.src=r;return}
+  const art=img.closest(".art"); if(art)art.classList.remove("photo"); img.remove();
+}
 function cardHTML(g){
   const p=prodottoDi(g);
   if(p)return cardProdottoHTML(g,p);
   const c1=hex(g.colors&&g.colors[0])||"#3a2414", c2=hex(g.colors&&g.colors[1])||"#ff7a2f";
-  const price=Number(g.price), f=g.foto&&/^https:\/\/images\.pexels\.com\//.test(g.foto.url)?g.foto:null;
-  const bg=f?`background:url('${esc(f.url)}') center/cover,${c1}`
+  const price=Number(g.price), f=fotoDi(g);
+  const bg=f?`background:${c1}`
     :`background:radial-gradient(circle at 30% 25%,${c2} 0%,transparent 58%),radial-gradient(circle at 85% 90%,${c2}88 0%,transparent 45%),linear-gradient(160deg,${c1},#0e1a16)`;
   return `<div class="art${f?" photo":""}" style="${bg}">
       <span class="new-tag">${t("new")}</span>${isFinite(price)&&price>0?`<span class="price-tag">€ ${Math.round(price)}</span>`:""}
-      <span class="em">${esc(g.emoji||"🎁")}</span>
-      ${f?`<a class="credit" href="${esc(f.link)}" target="_blank" rel="noopener">📷 ${esc(f.autore||t("photo"))} · Pexels</a>`:""}
+      ${f?imgFoto(f):""}<span class="em">${esc(g.emoji||"🎁")}</span>
+      ${f?`<a class="credit" href="${esc(f.link)}" target="_blank" rel="nofollow noopener">📷 ${esc(f.autore||t("photo"))}${f.fonte==="pexels"?" · Pexels":""}</a>`:""}
       <div class="stamp yes">${t("yes")}</div><div class="stamp no">${t("no")}</div><div class="stamp super">${t("perfect")}</div>
     </div>
     <div class="info">
@@ -725,7 +740,7 @@ function renderDeck(){
     return;
   }
   // le foto delle prossime carte si caricano in anticipo
-  S.deck.slice(0,5).forEach(g=>{const u=(prodottoDi(g)||{}).immagine||(g.foto&&g.foto.url);if(u){const im=new Image();im.referrerPolicy="no-referrer";im.src=u}});
+  S.deck.slice(0,5).forEach(g=>{const u=(prodottoDi(g)||{}).immagine||(fotoDi(g)||{}).url;if(u){const im=new Image();im.referrerPolicy="no-referrer";im.src=u}});
   S.deck.slice(0,3).reverse().forEach((g,i,arr)=>{
     const depth=arr.length-1-i, c=document.createElement("div");
     c.className="card"; c.innerHTML=cardHTML(g);
@@ -789,10 +804,10 @@ function showResults(){
   $("resSub").textContent=ranked.length?t("resSub")(ranked.length):t("resNone");
   $("list").innerHTML=ranked.map((l,i)=>{
     const g=l.g, c1=hex(g.colors&&g.colors[0])||"#3a2414", c2=hex(g.colors&&g.colors[1])||"#ff7a2f";
-    const f=g.foto&&/^https:\/\/images\.pexels\.com\//.test(g.foto.url)?g.foto:null;
+    const f=fotoDi(g);
     const q=encodeURIComponent(g.search||g.name);
     const p=prodottoDi(g);
-    const thumb=p?`<div class="e prod"><img src="${esc(p.immagine)}" alt="" referrerpolicy="no-referrer"></div>`:f?`<div class="e photo" style="background:url('${esc(f.url)}') center/cover"></div>`
+    const thumb=p?`<div class="e prod"><img src="${esc(p.immagine)}" alt="" referrerpolicy="no-referrer"></div>`:f?`<div class="e photo">${imgFoto(f)}</div>`
       :`<div class="e" style="background:linear-gradient(150deg,${c2},${c1})">${esc(g.emoji||"🎁")}</div>`;
     return `<div class="row${i===0?" top":""}">${thumb}
       <div><h4>${esc(nameIt(g.name))}</h4>${p?`<div class="ptitle">${esc(p.titolo)}</div>`:""}<div class="meta">${Number(g.price)>0?`<span class="pr">€ ${Math.round(g.price)}</span>`:""}${l.sup?`<span class="badge">${t("super")}</span>`:""}</div>
