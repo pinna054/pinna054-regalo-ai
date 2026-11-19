@@ -348,7 +348,7 @@ const T = {
     openSkip:"Salta",openPh:"Scrivi qui…",
     profKicker:"Il profilo",profTitle:"Ecco cosa ho capito di {nome}",profWait:"La volpe sta studiando {nome}…",profWaitSub:"Legge ogni risposta e come si combinano.",
     lastQ:"C'è qualcosa che {nome} ha già, o che proprio non sopporta?",lastHint:"Così evitiamo doppioni e passi falsi.",lastPh:"Es. ha già un Kindle, odia i profumi",
-    goShop:"Vai al prodotto",at:"su",
+    goShop:"Vai al prodotto",at:"su",book:"Dove prenotarlo",
     showGifts:"Mostrami i regali",
     photo:"Foto",
     affiliate:"In qualità di Affiliato Amazon, Gifty riceve un guadagno dagli acquisti idonei.",privacy:"Privacy",
@@ -375,7 +375,7 @@ const T = {
     openSkip:"Skip",openPh:"Type here…",
     profKicker:"The profile",profTitle:"Here's what I figured out about {nome}",profWait:"The fox is studying {nome}…",profWaitSub:"Reading every answer and how they fit together.",
     lastQ:"Is there anything {nome} already has, or really can't stand?",lastHint:"So we avoid duplicates and missteps.",lastPh:"E.g. already has a Kindle, hates perfume",
-    goShop:"See the product",at:"at",
+    goShop:"See the product",at:"at",book:"Where to book it",
     showGifts:"Show me the gifts",
     photo:"Photo",
     affiliate:"As an Amazon Associate, Gifty earns from qualifying purchases.",privacy:"Privacy",
@@ -800,7 +800,8 @@ function shopSearch(g,q){
   const amazon=/^https:\/\/www\.amazon\.[a-z.]+\//.test(g.link_amazon||"")?g.link_amazon:null;
   const google=/^https:\/\/www\.google\.[a-z.]+\//.test(g.link_google||"")?g.link_google:`https://www.google.it/search?udm=28&q=${q}`;
   const rel=g.affiliato?"sponsored nofollow noopener":"nofollow noopener";
-  return (amazon?`<a href="${esc(amazon)}" target="_blank" rel="${rel}">Amazon →</a>`:"")+`<a href="${esc(google)}" target="_blank" rel="nofollow noopener">Google Shopping →</a>`;
+  const etichetta=g.kind==="experience"?t("book"):"Google Shopping";
+  return (amazon?`<a href="${esc(amazon)}" target="_blank" rel="${rel}">Amazon →</a>`:"")+`<a href="${esc(google)}" target="_blank" rel="nofollow noopener">${esc(etichetta)} →</a>`;
 }
 
 /* ===================== Riserva se il server non risponde ===================== */

@@ -20,7 +20,7 @@ import { domandeDemo, dossierDemo, regaliDemo } from "@/gifty/demo";
 import { cercaFoto, fotoAttive } from "@/gifty/foto";
 import { servizioProdotti, trovaProdotto } from "@/gifty/prodotti";
 import { BATCH, DOMANDE_PER_ROUND, promptDomande, promptDossier, promptRegali, VERSIONE_PROMPT_GIFTY } from "@/gifty/prompt";
-import { effortMotore, modelloMotore } from "@/lib/ambiente";
+import { modelloMotore } from "@/lib/ambiente";
 import { ipRichiesta } from "@/lib/ip";
 import { controllaLimiteAzione, controllaLimitiAi } from "@/lib/limiti";
 import { linkAmazon, linkGoogleShopping } from "@/motore/link";
@@ -75,10 +75,17 @@ export async function GET(request: Request) {
  * Link per comprare ogni regalo, costruiti SOLO dalla query di ricerca (il modello non scrive URL).
  * Prezzi in euro → negozi italiani; Amazon con il tag di affiliazione AMAZON_TAG_IT se impostato.
  */
-function conLink<T extends { search: string; name: string }>(regali: T[], lingua: string) {
+function conLink<T extends { search: string; name: string; kind?: "product" | "experience" }>(regali: T[], lingua: string) {
   const paese = trovaPaese(PAESE_PREDEFINITO)!;
   return regali.map((g) => {
     const query = g.search || g.name;
+    if (g.kind === "experience") {
+      // Per un'esperienza: una normale ricerca Google per trovare dove prenotarla, niente Amazon
+      const url = new URL(`https://www.${paese.google.dominio}/search`);
+      url.searchParams.set("q", query.replace(/https?:\/\/\S+/gi, " ").trim().slice(0, 120));
+      url.searchParams.set("hl", lingua);
+      return { ...g, link_amazon: "", affiliato: false, link_google: url.toString() };
+    }
     const amazon = linkAmazon(query, paese);
     return { ...g, link_amazon: amazon.url, affiliato: amazon.affiliato, link_google: linkGoogleShopping(query, paese, lingua) };
   });
@@ -88,14 +95,15 @@ function conLink<T extends { search: string; name: string }>(regali: T[], lingua
  * Per ogni idea: il prodotto VERO (Google Shopping) con foto, prezzo, negozio e link;
  * se non si trova, una foto rappresentativa (Pexels); altrimenti resta l'emoji.
  */
-async function conProdotti<T extends { search: string; name: string; photo: string; price: number }>(
+async function conProdotti<T extends { search: string; name: string; photo: string; price: number; kind?: "product" | "experience" }>(
   regali: T[],
   r: { lingua: string; risposte: { q: string; a: string[] }[] },
 ) {
   const { max } = budget(r.risposte);
   const arricchiti = await Promise.all(
     regali.map(async (g) => {
-      const prodotto = await trovaProdotto(g.search || g.name, max, g.price);
+      // Le esperienze (corsi, viaggi, spettacoli) non si cercano su Google Shopping: uscirebbero oggetti a caso
+      const prodotto = g.kind === "experience" ? null : await trovaProdotto(g.search || g.name, max, g.price, g.name);
       const foto = prodotto ? null : await cercaFoto(g.photo);
       return { ...g, prodotto, foto, price: prodotto?.prezzo ?? g.price };
     }),
@@ -162,9 +170,9 @@ export async function POST(request: Request) {
     if (r.tipo === "domande") {
       const domande = await chiediAlModello(promptDomande(r.lingua, r.risposte, r.giro, r.chieste), SchemaDomande, {
         modello,
-        // Le domande devono arrivare in fretta: il modello ragiona poco
-        effort: "low",
-        maxToken: 6000,
+        // Domande belle e varie: il modello ragiona un po' (il round 2 si prepara mentre l'utente risponde)
+        effort: "medium",
+        maxToken: 10000,
       });
       // Teniamo le carte complete (una "questo o quello" deve avere le due scelte), al massimo quante ne prevede il round
       const questions = domande.questions
@@ -195,7 +203,8 @@ export async function POST(request: Request) {
     const { gifts } = await chiediAlModello(
       promptRegali(r.lingua, r.risposte, r.dossier, r.piaciute, r.scartate, r.mostrate),
       SchemaRegali,
-      { modello, effort: effortMotore(), maxToken: 16000 },
+      // I regali sono il cuore di Gifty: il modello ragiona a fondo
+      { modello, effort: "high", maxToken: 16000 },
     );
     const completi = await conProdotti(gifts.slice(0, BATCH), r);
     const trovati = completi.filter((g) => g.prodotto).length;

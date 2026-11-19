@@ -84,7 +84,24 @@ async function cerca(query: string): Promise<Prodotto[]> {
  * Il primo prodotto reale per la query, dentro il budget (tolleranza del 10%) e vicino al prezzo
  * stimato dall'AI; null se non c'è.
  */
-export async function trovaProdotto(query: string, budgetMax: number, prezzoStimato?: number): Promise<Prodotto | null> {
+/** Parole che non bastano a dire che un prodotto è quello giusto. */
+const PAROLE_VUOTE = new Set(
+  "regalo regali idea idee set kit per con senza della delle dello degli dei del alla alle allo agli una uno gli le la il lo di da in su tra fra e o personalizzato personalizzata originale edizione nuovo nuova cm pezzi pz".split(" "),
+);
+const normalizza_ = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+/** Parole importanti di un testo (almeno 4 lettere, non generiche). */
+function paroleChiave(testo: string): string[] {
+  return normalizza_(testo).split(/[^a-z0-9]+/).filter((p) => p.length >= 4 && !PAROLE_VUOTE.has(p));
+}
+/** True se il titolo del prodotto contiene almeno una parola importante dell'idea (radice di 5 lettere). */
+export function corrisponde(titolo: string, ...testi: string[]): boolean {
+  const t = normalizza_(titolo);
+  const parole = testi.flatMap(paroleChiave);
+  if (!parole.length) return true;
+  return parole.some((p) => t.includes(p.slice(0, Math.min(p.length, 5))));
+}
+
+export async function trovaProdotto(query: string, budgetMax: number, prezzoStimato?: number, nomeIdea = ""): Promise<Prodotto | null> {
   const q = query.replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " ").trim().slice(0, 100);
   if (!q || !servizioProdotti()) return null;
   let risultati: Prodotto[];
@@ -100,7 +117,8 @@ export async function trovaProdotto(query: string, budgetMax: number, prezzoStim
     if (cache.size > 2000) cache.clear();
     cache.set(q, { risultati, scade: Date.now() + DURATA_CACHE });
   }
-  const nelBudget = risultati.filter((p) => p.prezzo === null || p.prezzo <= budgetMax * 1.1);
+  // Solo prodotti dentro il budget e che corrispondono davvero all'idea (niente tazze al posto di un corso!)
+  const nelBudget = risultati.filter((p) => (p.prezzo === null || p.prezzo <= budgetMax * 1.1) && corrisponde(p.titolo, q, nomeIdea));
   if (!nelBudget.length) return null;
   // Se l'AI ha stimato un prezzo, preferiamo i prodotti più vicini a quella cifra (tra i primi 5)
   if (prezzoStimato && prezzoStimato > 0) {

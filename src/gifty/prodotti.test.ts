@@ -19,3 +19,13 @@ describe("prodotti", () => {
     expect(normalizza({ title: "x", link: "https://a/b", imageUrl: "https://a/b')" })).toBeNull();
   });
 });
+
+import { corrisponde } from "./prodotti";
+describe("corrispondenza prodotto-idea", () => {
+  it("accetta il prodotto giusto e scarta quello a caso", () => {
+    expect(corrisponde("Fujifilm Instax Mini 12 fotocamera istantanea", "Fujifilm Instax Mini 12")).toBe(true);
+    expect(corrisponde("Set di 6 tazze in ceramica", "corso di ceramica al tornio", "Lezione di ceramica")).toBe(true);
+    expect(corrisponde("Set di 6 tazze colorate", "Lego Icons Bonsai 10281", "Bonsai Lego")).toBe(false);
+    expect(corrisponde("Mappa del mondo da grattare con telaio", "mappa mondo da grattare")).toBe(true);
+  });
+});

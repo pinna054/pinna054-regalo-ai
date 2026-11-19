@@ -218,6 +218,7 @@ export function regaliDemo(
     const [nome, descrizione, perche, cerca] = g[lingua];
     const prezzo = Math.round(Math.min(Math.max((g.prezzo[0] + g.prezzo[1]) / 2, min), max));
     return {
+      kind: (g.tipologia === "esperienze" ? "experience" : "product") as "product" | "experience",
       name: nome,
       tagline:
         g.tipo === "originale"

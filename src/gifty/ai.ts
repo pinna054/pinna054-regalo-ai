@@ -13,6 +13,8 @@ import { clientAnthropic } from "@/motore/modello";
 export const SchemaDomande = z.object({
   questions: z.array(
     z.object({
+      // "funny" = divertente · "personal" = più personale (l'AI deve alternarle)
+      tone: z.enum(["funny", "personal"]),
       // "yn" = sì/no (left = No, right = Sì) · "ab" = questo o quello
       kind: z.enum(["yn", "ab"]),
       emoji: z.string(),
@@ -29,6 +31,8 @@ export type Domande = z.infer<typeof SchemaDomande>;
 
 /** Idea regalo generata dall'AI ("photo" = parole per cercare una foto vera). */
 export const SchemaRegalo = z.object({
+  // "product" = oggetto da cercare su Google Shopping · "experience" = da prenotare (niente Google Shopping)
+  kind: z.enum(["product", "experience"]),
   name: z.string(),
   tagline: z.string(),
   description: z.string(),

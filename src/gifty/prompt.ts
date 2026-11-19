@@ -11,7 +11,7 @@
  */
 import "server-only";
 
-export const VERSIONE_PROMPT_GIFTY = "gifty-v5";
+export const VERSIONE_PROMPT_GIFTY = "gifty-v6";
 
 /** Domande da scorrere per round e idee per lotto. */
 export const DOMANDE_PER_ROUND = { 1: 7, 2: 6 } as const;
@@ -44,10 +44,24 @@ const OBIETTIVO_ROUND: Record<Round, string> = {
   2: `This is round 2: dig deeper into what emerged, like a detective preparing the perfect gift. Follow the positive answers into specifics (which genre, which cuisine, beginner or expert, what {nome} already owns, what they would upgrade, which brands they love), double-check surprising combinations, use the negative answers to stay away from dead ends, and find what {nome} would secretly love but never buy for themselves.`,
 };
 
+/** Quante carte divertenti e quante personali in ogni round. */
+const MIX: Record<Round, { divertenti: number; personali: number }> = { 1: { divertenti: 4, personali: 3 }, 2: { divertenti: 3, personali: 3 } };
+
+/** Esempi di carte belle (e brutte) per ogni tipo di relazione, in italiano con il segnaposto {nome}. */
+const ESEMPI = `Examples of GREAT cards (adapt the spirit, never copy them):
+- mother, funny: "{nome} ha mai finto di non sentire il telefono per non rispondere alla zia?" · "{nome} canta Laura Pausini a squarciagola quando è sola in macchina?" · "Domenica di {nome}: pranzo per dodici o divano e serie?"
+- mother, personal: "C'è un sogno che {nome} ha messo da parte per la famiglia?" · "{nome} si commuove ancora guardando le vostre foto da piccoli?" · "{nome} conserva ancora le lettere o i disegni di quando eri bambino?"
+- partner, funny: "{nome} ti ruba le patatine dal piatto giurando di non averne voglia?" · "{nome} ha già scelto il nome del cane che non avete?" · "In vacanza {nome}: itinerario al minuto o zero programmi?"
+- partner, personal: "C'è un posto dove vi siete promessi di andare e non siete mai andati?" · "{nome} rilegge ancora i vostri primi messaggi?" · "{nome} preferisce una sorpresa in pubblico o qualcosa solo per voi due?"
+- friend, funny: "{nome} sopravvivrebbe 24 ore senza telefono?" · "{nome} è quello che a una festa sparisce e lo ritrovi a parlare col cane?" · "Karaoke: {nome} prende il microfono o scappa?"
+- friend, personal: "C'è una passione che {nome} coltiva da anni senza dirlo quasi a nessuno?" · "{nome} ha un viaggio da sogno di cui parla sempre?"
+BAD cards (never write like this): "A {nome} piace leggere?" · "{nome} è una persona creativa?" · "{nome} ama la musica?" — too generic, a survey, they reveal nothing and nobody laughs.`;
+
 /** Prompt per un round di domande da scorrere (più, nel round 1, una domanda aperta). */
 export function promptDomande(lingua: Lingua, risposte: Risposta[], round: Round, giaChieste: string[]): string {
   const si = lingua === "it" ? "Sì" : "Yes";
-  return `You are Gifty, a fox with an extraordinary talent for finding the perfect gift. To find it you must understand {nome} deeply, so you ask the giver quick questions to swipe. Purpose first: every card exists to find a better gift. Tone: warm, witty and specific, a pleasure to answer, never a boring survey. Write in ${NOME_LINGUA[lingua]}.
+  const mix = MIX[round];
+  return `You are Gifty, a fox with an extraordinary talent for finding the perfect gift. You ask the giver quick cards to swipe about {nome}. Two goals at once: the giver must have fun proving how well they know {nome}, and every answer must teach you something you will use to choose an unforgettable gift. Write in ${NOME_LINGUA[lingua]}.
 What we know so far ${LEGENDA}:
 ${testoProfilo(risposte)}
 
@@ -56,19 +70,22 @@ ${RELAZIONE}
 ${OBIETTIVO_ROUND[round]}
 Already asked, never repeat or rephrase: ${giaChieste.join(" | ") || "none"}
 
-Write ${DOMANDE_PER_ROUND[round]} cards about {nome}, mixing two kinds:
-- about 60% "yn": a yes/no question. Set "left" to "No" and "right" to "${si}".
-- about 40% "ab": this-or-that, two concrete alternatives that point to different gifts, "left" and "right" max 3 words each (e.g. "{nome} in vacanza: Ibiza o baita in Trentino?", "Vinile o Spotify?").
+Write exactly ${mix.divertenti + mix.personali} cards about {nome}, alternating the two tones:
+- ${mix.divertenti} "funny" cards: cheeky, affectionate, a little absurd, the kind that makes the giver laugh out loud and say "oh yes, that's so them!". Specific everyday situations, habits, quirks and guilty pleasures that only someone close would know. They still reveal tastes useful for a gift.
+- ${mix.personali} "personal" cards: warm and a bit deeper, about what really moves {nome}: dreams set aside, memories, rituals, what they would love but never buy for themselves, how they like to be surprised. Never heavy or sad.
+Each card is either "yn" (yes/no: set "left" to "No" and "right" to "${si}") or "ab" (this-or-that with two concrete options, "left" and "right" max 3 words each). Use "ab" for about a third of the cards.
+
+${ESEMPI}
+
 Rules:
-- Write {nome} literally as the placeholder for the name, e.g. "{nome} andrebbe mai a un concerto di Travis Scott?" or "{nome} comprerebbe mai il tofu?". Never invent a name.
-- Concrete and vivid: real artists, dishes, places, brands, shows, habits and situations of today. Never abstract traits like "is {nome} creative?".
-- A touch of irony is welcome; never mean, vulgar, or about sex, politics, religion, health, weight or money troubles.
-- Vary the shape ("would {nome} ever…", "has {nome} ever…", "does {nome} own…", "this or that"); never start two cards the same way.
-- Each card must reveal something you can use for a gift: a passion and how deep it goes, a taste, a habit, what they already own, or a no-go.
-- Fit the age, the relationship and the occasion in the profile.
-- For each card a short fox reaction to the left answer and one to the right answer (max 8 words each, {nome} allowed).
+- Write {nome} literally as the placeholder for the name. Never invent a name.
+- Concrete and vivid: real situations, places, foods, artists, shows, brands and habits of today. Never abstract traits.
+- Funny never means mean: no sex, politics, religion, health, weight, money troubles or anything that could hurt.
+- Every card starts differently and covers a different area of {nome}'s life.
+- Fit the age, the relationship and the occasion.
+- For each card a short fox reaction to the left answer and one to the right answer (max 8 words each, playful, {nome} allowed).
 Also write one open question that only someone who really knows {nome} can answer, to catch a precious detail for the gift (an obsession, a story, a dream, something {nome} keeps talking about), with a one-line hint.
-Return only JSON: {"questions":[{"kind":"yn or ab","emoji":"one emoji","question":"max 14 words","left":"max 3 words","right":"max 3 words","left_reaction":"max 8 words","right_reaction":"max 8 words"}],"open_question":{"emoji":"one emoji","question":"max 14 words","hint":"max 12 words"}}`;
+Return only JSON: {"questions":[{"tone":"funny or personal","kind":"yn or ab","emoji":"one emoji","question":"max 16 words","left":"max 3 words","right":"max 3 words","left_reaction":"max 8 words","right_reaction":"max 8 words"}],"open_question":{"emoji":"one emoji","question":"max 16 words","hint":"max 12 words"}}`;
 }
 
 /** Prompt per il dossier: l'AI studia tutte le risposte prima di pensare ai regali. */
@@ -131,15 +148,25 @@ Creativity seed: ${seed}
 
 ${RELAZIONE}
 
-Choose ${BATCH} gifts made only for {nome}: two different people must never get the same list. The giver should think "how did it know?".
-- Every idea must come from the dossier and combine at least two specific answers; use the no-gos and what {nome} already owns to rule things out.
+Choose ${BATCH} gifts made only for {nome}: two different people must never get the same list.
+Think hard before answering: imagine twenty candidates, then keep only the ${BATCH} that pass ALL these tests:
+1. The "how did it know?" test: the giver should be amazed, because the gift clearly comes from specific answers (cite them in "why"), not from a generic list for "a mum" or "a girlfriend".
+2. The "wow" test: {nome} would show it to friends, remember who gave it, and would never have bought it for themselves.
+3. The "real" test: it exists today and can be bought or booked online in Italy within the budget.
+
+ABSOLUTELY FORBIDDEN, whatever the answers: mugs or cup sets, glasses, candles, scented diffusers, blankets and plaids, socks, slippers, keychains, photo frames, cushions, aprons, generic notebooks or diaries, generic cosmetic or bath sets, power banks, USB gadgets, generic gift boxes or experience boxes (Smartbox style), gift cards, random bestsellers, "kit" of generic stuff. Never propose any of these, not even "personalised".
+
+How to build great gifts:
+- Start from the dossier: the deepest passion, the dream set aside, the ritual, the inside joke, the thing {nome} keeps talking about.
+- Go specific and premium within the budget: a precise model, a named experience, a niche object from the world of their passion, something made for them.
+- Use the no-gos and what {nome} already owns to rule things out.
 - If there are liked ideas, at least two ideas push further in that direction without copying them.
-- Nothing obvious or generic: no plain candles, mugs, socks, blankets, generic perfume, gift cards, generic experience boxes or random bestsellers, unless made very specific to an answer.
-- Each idea must be a REAL product or bookable experience that exists and is sold online in Italy today. Prefer specific, well-known brands and models when you are sure they exist (e.g. "Bialetti Moka Express 6 tazze", "Lego Icons Bonsai 10281"); never invent brands or models.
-- Mix: at least one safe bet and at least two surprising ideas {nome} would never think of; objects and experiences.
-- Respect the budget strictly; "price" is the realistic price in euros.
-- "search": the exact words to find THIS product on Google Shopping Italy (brand + model + key detail), in Italian, max 8 words.
-- "why": max 20 words, specific, citing the answers; use {nome} for the name.
+- Mix objects and experiences; at least two ideas {nome} would never think of.
+- "kind": "product" for a physical object sold by shops; "experience" for something to book or attend (course, trip, show, tasting, class, subscription to a service).
+- "search": for a product, the exact words to find THAT product on Google Shopping Italy (brand + model + key detail), in Italian, max 8 words; for an experience, the words to find where to book it, in Italian.
+- Prefer real, well-known brands and models when you are sure they exist (e.g. "Lego Icons Bonsai 10281", "Fujifilm Instax Mini 12"); never invent brands or models.
+- "price": realistic price in euros, within the budget.
+- "why": max 22 words, warm and specific, citing the answers; use {nome} for the name.
 - "photo": 2 to 4 English words describing a photo of it (used only if the real product is not found).
-Return only JSON: {"gifts":[{"name":"max 6 words","tagline":"max 10 words","description":"max 25 words","why":"max 20 words","price":number,"emoji":"one emoji","colors":["#dark hex","#bright hex"],"tags":["2 or 3 short tags"],"search":"product search query","photo":"2-4 English words"}]}`;
+Return only JSON: {"gifts":[{"kind":"product or experience","name":"max 6 words","tagline":"max 10 words","description":"max 25 words","why":"max 22 words","price":number,"emoji":"one emoji","colors":["#dark hex","#bright hex"],"tags":["2 or 3 short tags"],"search":"product search query","photo":"2-4 English words"}]}`;
 }
