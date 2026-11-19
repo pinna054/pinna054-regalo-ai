@@ -15,6 +15,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { chiediAlModello, ErroreAi, SchemaDomande, SchemaDossier, SchemaRegali } from "@/gifty/ai";
+import { linkAwin } from "@/gifty/awin";
 import { budget } from "@/gifty/budget";
 import { genere } from "@/gifty/genere";
 import { domandeDemo, dossierDemo, regaliDemo } from "@/gifty/demo";
@@ -89,6 +90,9 @@ function conAffiliazione<P extends { link: string }>(prodotto: P | null | undefi
   } catch {
     // link non valido: lo lasciamo com'è (il browser lo controlla di nuovo)
   }
+  // Negozi della rete Awin (Etsy, Smartbox…) che ti hanno approvato: link con il tuo codice
+  const awin = linkAwin(prodotto.link);
+  if (awin) return { ...prodotto, link: awin, affiliato: true };
   return { ...prodotto, affiliato: false };
 }
 
