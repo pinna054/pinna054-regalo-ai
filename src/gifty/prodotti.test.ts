@@ -29,3 +29,10 @@ describe("corrispondenza prodotto-idea", () => {
     expect(corrisponde("Mappa del mondo da grattare con telaio", "mappa mondo da grattare")).toBe(true);
   });
 });
+
+describe("miniature incorporate", () => {
+  it("accetta data:image in base64 e scarta il resto", () => {
+    expect(normalizza({ title: "Teiera Kyusu", link: "https://www.amazon.it/x", imageUrl: "data:image/webp;base64,UklGRiQAAABXRUJQ" })?.immagine).toMatch(/^data:image\/webp/);
+    expect(normalizza({ title: "x", link: "https://a/b", imageUrl: "data:text/html;base64,PHNjcmlwdD4=" })).toBeNull();
+  });
+});

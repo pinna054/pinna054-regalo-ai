@@ -12,7 +12,7 @@
 import "server-only";
 import { genere, regolaGenere } from "./genere";
 
-export const VERSIONE_PROMPT_GIFTY = "gifty-v7";
+export const VERSIONE_PROMPT_GIFTY = "gifty-v8";
 
 /** Domande da scorrere per round e idee per lotto. */
 export const DOMANDE_PER_ROUND = { 1: 7, 2: 6 } as const;
@@ -99,7 +99,7 @@ ${testoProfilo(risposte)}
 ${regolaGenere(genere(risposte))}
 Study every answer and how they combine. Infer what is not said explicitly, but never invent facts that contradict the answers.
 Return only JSON with:
-- "dossier": a thorough private brief for the gift team, 150-250 words: who {nome} is (age range, relationship, occasion, budget), passions and how deep each one goes (beginner, enthusiast, expert), tastes and style, daily habits, what {nome} probably already owns (so we avoid duplicates), clear no-gos, what {nome} would never buy for themselves, and 4-6 promising gift directions with reasons. Use {nome} for the name.
+- "dossier": a thorough private brief for the gift team, 150-250 words: who {nome} is (age range, relationship, occasion, budget), passions and how deep each one goes (beginner, enthusiast, expert), tastes and style, daily habits, what {nome} probably already owns (so we avoid duplicates), clear no-gos, what {nome} would never buy for themselves, the emotional core (what would make {nome} feel truly seen and loved by the giver), the obvious gift ideas a lazy shop assistant would suggest (so the gift team avoids them), and 4-6 surprising gift directions with reasons, each joining two or more answers. Use {nome} for the name.
 - "insights": 4 or 5 short sentences for the giver, each one a sharp, specific thing you understood about {nome} (max 16 words each, {nome} allowed). They must make the giver think "yes, that's exactly them".
 - "portrait": a warm, slightly witty one-sentence portrait of {nome} (max 25 words).
 - "badges": 3 short titles for {nome}, each starting with an emoji (max 4 words each).
@@ -111,7 +111,7 @@ Return only JSON with:
  * e non si ripetono (dopo l'ultimo si ricomincia, sempre escludendo le idee già mostrate).
  */
 const ANGOLI = [
-  "the best overall mix for {nome}",
+  "the most surprising and meaningful ideas: the ones that would make {nome} feel truly seen",
   "experiences and things to do (alone or together)",
   "personalised, handmade or made-to-measure things",
   "niche finds from deep inside {nome}'s biggest passion, the kind only a true fan knows",
@@ -160,8 +160,14 @@ Think hard before answering: imagine twenty candidates, then keep only the ${BAT
 
 ABSOLUTELY FORBIDDEN, whatever the answers: mugs or cup sets, glasses, candles, scented diffusers, blankets and plaids, socks, slippers, keychains, photo frames, cushions, aprons, generic notebooks or diaries, generic cosmetic or bath sets, power banks, USB gadgets, clothing, shoes, underwear and anything that needs a size (the giver cannot know it), generic gift boxes or experience boxes (Smartbox style), gift cards, random bestsellers, "kit" of generic stuff. Never propose any of these, not even "personalised".
 
+NO LAZY IDEAS. Never turn a single answer into its most obvious object: tea or coffee ritual → teapot or coffee machine; likes travel → scratch map or suitcase; likes cooking → generic cooking class or apron; likes reading → a bestseller; likes music → speaker or headphones. That is what anyone would think of in five seconds, and it is exactly what Gifty must never do.
+Examples (for a mum, budget around 100 €):
+- LAZY: "Teiera giapponese e tè Sencha", "Mappa del mondo da grattare", "Set per la cura del corpo".
+- GREAT: "Due biglietti per il concerto di Laura Pausini" (she sings it alone in the car), "Il quaderno delle ricette della nonna stampato come un vero libro" (family memories + cooking), "Giornata alle terme per voi due, con pranzo" (she never takes time for herself), "Corso di acquerello di un mese" (the dream she set aside).
+A great gift tells a story: it joins two or three answers into something with emotional weight, often an experience or something made just for {nome}, sometimes shared with the giver.
+
 How to build great gifts:
-- Start from the dossier: the deepest passion, the dream set aside, the ritual, the inside joke, the thing {nome} keeps talking about.
+- Start from the dossier: the emotional core, the dream set aside, the deepest passion, the inside joke, the memory, the thing {nome} keeps talking about. Combine them; don't map one answer to one object.
 - Go specific and premium within the budget: a precise model, a named experience, a niche object from the world of their passion, something made for them.
 - Use the no-gos and what {nome} already owns to rule things out.
 - If there are liked ideas, at least two ideas push further in that direction without copying them.

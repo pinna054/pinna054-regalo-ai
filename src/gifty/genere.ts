@@ -32,7 +32,9 @@ export function adattoAlGenere(titolo: string, g: Genere): boolean {
 
 /** Riga per il prompt. */
 export function regolaGenere(g: Genere): string {
-  if (g === "F") return "The recipient is a WOMAN: every card and every gift must fit a woman; never propose men's items.";
-  if (g === "M") return "The recipient is a MAN: every card and every gift must fit a man; never propose women's items.";
+  if (g === "F")
+    return "The recipient is a WOMAN: every card and every gift must fit a woman; never propose men's items. In Italian always use feminine grammar for her (lei, la, -a: \"sognatrice\", \"le piace\"), never \"lui\".";
+  if (g === "M")
+    return "The recipient is a MAN: every card and every gift must fit a man; never propose women's items. In Italian always use masculine grammar for him (lui, lo, -o), never \"lei\".";
   return "The recipient's gender is unknown: avoid anything made for a specific gender.";
 }

@@ -675,7 +675,9 @@ async function fetchGifts(){
 }
 
 const okUrl=u=>typeof u==="string"&&/^https:\/\/[^\s"'<>()]+$/.test(u);
-const prodottoDi=g=>g.prodotto&&okUrl(g.prodotto.immagine)&&okUrl(g.prodotto.link)?g.prodotto:null;
+// la foto del prodotto può essere un indirizzo https o una miniatura incorporata (data:image/...)
+const okImg=u=>okUrl(u)||(typeof u==="string"&&/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u));
+const prodottoDi=g=>g.prodotto&&okImg(g.prodotto.immagine)&&okUrl(g.prodotto.link)?g.prodotto:null;
 function cardHTML(g){
   const p=prodottoDi(g);
   if(p)return cardProdottoHTML(g,p);

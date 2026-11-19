@@ -42,10 +42,13 @@ export function leggiPrezzo(valore: unknown): number | null {
 }
 
 const httpsValido = (u: unknown): u is string => typeof u === "string" && u.length < 2000 && /^https:\/\/[^\s"'<>()]+$/.test(u);
+// Google Shopping a volte manda la miniatura già incorporata nel testo (data:image/...;base64,...)
+const immagineIncorporata = (u: unknown): u is string =>
+  typeof u === "string" && u.length < 250_000 && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u);
 
 /** Trasforma un risultato (di Serper o SerpApi) in un Prodotto; null se mancano foto o link. */
 export function normalizza(r: Record<string, unknown>): Prodotto | null {
-  const immagine = [r.imageUrl, r.thumbnail, r.image].find(httpsValido);
+  const immagine = [r.imageUrl, r.thumbnail, r.image].find((u) => httpsValido(u) || immagineIncorporata(u)) as string | undefined;
   const link = [r.link, r.product_link].find(httpsValido);
   const titolo = typeof r.title === "string" ? r.title.trim().slice(0, 140) : "";
   if (!immagine || !link || !titolo) return null;
@@ -78,7 +81,9 @@ async function cerca(query: string): Promise<Prodotto[]> {
     if (!risposta.ok) throw new Error(`SerpApi ${risposta.status}`);
     elenco = ((await risposta.json()) as { shopping_results?: Record<string, unknown>[] }).shopping_results ?? [];
   }
-  return elenco.slice(0, 10).flatMap((r) => normalizza(r) ?? []);
+  const prodotti = elenco.slice(0, 10).flatMap((r) => normalizza(r) ?? []);
+  console.info(`[prodotti] "${query}": ${elenco.length} risultati, ${prodotti.length} con foto e link`);
+  return prodotti;
 }
 
 /**
