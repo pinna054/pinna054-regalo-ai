@@ -265,7 +265,7 @@
       },
       "cookie": {
         "titolo": "Cookies",
-        "testo": "We only use one technical cookie, NEXT_LOCALE, which remembers the language you chose and is deleted when you close the browser. No tracking or third-party cookies. If you open a link to Amazon or Google Shopping, their privacy policies and cookies apply from that point."
+        "testo": "We only use one technical cookie, NEXT_LOCALE, which remembers the language you chose and is deleted when you close the browser. No tracking or third-party cookies. If you open a link to Amazon or Google Shopping, their privacy policies and cookies apply from that point. The Gifty page stores in your browser (local storage, not a cookie) the last questions you saw, only so it doesn't show them again: they don't reach us as a profile and you can delete them by clearing the site data."
       },
       "affiliazione": {
         "titolo": "Affiliate links",

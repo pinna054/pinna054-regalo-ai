@@ -43,7 +43,7 @@ const elenco = z
 const lingua = z.enum(["it", "en"]);
 
 const SchemaRichiesta = z.discriminatedUnion("tipo", [
-  z.object({ tipo: z.literal("domande"), lingua, giro: z.union([z.literal(1), z.literal(2)]), risposte: SchemaRisposte, chieste: elenco }),
+  z.object({ tipo: z.literal("domande"), lingua, giro: z.union([z.literal(1), z.literal(2)]), risposte: SchemaRisposte, chieste: elenco, viste: elenco.optional() }),
   z.object({ tipo: z.literal("dossier"), lingua, risposte: SchemaRisposte }),
   z.object({
     tipo: z.literal("regali"),
@@ -166,7 +166,12 @@ async function provaAi(request: Request) {
 
 /** Risposta senza AI (modalità demo). */
 async function rispostaDemo(r: Richiesta) {
-  if (r.tipo === "domande") return NextResponse.json({ demo: true, ...domandeDemo(r.lingua, r.giro, r.risposte, r.chieste) });
+  if (r.tipo === "domande") {
+    // Prima evitiamo anche le domande viste nelle partite precedenti; se non ne restano abbastanza, solo quelle di questa partita
+    const nuove = domandeDemo(r.lingua, r.giro, r.risposte, [...r.chieste, ...(r.viste ?? [])]);
+    const domande = nuove.questions.length >= DOMANDE_PER_ROUND[r.giro] ? nuove : domandeDemo(r.lingua, r.giro, r.risposte, r.chieste);
+    return NextResponse.json({ demo: true, ...domande });
+  }
   if (r.tipo === "dossier") return NextResponse.json({ demo: true, ...dossierDemo(r.lingua, r.risposte) });
   const { gifts } = regaliDemo(r.lingua, r.risposte, r.piaciute, r.scartate, r.mostrate);
   return NextResponse.json({ demo: true, gifts: await conProdotti(gifts, r) });
@@ -195,7 +200,7 @@ export async function POST(request: Request) {
   const modello = modelloMotore();
   try {
     if (r.tipo === "domande") {
-      const domande = await chiediAlModello(promptDomande(r.lingua, r.risposte, r.giro, r.chieste), SchemaDomande, {
+      const domande = await chiediAlModello(promptDomande(r.lingua, r.risposte, r.giro, r.chieste, (r.viste ?? []).slice(-60)), SchemaDomande, {
         modello,
         // Domande belle e varie: il modello ragiona un po' (il round 2 si prepara mentre l'utente risponde)
         effort: "medium",

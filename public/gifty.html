@@ -530,8 +530,11 @@ function onSkip(){
 }
 
 /* ===================== Il gioco: domande da scorrere ===================== */
+/* Domande già viste nelle partite precedenti (solo in questo browser), per non riproporle */
+function viste(){try{return JSON.parse(localStorage.getItem("gifty_viste")||"[]").slice(-60)}catch(e){return[]}}
+function ricordaViste(qs){try{localStorage.setItem("gifty_viste",JSON.stringify([...viste(),...qs].slice(-60)))}catch(e){}}
 function loadRound(r){
-  return askAI({tipo:"domande",giro:r,risposte:profileForAI(),chieste:S.asked})
+  return askAI({tipo:"domande",giro:r,risposte:profileForAI(),chieste:S.asked,viste:viste()})
     .catch(e=>{if(!e.offline)throw e;setDemo(true);return localRound(r)});
 }
 async function startRound(r){
@@ -545,6 +548,7 @@ async function startRound(r){
     const qs=(data.questions||[]).filter(q=>q&&q.question);
     if(!qs.length)throw new Error("bad");
     qs.forEach(q=>S.asked.push(q.question));
+    ricordaViste(qs.map(q=>q.question));
     S.qdeck=qs.map(q=>({...q,round:r}));
     if(r===1&&data.open_question&&data.open_question.question)S.open=data.open_question;
   }catch(e){S.prefetch=null;S.errorQ=true}

@@ -265,7 +265,7 @@
       },
       "cookie": {
         "titolo": "Cookie",
-        "testo": "Usiamo solo un cookie tecnico, NEXT_LOCALE, che ricorda la lingua scelta e si cancella quando chiudi il browser. Nessun cookie di profilazione o di terze parti. Se apri un link verso Amazon o Google Shopping, da quel momento valgono le loro informative e i loro cookie."
+        "testo": "Usiamo solo un cookie tecnico, NEXT_LOCALE, che ricorda la lingua scelta e si cancella quando chiudi il browser. Nessun cookie di profilazione o di terze parti. Se apri un link verso Amazon o Google Shopping, da quel momento valgono le loro informative e i loro cookie. La pagina di Gifty salva nel tuo browser (memoria locale, non un cookie) le ultime domande che hai visto, solo per non riproportele: non arrivano a noi come profilo e puoi cancellarle svuotando i dati del sito."
       },
       "affiliazione": {
         "titolo": "Link di affiliazione",

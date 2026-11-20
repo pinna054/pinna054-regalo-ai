@@ -12,7 +12,7 @@
 import "server-only";
 import { genere, regolaGenere } from "./genere";
 
-export const VERSIONE_PROMPT_GIFTY = "gifty-v8";
+export const VERSIONE_PROMPT_GIFTY = "gifty-v9";
 
 /** Domande da scorrere per round e idee per lotto. */
 export const DOMANDE_PER_ROUND = { 1: 7, 2: 6 } as const;
@@ -49,7 +49,7 @@ const OBIETTIVO_ROUND: Record<Round, string> = {
 const MIX: Record<Round, { divertenti: number; personali: number }> = { 1: { divertenti: 4, personali: 3 }, 2: { divertenti: 3, personali: 3 } };
 
 /** Esempi di carte belle (e brutte) per ogni tipo di relazione, in italiano con il segnaposto {nome}. */
-const ESEMPI = `Examples of GREAT cards (adapt the spirit, never copy them):
+const ESEMPI = `Examples of GREAT cards, only to show the tone (never reuse their topics, situations, artists or wording):
 - mother, funny: "{nome} ha mai finto di non sentire il telefono per non rispondere alla zia?" · "{nome} canta Laura Pausini a squarciagola quando è sola in macchina?" · "Domenica di {nome}: pranzo per dodici o divano e serie?"
 - mother, personal: "C'è un sogno che {nome} ha messo da parte per la famiglia?" · "{nome} si commuove ancora guardando le vostre foto da piccoli?" · "{nome} conserva ancora le lettere o i disegni di quando eri bambino?"
 - partner, funny: "{nome} ti ruba le patatine dal piatto giurando di non averne voglia?" · "{nome} ha già scelto il nome del cane che non avete?" · "In vacanza {nome}: itinerario al minuto o zero programmi?"
@@ -58,10 +58,76 @@ const ESEMPI = `Examples of GREAT cards (adapt the spirit, never copy them):
 - friend, personal: "C'è una passione che {nome} coltiva da anni senza dirlo quasi a nessuno?" · "{nome} ha un viaggio da sogno di cui parla sempre?"
 BAD cards (never write like this): "A {nome} piace leggere?" · "{nome} è una persona creativa?" · "{nome} ama la musica?" — too generic, a survey, they reveal nothing and nobody laughs.`;
 
+/**
+ * Argomenti per le carte del round 1: a ogni partita se ne pescano a caso tanti quante le carte,
+ * così due persone (o due partite della stessa persona) non ricevono mai le stesse domande.
+ */
+export const TEMI = [
+  "the first thing {nome} does in the morning", "Sunday afternoon habits", "what {nome} orders at the bar",
+  "the dish {nome} would eat every day", "a food {nome} hates that everyone else loves", "street food and late-night snacks",
+  "how {nome} behaves at a wedding or a big party", "the song {nome} knows by heart and sings badly", "concerts and live music",
+  "the TV show {nome} rewatches", "films that make {nome} cry", "podcasts, radio or audiobooks in the car",
+  "social media and what {nome} scrolls", "video games or board games", "the phone: gallery full of what?",
+  "plants, garden or balcony", "pets and animals", "cleaning and tidying obsessions", "how {nome} decorates home",
+  "the dream holiday", "how {nome} packs a suitcase", "a city {nome} would move to tomorrow", "camping, mountains or wild nature",
+  "beach habits", "road trips and the car", "sports {nome} watches and how they react", "sports {nome} actually does",
+  "the gym, walks or zero movement", "a talent {nome} hides", "something {nome} always wanted to learn",
+  "a childhood memory or passion", "something {nome} collects or used to collect", "nostalgia for an era (80s, 90s, 2000s)",
+  "how {nome} handles a free day with no plans", "how {nome} relaxes after a stressful day", "self-care and small luxuries",
+  "fragrances, scents and perfumes", "jewellery, watches or accessories they wear every day", "their bag or backpack: what is inside",
+  "coffee, tea or a ritual drink", "wine, beer, cocktails or none", "cooking: chef, survivor or delivery king",
+  "baking and sweets", "markets, vintage shops and flea markets", "museums, exhibitions and art", "theatre, musicals and shows",
+  "books and how {nome} reads them", "photography and memories", "writing, journaling or letters", "handmade crafts and DIY",
+  "tech gadgets and how {nome} uses them", "how {nome} gives gifts to others", "how {nome} reacts to surprises",
+  "a famous person {nome} adores", "a guilty pleasure {nome} would never admit", "superstitions and little rituals",
+  "the way {nome} spends a rainy day", "nights out vs nights in", "dancing", "how {nome} celebrates their birthday",
+  "how {nome} spends time with friends", "family traditions", "the one thing {nome} always complains about",
+  "a goal {nome} is chasing this year", "a place that is special to {nome}", "sleep: early bird or night owl",
+];
+
+/** Pesca n argomenti diversi a caso. */
+export function temiACaso(n: number): string[] {
+  const copia = [...TEMI];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia.slice(0, n);
+}
+
+/** Stili di carta: anche il modo di chiedere cambia a ogni partita. */
+const STILI = [
+  "imagine a funny scene and ask how {nome} would react",
+  "ask about a very specific habit",
+  "a this-or-that between two surprising, concrete options",
+  "a 'would {nome} ever…' dare",
+  "ask about a small secret only someone close would know",
+  "ask what {nome} would choose in an impossible dilemma",
+  "ask about a memory or a 'first time'",
+];
+
+function temiDiStile(n: number): string[] {
+  const copia = [...STILI].sort(() => Math.random() - 0.5);
+  return Array.from({ length: n }, (_, i) => copia[i % copia.length]);
+}
+
 /** Prompt per un round di domande da scorrere (più, nel round 1, una domanda aperta). */
-export function promptDomande(lingua: Lingua, risposte: Risposta[], round: Round, giaChieste: string[]): string {
+export function promptDomande(
+  lingua: Lingua,
+  risposte: Risposta[],
+  round: Round,
+  giaChieste: string[],
+  visteDiRecente: string[] = [],
+  temi: string[] = temiACaso(MIX[round].divertenti + MIX[round].personali),
+): string {
   const si = lingua === "it" ? "Sì" : "Yes";
   const mix = MIX[round];
+  const stili = temiDiStile(mix.divertenti + mix.personali);
+  const argomenti =
+    round === 1
+      ? `TOPICS FOR THIS GAME (drawn at random so every person gets a different game): write exactly one card per topic, in this order, adapting each topic to the relationship, age and gender:
+${temi.map((t, i) => `${i + 1}. ${t} (style: ${stili[i]})`).join("\n")}`
+      : `Card styles for this round (one each, in any order): ${stili.join("; ")}.`;
   return `You are Gifty, a fox with an extraordinary talent for finding the perfect gift. You ask the giver quick cards to swipe about {nome}. Two goals at once: the giver must have fun proving how well they know {nome}, and every answer must teach you something you will use to choose an unforgettable gift. Write in ${NOME_LINGUA[lingua]}.
 What we know so far ${LEGENDA}:
 ${testoProfilo(risposte)}
@@ -71,6 +137,9 @@ ${regolaGenere(genere(risposte))}
 
 ${OBIETTIVO_ROUND[round]}
 Already asked, never repeat or rephrase: ${giaChieste.join(" | ") || "none"}
+This giver already saw these cards in previous games, never reuse them or their idea: ${visteDiRecente.join(" | ") || "none"}
+${argomenti}
+AVOID THE CLICHÉS everyone asks (cinema or TV series, sea or mountains, sweet or savoury, dog or cat, early bird or night owl, books or films) unless a topic above requires it, and even then find an unusual angle.
 
 Write exactly ${mix.divertenti + mix.personali} cards about {nome}, alternating the two tones:
 - ${mix.divertenti} "funny" cards: cheeky, affectionate, a little absurd, the kind that makes the giver laugh out loud and say "oh yes, that's so them!". Specific everyday situations, habits, quirks and guilty pleasures that only someone close would know. They still reveal tastes useful for a gift.
@@ -83,7 +152,7 @@ Rules:
 - Write {nome} literally as the placeholder for the name. Never invent a name.
 - Concrete and vivid: real situations, places, foods, artists, shows, brands and habits of today. Never abstract traits.
 - Funny never means mean: no sex, politics, religion, health, weight, money troubles or anything that could hurt.
-- Every card starts differently and covers a different area of {nome}'s life.
+- Every card starts differently and covers a different area of {nome}'s life. Avoid the first idea that comes to mind: pick the second or third, more specific one.
 - Fit the age, the relationship and the occasion.
 - For each card a short fox reaction to the left answer and one to the right answer (max 8 words each, playful, {nome} allowed).
 Also write one open question that only someone who really knows {nome} can answer, to catch a precious detail for the gift (an obsession, a story, a dream, something {nome} keeps talking about), with a one-line hint.
